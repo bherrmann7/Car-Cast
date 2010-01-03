@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout android:id="@+id/widget0"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:background="#000"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	
+	<ImageButton android:id="@+id/previous"		
+	    android:src="@drawable/mrewind"
+	    android:layout_width="64px"
+		android:layout_height="43px" android:layout_x="8px"
+		android:layout_y="367px" />
+
+	<ImageButton android:id="@+id/pausePlay" android:layout_height="90px"
+		android:layout_y="315px" android:layout_width="102px"
+		android:layout_x="105px"  android:src="@drawable/mplay" />
+
+	<ImageButton android:id="@+id/next" android:layout_height="43px"
+		android:layout_y="367px" android:layout_width="65px"
+		android:src="@drawable/mforward"
+		android:layout_x="240px"/>
+
+	<ImageButton android:id="@+id/rewind30" android:src="@drawable/mleftarrow"	   
+		android:layout_y="305px" android:layout_height="37px"
+		android:layout_x="8px" android:layout_width="65px"
+		/>
+	
+	<ImageButton android:id="@+id/forward30" android:src="@drawable/mrightarrow"
+		android:layout_height="37px" android:layout_width="65px"
+		android:layout_y="305px" android:layout_x="238px" />
+
+
+
+
+	<TextView android:textSize="10pt"	    
+		android:id="@+id/subscriptionName" 
+		android:layout_width="fill_parent"
+		android:singleLine="true"
+		android:ellipsize="none"
+		android:textColor="#000"
+		android:layout_x="0px" android:text=""
+		android:background="@drawable/subscription_name_bar"
+		android:layout_y="0px" android:layout_height="35px"/>
+
+	<TextView android:textSize="12pt"	
+		android:id="@+id/title" android:layout_width="fill_parent"
+		android:textColor="#FFF"
+		android:textStyle="bold"
+		android:layout_x="0px" android:text=""
+		android:layout_y="35px" android:layout_height="194px"
+		android:background="@drawable/road"
+		/>
+
+	<SeekBar android:id="@+id/progress"
+		style="?android:attr/progressBarStyleHorizontal"		
+		android:layout_x="0px"
+		android:layout_y="230px" android:layout_width="fill_parent"
+		android:layout_height="30px"
+		android:max="100"
+		android:focusable="false"
+		android:progress="0" android:secondaryProgress="0"
+		android:clickable="true" android:scrollbarAlwaysDrawHorizontalTrack="true"
+		android:scrollbarStyle="insideOverlay"/>
+				
+	<TextView android:textSize="9pt"
+		android:id="@+id/location" android:layout_width="wrap_content"
+		android:layout_height="30px" android:layout_x="3px" android:layout_y="260px" android:text="XX:XX"/>
+		
+	<TextView android:textSize="9pt"
+		android:id="@+id/where" android:layout_width="wrap_content"
+		android:layout_height="30px" android:layout_x="130px" android:text="XX:XX" android:layout_y="260px"/>
+		
+	<TextView android:textSize="9pt"
+		android:id="@+id/duration" android:layout_width="wrap_content"
+		android:layout_height="30px" android:layout_y="260px" android:text="XX:XX" android:layout_x="245px" android:gravity="right"/>
+		
+</AbsoluteLayout>

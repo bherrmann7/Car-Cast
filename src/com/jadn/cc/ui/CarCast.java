@@ -1,0 +1,359 @@
+package com.jadn.cc.ui;
+
+import java.util.Arrays;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.RemoteException;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import com.google.android.googlelogin.GoogleLoginServiceHelper;
+import com.jadn.cc.R;
+import com.jadn.cc.core.Config;
+import com.jadn.cc.services.ContentService;
+import com.jadn.cc.trace.ExceptionHandler;
+
+public class CarCast extends BaseActivity {
+	final static String tag = CarCast.class.getSimpleName();
+
+	@Override
+	void onContentService() throws RemoteException {
+		final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
+		if (contentService.isPlaying()) {
+			pausePlay.setImageResource(R.drawable.mpause);
+		} else {
+			pausePlay.setImageResource(R.drawable.mplay);
+		}
+
+		updateUI();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		// Google responding to a name request
+		if (requestCode == 123) {
+			for (String key : data.getExtras().keySet()) {
+				if (key.equals("accounts")) {
+					String accounts = Arrays.toString(data.getExtras().getStringArray(key));
+					SharedPreferences.Editor editor = app_preferences.edit();
+					editor.putString("accounts", accounts);
+					editor.commit();
+				}
+			}
+		}
+
+		updateUI();
+	}
+
+	private SharedPreferences app_preferences;
+
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		ExceptionHandler.register(this);
+
+		try {
+			super.onCreate(savedInstanceState);
+
+			Intent csIntent = new Intent(getApplicationContext(), ContentService.class);
+			startService(csIntent);
+			bindService(csIntent, this, Context.BIND_AUTO_CREATE);
+
+			setTitle("Car Cast " + getVersion());
+
+			app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+			if (!app_preferences.contains("listmax")) {
+				SharedPreferences.Editor editor = app_preferences.edit();
+				editor.putString("listmax", "2");
+				editor.commit();
+			}
+
+			String lastRun = app_preferences.getString("lastRun", null);
+
+			// If it's false (the default) then we need to display an alert
+			// dialog
+			if (lastRun == null) {
+				// Start Splash
+				startActivity(new Intent(this, Splash.class));
+
+				// new AlertDialog.Builder(CarCast.this).setTitle(
+				// "Thanks for trying Car Cast").setMessage(
+				// "Car Cast is a media player for your commute  Enjoy!")
+				// .setNeutralButton("Close", null).show();
+
+				saveLastRun();
+			} else if (app_preferences.getBoolean("showSplash", false)) {
+				// Start Splash
+				startActivity(new Intent(this, Splash.class));
+
+				SharedPreferences.Editor editor = app_preferences.edit();
+				editor.putBoolean("showSplash", false);
+				editor.commit();
+			} else if (!lastRun.equals(releaseData[0])) {
+				new AlertDialog.Builder(CarCast.this).setTitle("Car Cast updated").setMessage(releaseData[1]).setNeutralButton("Close",
+						null).show();
+				saveLastRun();
+			}
+
+			int width = getWindow().getWindowManager().getDefaultDisplay().getWidth();
+			int height = getWindow().getWindowManager().getDefaultDisplay().getHeight();
+			if (width == 320 && height == 480) {
+				setContentView(R.layout.main_relative_g1);
+			} else if (width == 480 && height == 854) {
+				setContentView(R.layout.main_relative_droid);
+			} else {
+				setContentView(R.layout.main_relative);
+
+			}
+
+			ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
+			progressBar.setProgress(0);
+			progressBar.setOnTouchListener(new OnTouchListener() {
+
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					try {
+						contentService.moveTo(event.getX() / 320.0);
+					} catch (RemoteException e) {
+						esay(e);
+					}
+					updateUI();
+					return true;
+				}
+			});
+
+			final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
+			pausePlay.setBackgroundColor(0x0);
+			pausePlay.setSoundEffectsEnabled(true);
+			pausePlay.setImageResource(R.drawable.mplay);
+			pausePlay.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					try {
+						if (contentService.getCount() == 0)
+							return;
+						if (contentService.pauseOrPlay()) {
+							pausePlay.setImageResource(R.drawable.mpause);
+						} else {
+							pausePlay.setImageResource(R.drawable.mplay);
+						}
+						updateUI();
+					} catch (RemoteException e) {
+						esay(e);
+					}
+				}
+			});
+
+			ImageButton rewind30Button = (ImageButton) findViewById(R.id.rewind30);
+			rewind30Button.setBackgroundColor(0x0);
+			rewind30Button.setSoundEffectsEnabled(true);
+			rewind30Button.setOnClickListener(new Bumper(this, -30));
+
+			ImageButton forward60Button = (ImageButton) findViewById(R.id.forward30);
+			forward60Button.setBackgroundColor(0x0);
+			forward60Button.setSoundEffectsEnabled(true);
+			forward60Button.setOnClickListener(new Bumper(this, 30));
+
+			ImageButton nextButton = (ImageButton) findViewById(R.id.next);
+			nextButton.setBackgroundColor(0x0);
+			nextButton.setSoundEffectsEnabled(true);
+			nextButton.setOnClickListener(new BumpCast(this, true));
+
+			ImageButton previousButton = (ImageButton) findViewById(R.id.previous);
+			previousButton.setBackgroundColor(0x0);
+			previousButton.setSoundEffectsEnabled(true);
+			previousButton.setOnClickListener(new BumpCast(this, false));
+
+			TextView textView = (TextView) findViewById(R.id.title);
+			textView.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					try {
+						if (contentService.isPlaying()) {
+							contentService.pause();
+						}
+					} catch (Exception e) {
+						esay(e);
+					}
+
+					pausePlay.setImageResource(R.drawable.mplay);
+					startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
+				}
+			});
+
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+
+		String accounts = app_preferences.getString("accounts", null);
+		if (accounts == null) {
+			GoogleLoginServiceHelper.getAccount(this, 123, true);
+		}
+
+	}
+
+	private void saveLastRun() {
+		SharedPreferences.Editor editor = app_preferences.edit();
+		editor.putString("lastRun", releaseData[0]);
+		if (!app_preferences.contains("listmax")) {
+			editor.putString("listmax", "2");
+		}
+		editor.commit();
+	}
+
+	// Need handler for callbacks to the UI thread
+	final Handler handler = new Handler();
+
+	// Create runnable for posting
+	final Runnable mUpdateResults = new Runnable() {
+		public void run() {
+			updateUI();
+		}
+	};
+
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.options_menu, menu);
+		return true;
+	}
+
+	int bgcolor;
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		try {
+			if (item.getItemId() == R.id.purgeAll) {
+				contentService.purgeAll();
+				return true;
+			}
+			if (item.getItemId() == R.id.downloadNewPodcasts) {
+
+				startActivityForResult(new Intent(this, DownloadProgress.class), 0);
+
+				return true;
+			}
+			if (item.getItemId() == R.id.email) {
+				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+				emailIntent.setType("plain/text");
+				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "" });
+				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Car Cast: about podcast " + contentService.getCurrentTitle());
+				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, contentService.getPodcastEmailSummary());
+				startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
+			}
+			if (item.getItemId() == R.id.feedback) {
+				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+				emailIntent.setType("plain/text");
+				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "bob@jadn.com" });
+				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Car Cast: feedback ");
+				startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
+			}
+			if (item.getItemId() == R.id.settings) {
+				startActivity(new Intent(this, Settings.class));
+				return true;
+			}
+			if (item.getItemId() == R.id.menuSiteList) {
+				startActivityForResult(new Intent(this, Subscriptions.class), 0);
+				return true;
+			}
+			// if (item.getItemId() == R.id.delete) {
+			// startActivityForResult(new Intent(this, Delete.class), 0);
+			// return true;
+			// }
+			if (item.getItemId() == R.id.listPodcasts) {
+				// startActivityForResult(new Intent(this, Search.class), 0);
+				startActivityForResult(new Intent(this, PodcastList.class), 0);
+				return true;
+			}
+		} catch (RemoteException re) {
+			esay(re);
+		}
+		return false;
+	}
+
+	boolean toggleOnPause;
+
+	public void updateUI() {
+		if (contentService == null)
+			return;
+		try {
+			if (!android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+
+				TextView textView = (TextView) findViewById(R.id.title);
+				textView.setText("ERROR ** Car Cast requires the sdcard ** ");
+				return;
+			}
+			if (!Config.CarCastRoot.exists()) {
+				if (!Config.CarCastRoot.mkdirs()) {
+					TextView textView = (TextView) findViewById(R.id.title);
+					textView.setText("ERROR ** Car Cast cannot write to sdcard ** ");
+					return;
+				}
+			}
+
+			TextView textView = (TextView) findViewById(R.id.subscriptionName);
+			textView.setText(contentService.getCurrentSubscriptionName());
+
+			textView = (TextView) findViewById(R.id.title);
+			textView.setText(contentService.getCurrentTitle());
+
+			textView = (TextView) findViewById(R.id.location);
+			if (MediaMode.valueOf(contentService.getMediaMode()) == MediaMode.Paused) {
+				if (toggleOnPause == true) {
+					toggleOnPause = false;
+					textView.setText("");
+				} else {
+					toggleOnPause = true;
+					textView.setText(contentService.getLocationString());
+				}
+			} else {
+				textView.setText(contentService.getLocationString());
+			}
+
+			textView = (TextView) findViewById(R.id.where);
+			textView.setText(contentService.getWhereString());
+
+			textView = (TextView) findViewById(R.id.duration);
+			textView.setText(contentService.getDurationString());
+
+			ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
+			progressBar.setProgress(contentService.currentProgress());
+
+		} catch (Throwable e) {
+			Log.e("cc", "", e);
+		}
+	}
+
+	Updater updater;
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		updater = new Updater(handler, mUpdateResults);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		updater.allDone();
+	}
+
+}

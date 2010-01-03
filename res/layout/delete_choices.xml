@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent" 
+                android:layout_height="wrap_content"
+                android:padding="5px"
+                android:layout_margin="5px"
+                 >                 
+     <Button android:id="@+id/deleteCurrent" 
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content" 
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10px"
+            android:layout_marginTop="10px"
+            android:text="Delete current podcast" />
+              
+     <Button android:id="@+id/deleteToCurrent"
+     		android:layout_below="@id/deleteCurrent"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content" 
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10px"
+            android:layout_marginTop="10px"
+            android:text="Delete up to current podcast" />
+
+     <Button android:id="@+id/deleteAllPodcasts" 
+     		android:layout_below="@id/deleteToCurrent"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content" 
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10px"
+            android:layout_marginTop="10px"
+            android:text="Delete all podcasts" />
+            
+     <Button android:id="@+id/eraseHistory" 
+     		android:layout_below="@id/deleteAllPodcasts"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content" 
+            android:layout_marginTop="10px"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10px"
+            android:text="Erase download history" />
+
+     <Button android:id="@+id/deleteAllSubscriptions" 
+     		android:layout_below="@id/eraseHistory"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content" 
+            android:layout_marginTop="10px"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10px"
+            android:text="Delete all subscriptions" />
+            
+      <Button android:id="@+id/resetToDemoSubscriptions" 
+     		android:layout_below="@id/deleteAllSubscriptions"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content" 
+            android:layout_marginTop="10px"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10px"
+            android:text="Reset to demo subscriptions" />
+</RelativeLayout>

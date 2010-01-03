@@ -1,0 +1,36 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="45dip"
+    >
+
+    <TextView
+        android:textSize="14px"
+        android:id="@+id/firstLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:layout_alignParentTop="true"
+        android:gravity="left"
+        android:text="My Application" />
+    <TextView
+        android:textSize="14px"
+        android:id="@+id/amountHeard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:text="00:00-41:99 " />
+    <TextView
+        android:layout_below="@id/firstLine"
+        android:id="@+id/secondLine"
+        android:textSize="18px"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"        
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:text="Simple application that shows how to use RelativeLayout" />
+</RelativeLayout>

@@ -1,0 +1,17 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<ListPreference android:key="listmax"
+		 android:title="Max downloads"
+		android:entries="@array/maxs"
+		android:entryValues="@array/maxsValues"
+		android:dialogTitle="Max podcasts to download per site per run"
+		 android:summary="Set max number of downloads to obtain from one site in a run"/>
+<CheckBoxPreference android:title="Show Download Details" android:key="downloadDetails"
+ android:summary="Show activity with details about podcast downloading"></CheckBoxPreference>
+<CheckBoxPreference android:title="Enable Splash Screen" android:key="showSplash"
+ android:summary="On startup show splash screen once more"></CheckBoxPreference>
+<CheckBoxPreference android:title="Auto play next" android:key="autoPlayNext"
+	 android:summary="When the current podcast finishes, play the next one"
+	 android:defaultValue="true"
+	 >	 
+	 </CheckBoxPreference>
+</PreferenceScreen>

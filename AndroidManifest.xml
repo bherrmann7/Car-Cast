@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="com.jadn.cc" android:versionCode="54" android:versionName="1.0.54">	
+	<application android:icon="@drawable/icon3" android:label="@string/app_name">
+		<activity android:name=".ui.CarCast" android:label="Car Cast">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity android:name=".ui.AudioRecorder"></activity>
+		<activity android:name=".ui.Delete"></activity>
+		<activity android:name=".ui.Downloader"></activity>
+		<activity android:name=".ui.DownloadProgress" android:screenOrientation="portrait"></activity>
+		<activity android:name=".ui.SubscriptionEdit"></activity>
+		<activity android:name=".ui.Settings"></activity>
+		<activity android:name=".ui.Subscriptions"></activity>
+		<activity android:name=".ui.Search">
+		</activity>
+		<activity android:name=".ui.Splash"/>
+		<activity android:name=".ui.SearchResults"></activity>
+		<activity android:name=".ui.PodcastList"></activity>
+		<service android:name=".services.CCEventService"></service>
+		<service android:name=".services.ContentService" 
+		></service>
+		<receiver android:name=".services.ServiceReceiver"
+			android:enabled="true" android:exported="false"
+			android:label="ServiceReceiver">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="android.net.wifi.supplicant.CONNECTION_CHANGE" />
+			</intent-filter>
+		</receiver>
+	</application>
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.RECORD_AUDIO" />
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH" />
+
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
+	
+</manifest> 
