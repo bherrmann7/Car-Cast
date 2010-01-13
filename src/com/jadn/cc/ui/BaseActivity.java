@@ -70,6 +70,7 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	};
 
 	public final static String[] releaseData = new String[] {
+			"12-Jan", "Fix 'podcast' list font sizes on Droid (for Clyde.)",
 			"2-Jan", "Car Cast is now open source.\n\nsee http://jadn.com/cc/",
 			"27-Dec", "Change Droid layout to use g1 layout (for larger buttons.)",
 			"17-Dec", "Handle feeds with bad lengths, for Matt L",
