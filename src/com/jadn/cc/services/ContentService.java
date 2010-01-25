@@ -15,14 +15,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -37,24 +34,8 @@ import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
 
-public class ContentService extends Service implements ServiceConnection, OnCompletionListener {
+public class ContentService extends Service implements OnCompletionListener {
 
-	private StringBuilder notYetSentMessages = new StringBuilder();
-
-	protected void esay(String message) {
-		if (true)
-			return;
-		notYetSentMessages.append(message);
-		notYetSentMessages.append('|');
-		try {
-			if (eventService != null) {
-				eventService.post(message);
-				notYetSentMessages.setLength(0);
-			}
-		} catch (RemoteException e) {
-			// boo
-		}
-	}
 
 	MetaHolder metaHolder;
 	PlaySet currentSet = PlaySet.PODCASTS;
@@ -118,22 +99,19 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		esay("finished playing: " + currentTitle());
-		cm().setCurrentPos(0);
+		cm().setCurrentPos(-1);
+		cm().save();
 		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("autoPlayNext", true)) {
 			next(true);
-			esay("playing next: " + currentTitle());
 		}
 	}
 
 	void next() {
 		boolean wasPlaying = mediaPlayer.isPlaying();
 		if (wasPlaying) {
-			esay("next while playing: " + currentTitle());
 			mediaPlayer.stop();
 			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
 		} else {
-			esay("next while paused on: " + currentTitle());
 		}
 		next(wasPlaying);
 	}
@@ -156,18 +134,9 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 		current++;
 		if (playing)
 			play();
-		// final TextView textView = (TextView) activity
-		// .findViewById(R.id.summary);
-		// textView.setText(currentTitle());
-		esay("next-ed to: " + currentTitle());
-
 	}
 
 	private void play() {
-		// activity.enableJumpButtons();
-		// final TextView textView = (TextView) activity
-		// .findViewById(R.id.summary);
-		// textView.setText(currentTitle());
 		try {
 			mediaPlayer.reset();
 			if (current >= metaHolder.getSize())
@@ -224,12 +193,10 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 	boolean pauseOrPlay() {
 		try {
 			if (mediaPlayer.isPlaying()) {
-				esay("paused while playing: " + currentTitle());
 				pauseNow();
 				return false;
 			} else {
 				if (mediaMode == MediaMode.Paused) {
-					esay("resumed playing: " + currentTitle());
 					mediaPlayer.start();
 					mediaMode = MediaMode.Playing;
 					// activity.enableJumpButtons();
@@ -239,7 +206,6 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 				return true;
 			}
 		} catch (Exception e) {
-			esay(e.toString());
 			return false;
 		}
 	}
@@ -249,14 +215,14 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 			mediaPlayer.pause();
 			mediaMode = MediaMode.Paused;
 			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
+			cm().save();
 			// say(activity, "paused " + currentTitle());
 			saveState();
 		}
 		// activity.disableJumpButtons();
 	}
 
-	public void bump(int bump) {
-		esay("bumped " + bump);
+	public void bump(int bump) {		
 		if (current >= metaHolder.getSize())
 			return;
 		try {
@@ -269,7 +235,6 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 			}
 			mediaPlayer.seekTo(npos);
 		} catch (Exception e) {
-			esay(e.getMessage());
 		}
 		if (!mediaPlayer.isPlaying()) {
 			saveState();
@@ -511,18 +476,13 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 				if (state == TelephonyManager.CALL_STATE_OFFHOOK || state == TelephonyManager.CALL_STATE_RINGING) {
 					if (mediaPlayer.isPlaying()) {
 						pauseNow();
-						esay("Paused for phone call.");
 						wasPausedByPhoneCall = true;
-						// final ImageButton pausePlay = (ImageButton) activity
-						// .findViewById(R.id.pausePlay);
-						// pausePlay.setImageResource(R.drawable.play);
 					}
 				}
 
 				if (state == TelephonyManager.CALL_STATE_IDLE && wasPausedByPhoneCall) {
 					wasPausedByPhoneCall = false;
 					pauseOrPlay();
-					esay("Play after phone call.");
 				}
 			}
 		};
@@ -540,16 +500,9 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 		// restore state;
 		current = 0;
 
-		bindService(new Intent(getApplicationContext(), CCEventService.class), this, Context.BIND_AUTO_CREATE);
-
 		restoreState();
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		unbindService(this);
-	}
 
 	private final IContentService.Stub binder = new ContentServiceStub(this);
 
@@ -594,18 +547,6 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 			ss[i] = sites.get(i).toString();
 		}
 		return ss;
-	}
-
-	IEventService eventService;
-
-	@Override
-	public void onServiceConnected(ComponentName name, IBinder service) {
-		if (name.getClassName().equals(CCEventService.class.getName()))
-			eventService = IEventService.Stub.asInterface(service);
-	}
-
-	@Override
-	public void onServiceDisconnected(ComponentName name) {
 	}
 
 	DownloadHelper downloadHelper;
@@ -818,4 +759,5 @@ public class ContentService extends Service implements ServiceConnection, OnComp
 		return false;
 	}
 
+	
 }

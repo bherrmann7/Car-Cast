@@ -11,14 +11,11 @@ import android.os.Bundle;
 import android.os.RemoteException;
 
 import com.jadn.cc.core.Subscription;
-import com.jadn.cc.services.CCEventService;
 import com.jadn.cc.services.ContentService;
 import com.jadn.cc.services.IContentService;
 import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
-
-	//IEventService eventService;
 	IContentService contentService;
 
 	public IContentService getContentService() {
@@ -27,33 +24,21 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		Intent ccevent = new Intent(getApplicationContext(),
-				CCEventService.class);
-		// ccevent.putExtra("WifiState", true);
-		this.bindService(ccevent, this, Context.BIND_AUTO_CREATE);
-
+		super.onCreate(savedInstanceState);		
 		this.bindService(new Intent(getApplicationContext(),
 				ContentService.class), this, Context.BIND_AUTO_CREATE);
 	}	
  
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
-		
+		super.onDestroy();		
 		this.unbindService(this);
 	}
 	
-	//private StringBuilder notYetSentMessages = new StringBuilder();
-
 	public void onServiceConnected(android.content.ComponentName name,
 			android.os.IBinder iservice) {		
-//		if (name.getClassName().equals(CCEventService.class.getName()))
-//			//eventService = IEventService.Stub.asInterface(iservice);
-//		else 
 			if (name.getClassName().equals(ContentService.class.getName())){
-			contentService = IContentService.Stub.asInterface(iservice);
+				contentService = IContentService.Stub.asInterface(iservice);
 			try {
 				onContentService();
 			} catch (RemoteException re) {
@@ -62,7 +47,7 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 		}
 	}
 	
-	 abstract void onContentService() throws RemoteException ;
+	abstract void onContentService() throws RemoteException ;
 
 	@Override
 	public void onServiceDisconnected(ComponentName name) {
@@ -123,23 +108,6 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	public static String getVersion() {
 		return releaseData[0];
 	}
-
-//	protected void esay(String message) {
-//		if (true)
-//			return;
-//		try {
-////			if (eventService != null)
-////				eventService.post(message);
-////			else {
-//				if (notYetSentMessages.length() != 0) {
-//					notYetSentMessages.append('|');
-//				}
-//				notYetSentMessages.append(message);
-////			}
-//		} catch (RemoteException e) {
-//			// boo
-//		}
-//	}
 
 
 	protected List<Subscription> getSubscriptions() {

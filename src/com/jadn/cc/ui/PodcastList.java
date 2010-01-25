@@ -19,6 +19,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.jadn.cc.R;
+import com.jadn.cc.services.ContentService;
 import com.jadn.cc.services.MetaFile;
 import com.jadn.cc.services.MetaHolder;
 
@@ -124,7 +125,7 @@ public class PodcastList extends BaseActivity {
 				esay(e);
 				item.put("line1", metaFile.getFeedName());
 			}
-			item.put("xx:xx-xx:xx", ""); //ContentService.getTimeString(metaFile.getCurrentPos()+5)+"-"+ContentService.getTimeString(metaFile.getDuration()));
+			item.put("xx:xx-xx:xx", ContentService.getTimeString(metaFile.getCurrentPos()+5)+"-"+ContentService.getTimeString(metaFile.getDuration()));
 			item.put("line2", metaFile.getTitle());
 			list.add(item);
 

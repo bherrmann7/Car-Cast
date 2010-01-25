@@ -38,7 +38,7 @@ public class AudioRecorder extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				Recording.record();
-				// transiton to record mode
+				// transition to record mode
 				setReadyToRecord(false);
 			}});
 
@@ -164,6 +164,10 @@ public class AudioRecorder extends BaseActivity {
 
 	@Override
 	void onContentService() throws RemoteException {
+		// TODO Auto-generated method stub
+		
 	}
+
+	
 
 }

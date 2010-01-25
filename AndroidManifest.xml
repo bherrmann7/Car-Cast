@@ -20,17 +20,7 @@
 		<activity android:name=".ui.Splash"/>
 		<activity android:name=".ui.SearchResults"></activity>
 		<activity android:name=".ui.PodcastList"></activity>
-		<service android:name=".services.CCEventService"></service>
-		<service android:name=".services.ContentService" 
-		></service>
-		<receiver android:name=".services.ServiceReceiver"
-			android:enabled="true" android:exported="false"
-			android:label="ServiceReceiver">
-			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED" />
-				<action android:name="android.net.wifi.supplicant.CONNECTION_CHANGE" />
-			</intent-filter>
-		</receiver>
+		<service android:name=".services.ContentService"></service>
 	</application>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />

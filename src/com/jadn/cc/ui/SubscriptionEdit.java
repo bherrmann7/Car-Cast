@@ -1,6 +1,5 @@
 package com.jadn.cc.ui; import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.SAXParser;
