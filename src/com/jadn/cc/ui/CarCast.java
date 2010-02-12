@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
@@ -30,6 +32,14 @@ import com.jadn.cc.trace.ExceptionHandler;
 
 public class CarCast extends BaseActivity {
 	final static String tag = CarCast.class.getSimpleName();
+
+	protected PowerManager.WakeLock mWakeLock;
+
+	@Override
+	public void onDestroy() {
+		this.mWakeLock.release();
+		super.onDestroy();
+	}
 
 	@Override
 	void onContentService() throws RemoteException {
@@ -68,6 +78,15 @@ public class CarCast extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		ExceptionHandler.register(this);
+
+		// lifted from http://www.anddev.org/viewtopic.php?p=12381
+		/*
+		 * This code together with the one in onDestroy() will make the screen
+		 * be always on until this Activity gets destroyed.
+		 */
+		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "Car Cast isnt sleepy");
+		this.mWakeLock.acquire();
 
 		try {
 			super.onCreate(savedInstanceState);
@@ -182,26 +201,43 @@ public class CarCast extends BaseActivity {
 			previousButton.setOnClickListener(new BumpCast(this, false));
 
 			TextView textView = (TextView) findViewById(R.id.title);
-			textView.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					try {
-						if (contentService.isPlaying()) {
-							contentService.pause();
-						}
-					} catch (Exception e) {
-						esay(e);
-					}
+			textView.setOnTouchListener(new OnTouchListener() {
 
-					pausePlay.setImageResource(R.drawable.mplay);
-					startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+
+					if (event.getX() < v.getWidth() / 2) {
+						WindowManager.LayoutParams lp = getWindow().getAttributes();
+//						if (lp.screenBrightness<0.5f)
+//							lp.screenBrightness = 100 / 100.0f;
+//						else 
+						 if (event.getY()<v.getHeight()/2) {
+							lp.screenBrightness = 1.00f;
+						 } else {
+						    lp.screenBrightness = 0.05f;							 
+						 }
+					    Log.i("cc", "brighness="+lp.screenBrightness );
+						getWindow().setAttributes(lp);
+
+					} else {
+						try {
+							if (contentService.isPlaying()) {
+								contentService.pause();
+							}
+						} catch (Exception e) {
+							esay(e);
+						}
+
+						pausePlay.setImageResource(R.drawable.mplay);
+						startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
+					}
+					return true;
 				}
 			});
 
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-
 		String accounts = app_preferences.getString("accounts", null);
 		if (accounts == null) {
 			GoogleLoginServiceHelper.getAccount(this, 123, true);
@@ -355,5 +391,7 @@ public class CarCast extends BaseActivity {
 
 		updater.allDone();
 	}
+
+
 
 }
