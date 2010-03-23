@@ -34,7 +34,8 @@ import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
 
-public class ContentService extends Service implements OnCompletionListener {
+public class ContentService extends Service implements OnCompletionListener  {
+
 
 	MetaHolder metaHolder;
 	PlaySet currentSet = PlaySet.PODCASTS;
