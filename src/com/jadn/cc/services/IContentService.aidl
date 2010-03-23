@@ -10,7 +10,6 @@ interface IContentService {
 	void previous();
 	int getCount();
 	String getCurrentPlaySetName();
-	void switchPlaySet(String name);
 	void pause();
 	void purgeAll();
 	void purgeToCurrent();	

@@ -2,8 +2,6 @@ package com.jadn.cc.services;
 
 import android.os.RemoteException;
 
-import com.jadn.cc.core.PlaySet;
-
 public class ContentServiceStub extends IContentService.Stub {
 
 	ContentService contentService;
@@ -107,11 +105,6 @@ public class ContentServiceStub extends IContentService.Stub {
 	public void purgeToCurrent() throws RemoteException {
 		contentService.delete(contentService.current);
 
-	}
-
-	@Override
-	public void switchPlaySet(String name) throws RemoteException {
-		contentService.switchSet(PlaySet.valueOf(name));
 	}
 
 	@Override

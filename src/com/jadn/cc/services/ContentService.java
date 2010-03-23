@@ -36,7 +36,6 @@ import com.jadn.cc.ui.CarCast;
 
 public class ContentService extends Service implements OnCompletionListener {
 
-
 	MetaHolder metaHolder;
 	PlaySet currentSet = PlaySet.PODCASTS;
 	MediaPlayer mediaPlayer = new MediaPlayer();
@@ -222,7 +221,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		// activity.disableJumpButtons();
 	}
 
-	public void bump(int bump) {		
+	public void bump(int bump) {
 		if (current >= metaHolder.getSize())
 			return;
 		try {
@@ -256,6 +255,15 @@ public class ContentService extends Service implements OnCompletionListener {
 			if (location == null) {
 				location = Location.load(stateFile);
 			}
+			tryToSetLocation();
+		} catch (Throwable e) {
+			// bummer.
+		}
+
+	}
+
+	private void tryToSetLocation() {
+		try {
 			if (location == null) {
 				return;
 			}
@@ -372,19 +380,6 @@ public class ContentService extends Service implements OnCompletionListener {
 		DownloadHelper.eraseHistory();
 	}
 
-	public void switchSet(PlaySet playset) {
-		pauseNow();
-		if (currentSet == playset) {
-			return;
-		}
-		saveState();
-		mediaPlayer.reset();
-		currentSet = playset;
-		metaHolder = new MetaHolder();
-		current = 0;
-		restoreState();
-	}
-
 	public void moveTo(double d) {
 		if (mediaMode == MediaMode.UnInitialized) {
 			if (currentDuration() == 0)
@@ -405,20 +400,20 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	void delete(int upTo) {
 		if (mediaPlayer.isPlaying()) {
+			pauseNow();
 			mediaPlayer.stop();
 			mediaPlayer.reset();
 		}
-		current = 0;
 		mediaMode = MediaMode.UnInitialized;
-		location = null;
-
 		if (upTo == -1)
 			upTo = metaHolder.getSize();
 		for (int i = 0; i < upTo; i++) {
 			metaHolder.delete(0);
 		}
 		metaHolder = new MetaHolder();
-		current = 0;
+		tryToSetLocation();
+		if(location==null)
+			current = 0;
 	}
 
 	public int getCount() {
@@ -502,7 +497,6 @@ public class ContentService extends Service implements OnCompletionListener {
 
 		restoreState();
 	}
-
 
 	private final IContentService.Stub binder = new ContentServiceStub(this);
 
@@ -759,5 +753,4 @@ public class ContentService extends Service implements OnCompletionListener {
 		return false;
 	}
 
-	
 }
