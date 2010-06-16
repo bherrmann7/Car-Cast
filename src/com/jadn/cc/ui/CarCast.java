@@ -33,11 +33,9 @@ import com.jadn.cc.trace.ExceptionHandler;
 public class CarCast extends BaseActivity {
 	final static String tag = CarCast.class.getSimpleName();
 
-	protected PowerManager.WakeLock mWakeLock;
-
+	
 	@Override
 	public void onDestroy() {
-		this.mWakeLock.release();
 		super.onDestroy();
 	}
 
@@ -78,15 +76,6 @@ public class CarCast extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		ExceptionHandler.register(this);
-
-		// lifted from http://www.anddev.org/viewtopic.php?p=12381
-		/*
-		 * This code together with the one in onDestroy() will make the screen
-		 * be always on until this Activity gets destroyed.
-		 */
-		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "Car Cast isnt sleepy");
-		this.mWakeLock.acquire();
 
 		try {
 			super.onCreate(savedInstanceState);
@@ -206,6 +195,7 @@ public class CarCast extends BaseActivity {
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
 
+					/** This brightness hack seems to be a bit broken. 
 					if (event.getX() < v.getWidth() / 2) {
 						WindowManager.LayoutParams lp = getWindow().getAttributes();
 //						if (lp.screenBrightness<0.5f)
@@ -220,6 +210,7 @@ public class CarCast extends BaseActivity {
 						getWindow().setAttributes(lp);
 
 					} else {
+					*/
 						try {
 							if (contentService.isPlaying()) {
 								contentService.pause();
@@ -230,7 +221,7 @@ public class CarCast extends BaseActivity {
 
 						pausePlay.setImageResource(R.drawable.mplay);
 						startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
-					}
+					/*}*/
 					return true;
 				}
 			});

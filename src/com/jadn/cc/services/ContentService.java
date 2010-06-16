@@ -36,10 +36,12 @@ import com.jadn.cc.ui.CarCast;
 
 public class ContentService extends Service implements OnCompletionListener  {
 
+	//Jam jam;
+	MediaPlayer mediaPlayer = new MediaPlayer();
 
 	MetaHolder metaHolder;
 	PlaySet currentSet = PlaySet.PODCASTS;
-	MediaPlayer mediaPlayer = new MediaPlayer();
+	
 	// CarCast activity;
 	int current;
 
@@ -148,6 +150,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 			// say(activity, "started " + currentTitle());
 			mediaPlayer.start();
 			mediaMode = MediaMode.Playing;
+			saveState();
 		} catch (Exception e) {
 			TraceUtil.report(e);
 		}
@@ -256,14 +259,14 @@ public class ContentService extends Service implements OnCompletionListener  {
 			if (location == null) {
 				location = Location.load(stateFile);
 			}
-			tryToSetLocation();
+			tryToRestoreLocation();
 		} catch (Throwable e) {
 			// bummer.
 		}
 
 	}
 
-	private void tryToSetLocation() {
+	private void tryToRestoreLocation() {
 		try {
 			if (location == null) {
 				return;
@@ -374,7 +377,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 	}
 
 	public void purgeHeard() {
-		delete(current);
+		deleteUpTo(current);
 	}
 
 	public void eraseHistory() {
@@ -399,7 +402,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 		mediaPlayer.seekTo((int) (d * mediaPlayer.getDuration()));
 	}
 
-	void delete(int upTo) {
+	void deleteUpTo(int upTo) {
 		if (mediaPlayer.isPlaying()) {
 			pauseNow();
 			mediaPlayer.stop();
@@ -412,7 +415,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 			metaHolder.delete(0);
 		}
 		metaHolder = new MetaHolder();
-		tryToSetLocation();
+		tryToRestoreLocation();
 		if(location==null)
 			current = 0;
 	}
@@ -658,6 +661,10 @@ public class ContentService extends Service implements OnCompletionListener  {
 			if (current > 0)
 				current--;
 		}
+		// If we are playing something after what's deleted, adjust the current
+		if (current > position)
+			current--;
+		
 	}
 
 	public void play(int position) {
@@ -671,8 +678,8 @@ public class ContentService extends Service implements OnCompletionListener  {
 	public void setCurrentPaused(int position) {
 		boolean wasPlaying = mediaPlayer.isPlaying();
 		if (wasPlaying) {
-			mediaPlayer.stop();
 			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
+			mediaPlayer.stop();
 		}
 		mediaMode = MediaMode.Paused;
 		current = position;

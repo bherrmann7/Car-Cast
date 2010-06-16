@@ -107,6 +107,7 @@ public class PodcastList extends BaseActivity {
 
 		MetaHolder metaHolder = new MetaHolder();
 		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+		
 
 		for (int i = 0; i < metaHolder.getSize(); i++) {
 			MetaFile metaFile = metaHolder.get(i);
@@ -135,6 +136,7 @@ public class PodcastList extends BaseActivity {
 				// "line2" }, new int[] { R.id.text1, R.id.text2 });
 				R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx","line2" }, new int[] { R.id.firstLine, R.id.amountHeard, R.id.secondLine });
 		listView.setAdapter(notes);
+		
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {

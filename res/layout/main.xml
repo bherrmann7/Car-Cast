@@ -32,7 +32,7 @@
 
 
 
-	<TextView android:textSize="10pt"	    
+	<TextView android:textSize="10dp"	    
 		android:id="@+id/subscriptionName" 
 		android:layout_width="fill_parent"
 		android:singleLine="true"
@@ -42,7 +42,7 @@
 		android:background="@drawable/subscription_name_bar"
 		android:layout_y="0px" android:layout_height="35px"/>
 
-	<TextView android:textSize="12pt"	
+	<TextView android:textSize="12dp"	
 		android:id="@+id/title" android:layout_width="fill_parent"
 		android:textColor="#FFF"
 		android:textStyle="bold"
@@ -62,15 +62,15 @@
 		android:clickable="true" android:scrollbarAlwaysDrawHorizontalTrack="true"
 		android:scrollbarStyle="insideOverlay"/>
 				
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/location" android:layout_width="wrap_content"
 		android:layout_height="30px" android:layout_x="3px" android:layout_y="260px" android:text="XX:XX"/>
 		
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/where" android:layout_width="wrap_content"
 		android:layout_height="30px" android:layout_x="130px" android:text="XX:XX" android:layout_y="260px"/>
 		
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/duration" android:layout_width="wrap_content"
 		android:layout_height="30px" android:layout_y="260px" android:text="XX:XX" android:layout_x="245px" android:gravity="right"/>
 		

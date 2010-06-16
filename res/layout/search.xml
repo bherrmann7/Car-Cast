@@ -8,7 +8,7 @@
     <TextView android:id="@+id/searchLabel"
     android:padding="5px" 
               android:layout_width="fill_parent"
-              android:textSize="9pt"               
+              android:textSize="9dp"               
               android:layout_height="wrap_content"
               android:text="Subscription Search:"/>
 
@@ -28,7 +28,7 @@
     <TextView android:id="@+id/searchLabel2"
   			  android:padding="5px" 
               android:layout_width="fill_parent"
-              android:textSize="7pt"               
+              android:textSize="7dp"               
               android:layout_alignParentLeft="true"            
               android:layout_below="@+id/searchText"
               android:layout_height="wrap_content"

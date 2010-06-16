@@ -13,29 +13,29 @@
 
 
 	<TextView android:id="@+id/labelSubscriptionSites"
-		android:paddingTop="10px" android:textSize="11pt"
+		android:paddingTop="10px" android:textSize="11dp"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_below="@id/AbortDownloads" android:text="Subscriptions" />
 
 	<TextView android:id="@+id/scanning" 
-		android:textSize="11pt" android:layout_width="fill_parent"
+		android:textSize="11dp" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:layout_below="@id/labelSubscriptionSites"
 		android:text="" />
 
 
 	<TextView android:id="@+id/downloadingLabel"
-		android:paddingTop="30px" android:textSize="11pt"
+		android:paddingTop="30px" android:textSize="11dp"
 
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_below="@id/scanning" android:text="Download Progress" />
 
 	<TextView android:id="@+id/progressSimple"
-		 android:textSize="11pt"
+		 android:textSize="11dp"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_below="@id/downloadingLabel" android:text="" />
 
 	<TextView android:id="@+id/progressBytes"
-	 android:textSize="11pt"
+	 android:textSize="11dp"
 		android:layout_width="fill_parent" android:layout_below="@id/progressSimple"
 		android:layout_height="wrap_content" android:text=""
 		android:paddingBottom="20px" 
@@ -50,7 +50,7 @@
 		android:scrollbarStyle="insideOverlay" />
 		
 	<TextView android:id="@+id/subscriptionName"
-	 android:textSize="11pt"
+	 android:textSize="11dp"
 		android:paddingTop="10px" 
 		android:layout_width="fill_parent" android:layout_below="@id/progress"
 		android:layout_height="wrap_content" android:text="fffff"
@@ -58,7 +58,7 @@
 		 />
 
 	<TextView android:id="@+id/title"
-	 android:textSize="11pt"
+	 android:textSize="11dp"
 		android:layout_width="fill_parent" android:layout_below="@id/subscriptionName"
 		android:layout_height="wrap_content" android:text="bbbbb"
 		android:singleLine="true"

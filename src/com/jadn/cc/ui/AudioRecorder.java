@@ -14,7 +14,9 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
@@ -90,10 +92,14 @@ public class AudioRecorder extends BaseActivity {
 			list.add(item);
 
 		}
-		SimpleAdapter notes = new SimpleAdapter(this,
+		/*
+		ArrayAdapter<HashMap<String, String>> notes = new ArrayAdapter<HashMap<String, String>>(this, R.layout.podcast_items, list);
+*/
+	SimpleAdapter notes = new SimpleAdapter(this,
 				list,
 				R.layout.podcast_items, new String[] { "line1", "line2" },
 				new int[] { R.id.firstLine, R.id.secondLine });
+		
 		listView.setAdapter(notes);
 		
 	}

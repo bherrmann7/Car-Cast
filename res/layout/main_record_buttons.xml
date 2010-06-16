@@ -42,7 +42,7 @@
 		android:layout_height="65px" android:layout_width="83px"
 		android:layout_y="290px" android:layout_x="233px" />
 
-	<TextView android:textSize="13pt"
+	<TextView android:textSize="13dp"
 		android:id="@+id/summary" android:layout_width="wrap_content"
 		android:layout_height="150px" android:layout_x="0px" android:layout_y="67px" android:text="PodCastShortName"/>
 
@@ -53,22 +53,22 @@
 		android:max="100"
 		android:progress="0" android:secondaryProgress="0" android:clickable="true"
 		 />
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/location" android:layout_width="wrap_content"
 		android:layout_height="30px" android:layout_x="3px" android:layout_y="260px" android:text="#:##"/>
 		
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/where" android:layout_width="wrap_content"
 		android:layout_height="30px" android:layout_x="130px" android:layout_y="200px" android:text="##/##"/>
 		
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/duration" android:layout_width="wrap_content"
 		android:layout_height="30px" android:layout_x="260px" android:layout_y="260px" android:text="##:##"/>
 
      <TextView android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" android:layout_x="105px" android:layout_y="5px" android:id="@+id/homeCount" android:textSize="9pt" android:text="#"/>
+	android:layout_height="wrap_content" android:layout_x="105px" android:layout_y="5px" android:id="@+id/homeCount" android:textSize="9dp" android:text="#"/>
 
      <TextView android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" android:layout_x="200px" android:layout_y="5px" android:id="@+id/workCount" android:textSize="9pt" android:text="#"/>
+	android:layout_height="wrap_content" android:layout_x="200px" android:layout_y="5px" android:id="@+id/workCount" android:textSize="9dp" android:text="#"/>
 
 </AbsoluteLayout>

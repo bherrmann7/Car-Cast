@@ -98,12 +98,12 @@ public class ContentServiceStub extends IContentService.Stub {
 
 	@Override
 	public void purgeAll() throws RemoteException {
-		contentService.delete(-1);
+		contentService.deleteUpTo(-1);
 	}
 
 	@Override
 	public void purgeToCurrent() throws RemoteException {
-		contentService.delete(contentService.current);
+		contentService.deleteUpTo(contentService.current);
 
 	}
 

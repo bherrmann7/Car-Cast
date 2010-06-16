@@ -28,19 +28,19 @@
 		android:layout_alignParentRight="true"
 		/>
 				
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/location" android:layout_width="wrap_content"
 		android:layout_height="30dip" android:layout_above="@id/pausePlay"
 		android:layout_alignParentLeft="true" android:text="XX:XX"/>
 		
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/where" android:layout_width="wrap_content"
 		android:layout_height="30dip"  android:text="XX:XX"
 		android:layout_above="@id/pausePlay"
 		android:layout_centerInParent="true"
 		/>
 		
-	<TextView android:textSize="9pt"
+	<TextView android:textSize="9dp"
 		android:id="@+id/duration"
 		 android:layout_width="wrap_content"
 		android:layout_height="30dip" 
@@ -74,7 +74,7 @@
 		/>
 	
 		
-<TextView android:textSize="10pt"	    
+<TextView android:textSize="10dp"	    
 		android:id="@+id/subscriptionName" 
 		android:layout_width="fill_parent"
 		android:singleLine="true"
@@ -86,7 +86,7 @@
 		android:layout_height="35dip"
 				/>
 <!-- 		android:background="#c7cbd7  -->		
-<TextView android:textSize="12pt"	
+<TextView android:textSize="12dp"	
 		android:id="@+id/title" android:layout_width="fill_parent"
 		android:layout_height="110dip"		
 		android:textColor="#FFF"

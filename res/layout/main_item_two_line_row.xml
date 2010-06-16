@@ -6,14 +6,14 @@
      android:orientation="vertical">
  
      <TextView android:id="@+id/text1"
-         android:textSize="16px"
+         android:textSize="16dp"
          android:textStyle="bold"
          android:text="sample2"
          android:layout_width="320px"
          android:layout_height="fill_parent"/>
  
      <TextView android:id="@+id/text2"
-         android:textSize="12px"
+         android:textSize="12dp"
          android:textStyle="italic"
          android:text="sample1"
          android:layout_width="320px"
