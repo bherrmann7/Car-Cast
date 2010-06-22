@@ -55,6 +55,8 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	};
 
 	public final static String[] releaseData = new String[] {
+			"22-Jun-2010b", "Fix allowing phone display to turn off (Thanks to Ofer Webman!!), increase font on download screen.",
+		    "22-Jun-2010", "Fix allowing phone display to turn off.\n\nThanks to Ofer Webman!!",
 			"10-Jun-2010", "Fix font sizes on rotated screen.",
 			"12-Jan", "Fix 'podcast' list font sizes on Droid (for Clyde.)",
 			"2-Jan", "Car Cast is now open source.\n\nsee http://jadn.com/cc/",
