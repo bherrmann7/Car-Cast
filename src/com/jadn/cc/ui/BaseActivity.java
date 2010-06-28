@@ -55,6 +55,7 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	};
 
 	public final static String[] releaseData = new String[] {
+         	"24-Jun-2010", "Make Audio Recorder more obvious.\n\nThanks Patrick Forhan!!\n\n'Car Cast Pro' will get this update in about a week.",
 			"22-Jun-2010b", "Fix allowing phone display to turn off (Thanks to Ofer Webman!!), increase font on download screen.",
 		    "22-Jun-2010", "Fix allowing phone display to turn off.\n\nThanks to Ofer Webman!!",
 			"10-Jun-2010", "Fix font sizes on rotated screen.",
@@ -134,6 +135,7 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 		TraceUtil.report(e1);
 	}
 
+	@SuppressWarnings("unchecked")
 	public  static String getVersionName(Context context, Class cls) 
 	{
 	  try {

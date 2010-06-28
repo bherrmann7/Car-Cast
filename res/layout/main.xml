@@ -48,7 +48,7 @@
 		android:textStyle="bold"
 		android:layout_x="0px" android:text=""
 		android:layout_y="35px" android:layout_height="194px"
-		android:background="@drawable/road"
+		android:background="@drawable/carcastbg"
 		/>
 
 	<SeekBar android:id="@+id/progress"

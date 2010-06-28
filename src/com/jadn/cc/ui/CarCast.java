@@ -137,7 +137,7 @@ public class CarCast extends BaseActivity {
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
 					try {
-						contentService.moveTo(event.getX() / 320.0);
+						contentService.moveTo(event.getX() / v.getWidth());
 					} catch (RemoteException e) {
 						esay(e);
 					}
@@ -191,24 +191,13 @@ public class CarCast extends BaseActivity {
 			textView.setOnTouchListener(new OnTouchListener() {
 
 				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-
-					/** This brightness hack seems to be a bit broken. 
-					if (event.getX() < v.getWidth() / 2) {
-						WindowManager.LayoutParams lp = getWindow().getAttributes();
-//						if (lp.screenBrightness<0.5f)
-//							lp.screenBrightness = 100 / 100.0f;
-//						else 
-						 if (event.getY()<v.getHeight()/2) {
-							lp.screenBrightness = 1.00f;
-						 } else {
-						    lp.screenBrightness = 0.05f;							 
-						 }
-					    Log.i("cc", "brighness="+lp.screenBrightness );
-						getWindow().setAttributes(lp);
-
-					} else {
-					*/
+				public boolean onTouch(View v, MotionEvent event) {		
+					if(event.getAction() != MotionEvent.ACTION_UP)
+						return true;
+					// if clicking on the audio recorder (lower 1/3 of screen on 1/2 of right)
+					if ( event.getAction() == MotionEvent.ACTION_UP &&
+							event.getX() > (v.getWidth() * 0.66) && 
+							(event.getY()) > (v.getHeight() * 0.5) ){
 						try {
 							if (contentService.isPlaying()) {
 								contentService.pause();
@@ -219,7 +208,7 @@ public class CarCast extends BaseActivity {
 
 						pausePlay.setImageResource(R.drawable.mplay);
 						startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
-					/*}*/
+					}
 					return true;
 				}
 			});

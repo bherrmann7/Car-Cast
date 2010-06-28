@@ -94,7 +94,7 @@
 		android:text=""
 		android:layout_below="@id/subscriptionName"
 		android:layout_above="@id/progress"
-		android:background="@drawable/road"
+		android:background="@drawable/carcastbg"
 		/>
 		<!-- android:background="#2a3859"  -->
 
