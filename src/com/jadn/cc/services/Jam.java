@@ -1,9 +1,12 @@
 package com.jadn.cc.services;
 
-import android.media.MediaPlayer;
+
+/* Wraps the media player.  Keeps track of current location in the set of podcasts.
+ * responsible for.  pausing, reloading and not losing place,     
+ */
 
 public class Jam {
 	
-	private MediaPlayer mediaPlayer = new MediaPlayer();
+	//private MediaPlayer mediaPlayer = new MediaPlayer();
 
 }

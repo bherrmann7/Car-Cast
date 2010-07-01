@@ -37,7 +37,7 @@ import com.jadn.cc.ui.BaseActivity;
 public class DownloadHelper implements Sayer {
 	int max;
 
-	DownloadHelper(int max) {
+	public DownloadHelper(int max) {
 		this.max = max;
 	}
 
@@ -239,8 +239,8 @@ public class DownloadHelper implements Sayer {
 			// Get the response
 			BufferedReader rd = new BufferedReader(new InputStreamReader(conn
 					.getInputStream()));
-			String line = null;
-			while ((line = rd.readLine()) != null) {
+			//String line = null;
+			while ((rd.readLine()) != null) {
 				// Process line...
 				// Log.d("carcast",line);
 			}
