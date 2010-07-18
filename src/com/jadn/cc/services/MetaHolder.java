@@ -29,8 +29,12 @@ public class MetaHolder {
 			return;
 
 		for (File file : files) {
+			if (file.length()==0){
+				file.delete();
+				continue;				
+			}
 			if (file.getName().endsWith(".mp3")
-					|| file.getName().endsWith(".3gp")) {				
+					|| file.getName().endsWith(".3gp")) {
 				MetaFile meta = new MetaFile(file);
 				metas.add(meta);
 			}

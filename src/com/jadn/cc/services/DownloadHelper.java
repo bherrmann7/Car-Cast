@@ -186,6 +186,12 @@ public class DownloadHelper implements Sayer {
 					tempFile.renameTo(castFile);
 					new MetaFile(newPodcasts.get(i), castFile).save();
 					got++;
+					if(podcastsCurrentBytes != newPodcasts.get(i).getSize()){
+						// subtract out wrong value
+						podcastsTotalBytes -= newPodcasts.get(i).getSize();
+						// add in correct value
+						podcastsTotalBytes += podcastsCurrentBytes;
+					}					
 				}
 			} catch (IOException e) {
 				say("Problem downloading "
