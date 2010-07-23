@@ -13,7 +13,8 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 	TextView tv;
 
 	final Handler handler = new Handler() {
-		public void handleMessage(Message m) {
+		@Override
+        public void handleMessage(Message m) {
 			tv.append(m.getData().getCharSequence("text"));
 		}
 	};

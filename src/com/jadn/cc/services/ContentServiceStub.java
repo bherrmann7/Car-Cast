@@ -1,6 +1,10 @@
 package com.jadn.cc.services;
 
+import java.util.List;
+
 import android.os.RemoteException;
+
+import com.jadn.cc.core.Subscription;
 
 public class ContentServiceStub extends IContentService.Stub {
 
@@ -104,12 +108,11 @@ public class ContentServiceStub extends IContentService.Stub {
 	@Override
 	public void purgeToCurrent() throws RemoteException {
 		contentService.deleteUpTo(contentService.current);
-
 	}
 
 	@Override
-	public void deleteSite(int position) throws RemoteException {
-		contentService.deleteSite(position);
+	public void deleteSubscription(Subscription toDelete) throws RemoteException {
+	    contentService.deleteSubscription(toDelete);
 	}
 
 	@Override
@@ -120,16 +123,6 @@ public class ContentServiceStub extends IContentService.Stub {
 	@Override
 	public String getDownloadProgress() throws RemoteException {
 		return contentService.downloadHelper.sb.toString();
-	}
-
-	@Override
-	public String[] getSites() throws RemoteException {
-		return contentService.getSitesAsString();
-	}
-
-	@Override
-	public void saveSites(String[] sites) throws RemoteException {
-		contentService.saveSubscriptions(sites);
 	}
 
 	@Override
@@ -189,9 +182,20 @@ public class ContentServiceStub extends IContentService.Stub {
 	}
 
 	@Override
-	public boolean addSubscription(String subscription) throws RemoteException {
-		return contentService.addSubscription(subscription);		
+	public boolean addSubscription(Subscription toAdd) throws RemoteException {
+	    return contentService.addSubscription(toAdd);
 	}
+
+	@Override
+	public boolean editSubscription(Subscription original, Subscription modified) throws RemoteException {
+	    return contentService.editSubscription(original, modified);
+	}
+
+    @Override
+    public List<Subscription> getSubscriptions() throws RemoteException {
+       List<Subscription> subscriptions = contentService.getSubscriptions();
+       return subscriptions;
+    }
 
 	
 

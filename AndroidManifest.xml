@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.jadn.cc" android:versionCode="64" android:versionName="1.0.64">
-	<application android:icon="@drawable/icon3" android:label="@string/app_name">
-		<activity android:name=".ui.CarCast" android:label="Car Cast">
+	<application android:icon="@drawable/icon3" android:label="@string/app_name" android:debuggable="true">
+		<activity android:name=".ui.CarCast" android:label="Car Cast" android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />

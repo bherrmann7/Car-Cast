@@ -1,4 +1,4 @@
-package com.jadn.cc.ui; import java.util.ArrayList;
+package com.jadn.cc.ui; import java.util.Collections;
 import java.util.List;
 
 import android.app.Activity;
@@ -52,7 +52,7 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	@Override
 	public void onServiceDisconnected(ComponentName name) {
 		//eventService = null;
-	};
+	}
 
 	public final static String[] releaseData = new String[] {
           	"18-Jul-2010", "Bug Fixes: delete empty files, tweak download progress bar",
@@ -117,14 +117,12 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 
 	protected List<Subscription> getSubscriptions() {
 		try {
-			String[] x = contentService.getSites();
-			if (x==null)
-				return null;
-			List<Subscription> list = Subscription.fromStrings(x);			
-			return list;
+			List<Subscription> subs = contentService.getSubscriptions();
+
+			return subs;
 		} catch (RemoteException re) {
 			esay(re);
-			return new ArrayList<Subscription>();
+			return Collections.emptyList();
 		}
 	}
 	

@@ -17,7 +17,8 @@ public class Updater extends Thread {
 		keepGoing = false;
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		while (keepGoing) {
 			try {
 				Thread.sleep(1000);

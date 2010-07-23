@@ -1,5 +1,4 @@
-package com.jadn.cc.ui; import java.net.MalformedURLException;
-import java.net.URL;
+package com.jadn.cc.ui; import java.net.URL;
 import java.util.List;
 
 import javax.xml.parsers.SAXParser;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
+import com.jadn.cc.core.ExternalMediaStatus;
 import com.jadn.cc.core.Sayer;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.core.Util;
@@ -27,16 +27,17 @@ import com.jadn.cc.services.EnclosureHandler;
 
 public class SubscriptionEdit extends BaseActivity {
 
-	int position;
+	Subscription currentSub;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.editsite);
 
-		position = -1;
+		currentSub = null;
+		
 		if (getIntent().getExtras() != null) {
-			position = getIntent().getExtras().getInt("site");
+            currentSub = (Subscription) getIntent().getExtras().get("subscription");
 		}
 
 		((Button) findViewById(R.id.saveEditSite))
@@ -44,33 +45,36 @@ public class SubscriptionEdit extends BaseActivity {
 
 					@Override
 					public void onClick(View v) {
-
 						String name = ((TextView) findViewById(R.id.editsite_name))
 								.getText().toString();
 						String url = ((TextView) findViewById(R.id.editsite_url))
 								.getText().toString();
+				        // TODO: add max count, ordering here
 						
-						Subscription site = new Subscription();
-						site.name = name;
-						try {
-							site.url = new URL(url);
-						} catch (MalformedURLException e1) {
-							Util.say(SubscriptionEdit.this, "URL to site is malformed."); 
-							return;
-						}						
-						List<Subscription> sites = getSubscriptions();
-						if (sites == null){
+						// try out the url:
+						if (!Util.isValidURL(url)) {
+                            Util.say(SubscriptionEdit.this, "URL to site is malformed."); 
+                            return;
+                        } // endif
+
+						ExternalMediaStatus status = ExternalMediaStatus.getExternalMediaStatus();
+						if (status != ExternalMediaStatus.writeable) {
 							// unable to access sdcard
-							Toast.makeText(getApplicationContext(),"Unable to access sdcard", Toast.LENGTH_LONG);
+							Toast.makeText(getApplicationContext(),"Unable to add subscription to sdcard", Toast.LENGTH_LONG);
 							return;
 						}
-						if(position == -1){
-							sites.add(site);
-						} else {
-							sites.set(position, site);
-						}
+
 						try {
-							contentService.saveSites(Subscription.toStrings(sites));
+						    Subscription newSub = new Subscription(name, url); // TODO add max count, ordering
+						    if (currentSub != null) {
+						        // edit:
+                                contentService.editSubscription(currentSub, newSub);
+
+						    } else {
+						        // add:
+                                contentService.addSubscription(newSub);
+                            } // endif
+
 						} catch (RemoteException e) {
 							esay(e);
 						}
@@ -143,19 +147,11 @@ public class SubscriptionEdit extends BaseActivity {
 
 	@Override
 	void onContentService() throws RemoteException {
-		if (position != -1) {
-			List<Subscription> subs = getSubscriptions();
-			if(subs==null){
-				// can't access sdcard BOBH
-				Toast.makeText(getApplicationContext(),"Unable to access sdcard", Toast.LENGTH_LONG);
-				return;
-			}
-			Subscription site = subs.get(position);			
-
-			((TextView) findViewById(R.id.editsite_name)).setText(site.name);
-			((TextView) findViewById(R.id.editsite_url)).setText(site.url
-					.toString());
-		}
+	    if (currentSub != null) {
+	        ((TextView) findViewById(R.id.editsite_name)).setText(currentSub.name);
+	        ((TextView) findViewById(R.id.editsite_url)).setText(currentSub.url);
+	        // TODO: add max count, ordering here
+        } // endif
 	}
 
 }

@@ -1,6 +1,8 @@
 package com.jadn.cc.ui; import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import com.jadn.cc.R;
+import com.jadn.cc.core.ExternalMediaStatus;
 import com.jadn.cc.core.Subscription;
 
 public class Subscriptions extends BaseActivity {
@@ -42,56 +45,68 @@ public class Subscriptions extends BaseActivity {
 		menu.add("Delete");
 	}
 
-	@Override
+    @Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
+		ListView listView = (ListView) findViewById(R.id.siteList);
+		Map<?, ?> rowData = (Map<?,?>)listView.getAdapter().getItem(info.position);
+
+		Subscription sub = (Subscription)rowData.get("subscription");
 		if (item.getTitle().equals("Delete")) {
 			try {
-				contentService.deleteSite(info.position);
+                contentService.deleteSubscription(sub);
+
 			} catch (RemoteException e) {
 				// humm.
 			}
 			showSites();
 			return false;
-		}
-		if (item.getTitle().equals("Edit")) {
+
+		} else if (item.getTitle().equals("Edit")) {
 			Intent intent = new Intent(this, SubscriptionEdit.class);
-			intent.putExtra("site", info.position);
+            intent.putExtra("subscription", sub);
 			startActivityForResult(intent, info.position);
 		}
 		return true;
 	}
 
 	protected void showSites() {
+		ExternalMediaStatus status = ExternalMediaStatus.getExternalMediaStatus();
 
-		ListView listView = (ListView) findViewById(R.id.siteList);
+        if (status == ExternalMediaStatus.unavailable){
+            Toast.makeText(getApplicationContext(),"Unable to read subscriptions from sdcard", Toast.LENGTH_LONG);
+		    return;
+		}
 
 		List<Subscription> sites = getSubscriptions();
-		if(sites==null){
-			Toast.makeText(getApplicationContext(),"Unable to access sdcard", Toast.LENGTH_LONG);
-		}
-		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+		// sort sites by name:
+        Collections.sort(sites); 
 
-		for (Subscription site : sites) {
-			HashMap<String, String> item = new HashMap<String, String>();
-			item.put("line1", site.name);
-			item.put("line2", site.url.toString());
-			list.add(item);
+        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 
+		for (Subscription sub: sites) {
+			Map<String, Object> item = new HashMap<String, Object>();
+			item.put("name", sub.name);
+			item.put("url", sub.url);
+			item.put("subscription", sub);
+			rows.add(item);
 		}
-		SimpleAdapter notes = new SimpleAdapter(this, list,
-				R.layout.main_item_two_line_row, new String[] { "line1",
-						"line2" }, new int[] { R.id.text1, R.id.text2 });
+
+		SimpleAdapter notes = new SimpleAdapter(this, rows,
+				R.layout.main_item_two_line_row, new String[] { "name",
+						"url" }, new int[] { R.id.text1, R.id.text2 });
+
+		ListView listView = (ListView) findViewById(R.id.siteList);
 		listView.setAdapter(notes);
 	}
 
-	public boolean onCreateOptionsMenu(Menu menu) {
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.editsite_menu, menu);
 		return true;
 	}
-
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {

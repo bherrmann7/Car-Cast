@@ -1,7 +1,11 @@
 
 package com.jadn.cc.services;
 
+import com.jadn.cc.core.Subscription;
+
 interface IContentService {
+    // player status:
+
 	//String[] getPlaySet();
 	void moveTo(in double d);
 	boolean pauseOrPlay();
@@ -13,7 +17,6 @@ interface IContentService {
 	void pause();
 	void purgeAll();
 	void purgeToCurrent();	
-	void eraseHistory();	
 	void play(int position);
 	String getCurrentTitle();	
 	String getCurrentSubscriptionName();	
@@ -22,23 +25,28 @@ interface IContentService {
 	String getWhereString();
 	String getDurationString();
 	int currentProgress();
-	void deleteSite(int position);
+    boolean isPlaying();
+    void setCurrentPaused(int position);
+
+    // ??
+    void eraseHistory();    
+    String startSearch(String search);
+
+    // Podcasts:
 	void deleteCurrentPodcast();
-	void deleteAllSubscriptions();
 	void deletePodcast(int position);
+    String getPodcastEmailSummary();
+
+    // subscription management:
+	void deleteSubscription(in Subscription toDelete);
+	void deleteAllSubscriptions();
 	void resetToDemoSubscriptions();
+    List<Subscription> getSubscriptions();
+    boolean editSubscription(in Subscription original, in Subscription modified);
+    boolean addSubscription(in Subscription toAdd);
 	
+	// download:
 	void startDownloadingNewPodCasts(int max);
 	String getDownloadProgress();
-	String[] getSites();
-	void saveSites(in String[] sites);	
-	
-	String getPodcastEmailSummary();
-	boolean isPlaying();
-	void setCurrentPaused(int position);
-	
-	String startSearch(String search);
-	
 	String encodedDownloadStatus();
-	boolean addSubscription(String subscription);
 }

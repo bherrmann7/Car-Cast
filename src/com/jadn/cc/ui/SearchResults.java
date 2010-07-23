@@ -3,6 +3,7 @@ package com.jadn.cc.ui;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -53,7 +54,8 @@ public class SearchResults extends BaseActivity {
 		menu.add("Subscribe");
 	}
 
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+	@Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		if (item.getItemId() == R.id.searchAgain) {
 			finish();
 			return true;
@@ -62,17 +64,23 @@ public class SearchResults extends BaseActivity {
 		return true;
 	}
 
-	private void add(int position) {
-		Subscription s = getResults().get(position);
-		try {
-			boolean b = contentService.addSubscription(s.name + "=" + s.url);
+	@SuppressWarnings("unchecked")
+    private void add(int position) {
+        ListView listView = (ListView) findViewById(R.id.siteList);
+        Map<String, String> rowData = (Map<String, String>) listView.getAdapter().getItem(position);
+
+        String name = rowData.get("name");
+	    String url = rowData.get("url");
+
+	    try {
+			boolean b = contentService.addSubscription(new Subscription(name, url));
 			if (b) {
 				Toast.makeText(getApplicationContext(),
-						"Added subscription to " + s.name, Toast.LENGTH_LONG)
+						"Added subscription to " + name, Toast.LENGTH_LONG)
 						.show();
 			} else {
 				Toast.makeText(getApplicationContext(),
-						"Already subscribed to " + s.name, Toast.LENGTH_LONG)
+						"Already subscribed to " + name, Toast.LENGTH_LONG)
 						.show();
 			}
 		} catch (RemoteException e) {
@@ -80,7 +88,8 @@ public class SearchResults extends BaseActivity {
 		}
 	}
 
-	public boolean onCreateOptionsMenu(Menu menu) {
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.search_results_menu, menu);
 		return true;
@@ -91,22 +100,7 @@ public class SearchResults extends BaseActivity {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		if (item.getTitle().equals("Subscribe")) {
-			try {
-				Subscription s = getResults().get(info.position);
-				boolean b = contentService
-						.addSubscription(s.name + "=" + s.url);
-				if (b) {
-					Toast.makeText(getApplicationContext(),
-							"Added Subscription to " + s.name,
-							Toast.LENGTH_LONG).show();
-				} else {
-					Toast.makeText(getApplicationContext(),
-							"Already subscribed to " + s.name,
-							Toast.LENGTH_LONG).show();
-				}
-			} catch (RemoteException e) {
-				esay(e);
-			}
+		    add(info.position);
 			return false;
 		}
 		return true;
@@ -118,22 +112,23 @@ public class SearchResults extends BaseActivity {
 			ListView listView = (ListView) findViewById(R.id.siteList);
 
 			List<Subscription> sites = getResults();
-			ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 
 			Toast.makeText(getApplicationContext(),
 					"Found " + sites.size() + " results", Toast.LENGTH_LONG)
 					.show();
 
-			for (Subscription site : sites) {
-				HashMap<String, String> item = new HashMap<String, String>();
-				item.put("line1", site.name);
-				item.put("line2", site.url.toString());
+			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+
+			for (Subscription sub: sites) {
+				Map<String, String> item = new HashMap<String, String>();
+				item.put("name", sub.name);
+				item.put("url", sub.url);
 				list.add(item);
 
 			}
 			SimpleAdapter notes = new SimpleAdapter(this, list,
-					R.layout.main_item_two_line_row, new String[] { "line1",
-							"line2" }, new int[] { R.id.text1, R.id.text2 });
+					R.layout.main_item_two_line_row, new String[] { "name",
+							"url" }, new int[] { R.id.text1, R.id.text2 });
 			listView.setAdapter(notes);
 		} catch (Throwable t) {
 			TraceUtil.report(new RuntimeException("lastResults="+lastResults,t));
@@ -146,13 +141,19 @@ public class SearchResults extends BaseActivity {
 	String lastResults;
 
 	private List<Subscription> getResults() {
-		ArrayList<Subscription> res = new ArrayList<Subscription>();
+		List<Subscription> res = new ArrayList<Subscription>();
 		try {
 			lastResults = contentService.startSearch("-results-");
 			String[] lines = lastResults.split("\\n");
 			for (String line : lines) {
-				if (!line.trim().equals("") && !line.startsWith("#"))
-					res.add(Subscription.fromString(line));
+				if (!line.trim().equals("") && !line.startsWith("#")) {
+				    int eq = line.indexOf('=');
+			        if (eq != -1) {
+			            String name = line.substring(0, eq);
+			            String url = line.substring(eq + 1);
+			            res.add(new Subscription(name, url));
+			        }
+				}
 			}
 		} catch (Exception e) {
 			esay(e);

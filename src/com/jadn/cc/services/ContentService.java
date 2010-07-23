@@ -1,13 +1,6 @@
 package com.jadn.cc.services;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -23,7 +16,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
@@ -36,6 +28,9 @@ import com.jadn.cc.ui.CarCast;
 
 public class ContentService extends Service implements OnCompletionListener  {
 
+    File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
+    File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
+
 	//Jam jam;
 	MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -44,6 +39,8 @@ public class ContentService extends Service implements OnCompletionListener  {
 	
 	// CarCast activity;
 	int current;
+	
+	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
 
 	private int currentDuration() {
 		if (current >= metaHolder.getSize()) {
@@ -113,7 +110,6 @@ public class ContentService extends Service implements OnCompletionListener  {
 		if (wasPlaying) {
 			mediaPlayer.stop();
 			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
-		} else {
 		}
 		next(wasPlaying);
 	}
@@ -180,7 +176,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 
 	enum MediaMode {
 		UnInitialized, Playing, Paused
-	};
+	}
 
 	MediaMode mediaMode = MediaMode.UnInitialized;
 
@@ -238,6 +234,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 			}
 			mediaPlayer.seekTo(npos);
 		} catch (Exception e) {
+		    // do nothing
 		}
 		if (!mediaPlayer.isPlaying()) {
 			saveState();
@@ -424,43 +421,21 @@ public class ContentService extends Service implements OnCompletionListener  {
 		return metaHolder.getSize();
 	}
 
-	public void deleteSite(int position) {
-		List<Subscription> sites = getSites();
-		sites.remove(position);
-		saveSubscriptions(sites);
+	public void deleteSubscription(Subscription sub) {
+	    subHelper.removeSubscription(sub);
 	}
 
-	static File siteListFile = new File(Config.CarCastRoot, "podcasts.txt");
-
-	public List<Subscription> getSites() {
-		if (!siteListFile.exists()) {
-			siteListFile.getParentFile().mkdirs();
-			resetToDemoSubscriptions();
-		}
-		if (!siteListFile.exists()) {
-			return null;
-		}
-		List<Subscription> sites = new ArrayList<Subscription>();
-		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(siteListFile));
-			String line = null;
-			while ((line = dis.readLine()) != null) {
-				try {
-					Subscription site = Subscription.fromString(line);
-					if (site != null)
-						sites.add(site);
-				} catch (Throwable t) {
-					TraceUtil.report(new RuntimeException("line is " + line, t));
-				}
-			}
-			return sites;
-		} catch (Exception e1) {
-			TraceUtil.report(e1);
-			return new ArrayList<Subscription>();
-		}
+	/**
+	 * Gets a Map of URLs to Subscription Name
+	 * 
+	 * @return a map keyed on sub url to value of sub name
+	 */
+	public List<Subscription> getSubscriptions() {
+	    List<Subscription> subscriptions = subHelper.getSubscriptions();
+        return subscriptions;
 	}
 
-	boolean wasPausedByPhoneCall;
+    boolean wasPausedByPhoneCall;
 
 	@Override
 	public void onCreate() {
@@ -507,44 +482,6 @@ public class ContentService extends Service implements OnCompletionListener  {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return binder;
-	}
-
-	protected void saveSubscriptions(String[] sites) {
-		try {
-			DataOutputStream dos = new DataOutputStream(new FileOutputStream(siteListFile));
-			for (String site : sites) {
-				dos.writeBytes(site);
-				dos.writeByte('\n');
-			}
-			dos.close();
-		} catch (IOException e) {
-			// esay(e);
-		}
-
-	}
-
-	public static void saveSubscriptions(List<Subscription> sites) {
-		try {
-			DataOutputStream dos = new DataOutputStream(new FileOutputStream(siteListFile));
-			for (Subscription site : sites) {
-				dos.writeBytes(site.toString());
-				dos.writeByte('\n');
-			}
-			dos.close();
-		} catch (IOException e) {
-			TraceUtil.report(e);
-		}
-	}
-
-	protected String[] getSitesAsString() {
-		List<Subscription> sites = getSites();
-		if (sites == null)
-			return null;
-		String[] ss = new String[sites.size()];
-		for (int i = 0; i < ss.length; i++) {
-			ss[i] = sites.get(i).toString();
-		}
-		return ss;
 	}
 
 	DownloadHelper downloadHelper;
@@ -627,29 +564,11 @@ public class ContentService extends Service implements OnCompletionListener  {
 	}
 
 	public void deleteAllSubscriptions() {
-		saveSubscriptions(new ArrayList<Subscription>());
+		subHelper.deleteAllSubscriptions();
 	}
 
 	public void resetToDemoSubscriptions() {
-		List<Subscription> s = new ArrayList<Subscription>();
-		add(s, "Science Channel=http://www.discovery.com/radio/xml/sciencechannel.xml");
-		add(s, "Quirks and Quarks=http://www.cbc.ca/podcasting/includes/quirks.xml");
-		add(s, "Cringely=http://www.cringely.com/feed/podcast/");
-		add(s, "60 second science=http://rss.sciam.com/sciam/60secsciencepodcast");
-		add(s, "60 second psych=http://rss.sciam.com/sciam/60-second-psych");
-		add(s, "60 second earth=http://rss.sciam.com/sciam/60-second-earth");
-		add(s, "New York Times Tech Talk=http://nytimes.com/services/xml/rss/nyt/podcasts/techtalk.xml");
-		saveSubscriptions(s);
-	}
-
-	private void add(List<Subscription> s, String string) {
-		Subscription sub = null;
-		try {
-			sub = Subscription.fromString(string);
-			s.add(sub);
-		} catch (MalformedURLException url) {
-			// Do I just drop these, or do I mention it?
-		}
+	    subHelper.resetToDemoSubscriptions();
 	}
 
 	public void deletePodcast(int position) {
@@ -716,10 +635,12 @@ public class ContentService extends Service implements OnCompletionListener  {
 			if (mf != null) {
 				sb.append("\nWanted to let you know about this podcast:\n\n");
 				sb.append("\nTitle: " + mf.getTitle());
-				sb.append("\nFeed Title: " + mf.getFeedName());
-				for (Subscription site : getSites()) {
-					if (site.name.equals(mf.getFeedName())) {
-						sb.append("\nFeed URL: " + site.url);
+				String searchName = mf.getFeedName();
+                sb.append("\nFeed Title: " + searchName);
+				List<Subscription> subs = getSubscriptions();
+                for (Subscription sub: subs) {
+					if (sub.name.equals(searchName)) {
+						sb.append("\nFeed URL: " + sub.url);
 						break;
 					}
 				}
@@ -744,21 +665,12 @@ public class ContentService extends Service implements OnCompletionListener  {
 		return status;
 	}
 
-	public boolean addSubscription(String subscription) {
-		List<Subscription> slist = getSites();
-		try {
-			Subscription s = Subscription.fromString(subscription);
-			for (Subscription sub : slist) {
-				if (sub.url.equals(s.url))
-					return false;
-			}
-			slist.add(s);
-			saveSubscriptions(slist);
-			return true;
-		} catch (MalformedURLException e) {
-			Log.e("CarCast", "addSubscription", e);
-		}
-		return false;
+	public boolean editSubscription(Subscription original, Subscription modified) {
+	    return subHelper.editSubscription(original, modified);
+	}
+
+	public boolean addSubscription(Subscription toAdd) {
+	    return subHelper.addSubscription(toAdd);
 	}
 
 }

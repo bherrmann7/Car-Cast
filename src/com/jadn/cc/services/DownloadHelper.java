@@ -1,17 +1,6 @@
 package com.jadn.cc.services;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -28,7 +17,6 @@ import org.xml.sax.XMLReader;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.jadn.cc.core.Config;
 import com.jadn.cc.core.PlaySet;
 import com.jadn.cc.core.Sayer;
 import com.jadn.cc.core.Subscription;
@@ -43,7 +31,6 @@ public class DownloadHelper implements Sayer {
 
 	private static File histFile = new File(PlaySet.PODCASTS.getRoot(),
 			"history.prop");
-	private static File siteList = new File(Config.CarCastRoot, "podcasts.txt");
 
 	TextView tv;
 
@@ -70,17 +57,7 @@ public class DownloadHelper implements Sayer {
 			String accounts) {
 		say("loading podcast sites.");
 
-		if (!siteList.exists()) {
-			PrintWriter pw;
-			try {
-				pw = new PrintWriter(new FileWriter(siteList));
-				pw.close();
-			} catch (IOException e) {
-				say("Blast: " + e);
-			}
-		}
-
-		List<Subscription> sites = loadSites();
+		List<Subscription> sites = contentService.getSubscriptions();
 
 		postSitesToJadn(accounts, sites);
 
@@ -96,31 +73,40 @@ public class DownloadHelper implements Sayer {
 		EnclosureHandler encloseureHandler = new EnclosureHandler(max, history,
 				this);
 
-		for (int i = 0; i < sites.size(); i++) {
-			try {
-				URL url = sites.get(i).url;
-				int foundStart = encloseureHandler.metaNets.size();
-				encloseureHandler.max = max;
+		for (Subscription sub : sites) {
+            try {
+                URL url = new URL(sub.url);
+                int foundStart = encloseureHandler.metaNets.size();
+                if (sub.maxDownloads == -1) {
+                    encloseureHandler.max = max;
 
-				SAXParser sp = spf.newSAXParser();
-				XMLReader xr = sp.getXMLReader();
-				xr.setContentHandler(encloseureHandler);
-				encloseureHandler.setFeedName(sites.get(i).name);
-				xr.parse(new InputSource(url.openStream()));
+                } else {
+                    encloseureHandler.max = sub.maxDownloads;
+                } // endif
 
-				String message = (i + 1) + "/" + sites.size() + ": "
-						+ sites.get(i).name + " "
-						+ (encloseureHandler.metaNets.size() - foundStart)
-						+ " podcasts";
-				say(message);
-				contentService.updateNotification(message);
-			} catch (Throwable e) {
-				/* Display any Error to the GUI. */
-				say("Error: " + e.getMessage());
-				Log.e("BAH", "bad", e);
-			}
-			sitesScanned = i + 1;
-		}
+                SAXParser sp = spf.newSAXParser();
+                XMLReader xr = sp.getXMLReader();
+                xr.setContentHandler(encloseureHandler);
+                String name = sub.name;
+                encloseureHandler.setFeedName(name);
+                xr.parse(new InputSource(url.openStream()));
+
+                String message = sitesScanned + "/" + sites.size() + ": "
+                        + name + " "
+                        + (encloseureHandler.metaNets.size() - foundStart)
+                        + " podcasts";
+                say(message);
+                contentService.updateNotification(message);
+
+            } catch (Throwable e) {
+                /* Display any Error to the GUI. */
+                say("Error: " + e.getMessage());
+                Log.e("BAH", "bad", e);
+            }
+            sitesScanned++;
+
+		} // endforeach
+
 		say("total enclosures " + encloseureHandler.metaNets.size());
 
 		List<MetaNet> newPodcasts = new ArrayList<MetaNet>();
@@ -218,12 +204,12 @@ public class DownloadHelper implements Sayer {
 			// Construct data
 			StringBuilder data = new StringBuilder();
 			boolean first = true;
-			for (Subscription subscription : sites) {
+			for (Subscription sub : sites) {
 				if (first)
 					first = false;
 				else
 					data.append('|');
-				data.append(subscription.url);
+				data.append(sub.url);
 			}
 
 			// Send data
@@ -257,41 +243,6 @@ public class DownloadHelper implements Sayer {
 
 		}
 
-	}
-
-	public static List<Subscription> loadSites() {
-		List<Subscription> sites = new ArrayList<Subscription>();
-		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(
-					siteList));
-			String line = null;
-			while ((line = dis.readLine()) != null) {
-				int eq = line.indexOf('=');
-				if (eq != -1) {
-					Subscription site = new Subscription();
-					site.name = line.substring(0, eq);
-					site.url = new URL(line.substring(eq + 1));
-					sites.add(site);
-				}
-			}
-			return sites;
-		} catch (Exception e1) {
-			// say("problem loading list of podcasts: " + e1);
-			return new ArrayList<Subscription>();
-		}
-	}
-
-	public static void saveSites(List<Subscription> sites) {
-		try {
-			DataOutputStream dos = new DataOutputStream(new FileOutputStream(
-					siteList));
-			for (Subscription site : sites) {
-				dos.writeBytes(site.name + "=" + site.url + "\n");
-			}
-			dos.close();
-		} catch (IOException e) {
-			// esay(e);
-		}
 	}
 
 	// Deal with servers with "location" instead of "Location" in redirect

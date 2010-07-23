@@ -1,53 +1,60 @@
 package com.jadn.cc.core;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Subscription {
+public class Subscription implements Parcelable, Comparable<Subscription> {
 
-	public String name;
-	public URL url;
+    public final String             name;
+    public final String             url;
+    public final int                maxDownloads;
+    public final OrderingPreference orderingPreference;
 
-	public static List<Subscription> fromStrings(String[] sites) {
-		List<Subscription> sitesList = new ArrayList<Subscription>();
-		for (String siteString : sites) {
-			int pipe = siteString.indexOf('=');
-			Subscription site = new Subscription();
-			site.name = siteString.substring(0, pipe);
-			try {
-				site.url = new URL(siteString.substring(pipe + 1));
-				// dont add it if the url is bad
-				sitesList.add(site);
-			} catch (MalformedURLException e) {
-			}
-		}
-		return sitesList;
-	}
+    public Subscription(String name, String url) {
+        this(name, url, -1, OrderingPreference.FIFO);
+    }
 
-	public static String[] toStrings(List<Subscription> sites) {
-		String[] ss = new String[sites.size()];
-		for (int i = 0; i < ss.length; i++) {
-			ss[i] = sites.get(i).toString();
-		}
-		return ss;
-	}
+    public Subscription(String name, String url, int maxDownloads, OrderingPreference orderingPreference) {
+        this.name = name;
+        this.url = url;
+        this.maxDownloads = maxDownloads;
+        this.orderingPreference = orderingPreference;
+    }
 
-	@Override
-	public String toString() {
-		return name + "=" + url;
-	}
+    @Override
+    public String toString() {
+        return "Subscription: url=" + url + " ; name="+ name + "; max=" + maxDownloads + " ; ordering=" + orderingPreference;
+    }
 
-	public static Subscription fromString(String line) throws MalformedURLException {
-		int eq = line.indexOf('=');
-		if (eq != -1) {
-			Subscription site = new Subscription();
-			site.name = line.substring(0, eq);
-			site.url = new URL(line.substring(eq + 1));
-			return site;
-		}
-		return null;
-	}
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(url);
+        dest.writeInt(maxDownloads);
+        dest.writeInt(orderingPreference.ordinal());
+    }
+
+    public static final Parcelable.Creator<Subscription> CREATOR = new Parcelable.Creator<Subscription>() {
+         public Subscription createFromParcel(Parcel in) {
+             return new Subscription(in.readString(),   // name
+                                     in.readString(),   // URL
+                                     in.readInt(),      // max count
+                                     OrderingPreference.values()[in.readInt()]); // order pref
+         }
+
+         public Subscription[] newArray(int size) {
+             return new Subscription[size];
+         }
+     };
+
+    @Override
+    public int compareTo(Subscription another) {
+        return name.compareTo(another.name);
+    }
 
 }

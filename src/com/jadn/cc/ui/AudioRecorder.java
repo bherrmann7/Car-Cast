@@ -143,7 +143,8 @@ public class AudioRecorder extends BaseActivity {
 		
 	}
 
-	public boolean onCreateOptionsMenu(Menu menu) {
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.audio_recorder_menu, menu);
 		return true;
