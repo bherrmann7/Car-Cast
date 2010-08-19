@@ -41,14 +41,13 @@ public class DownloadHelper implements Sayer {
 		this.max = max;
 	}
 
-	private static File histFile = new File(PlaySet.PODCASTS.getRoot(),
-			"history.prop");
 	private static File siteList = new File(Config.CarCastRoot, "podcasts.txt");
 
-	private List<String> history;
 	TextView tv;
 
 	StringBuilder newText = new StringBuilder();
+	
+	DownloadHistory history = DownloadHistory.getInstance();
 
 	int totalSites;
 	int sitesScanned;
@@ -90,7 +89,6 @@ public class DownloadHelper implements Sayer {
 
 		totalSites = sites.size();
 
-		history = getHistory();
 		say("History of downloads contains " + history.size() + " podcasts.");
 
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -165,7 +163,6 @@ public class DownloadHelper implements Sayer {
 				// trust the filename, so it could use some reworking
 				if (castFile.exists()) {
 					say("Skipping already have: " + shortName);
-					addToHistory(shortName);
 					history.add(shortName);
 				} else {
 					currentSubscription = newPodcasts.get(i).getSubscription();
@@ -185,7 +182,7 @@ public class DownloadHelper implements Sayer {
 					// add before rename, so if rename fails, we remember
 					// that we tried this file and skip it next time.
 					
-					addToHistory(shortName);
+					history.add(shortName);
 
 					tempFile.renameTo(castFile);
 					new MetaFile(newPodcasts.get(i), castFile).save();
@@ -334,39 +331,6 @@ public class DownloadHelper implements Sayer {
 	public void say(String text) {
 		sb.append(text);
 		sb.append('\n');
-	}
-
-	/**
-	 * @param shortName
-	 */
-	private void addToHistory(String shortName) {
-		history.add(shortName);
-		try {
-			PrintWriter histOut = new PrintWriter(new FileWriter(histFile,true));
-			histOut.println(shortName);
-			histOut.close();
-		} catch (IOException e) {
-			say("problem writing history file: " + histFile + " ex:" + e);
-		}
-	}
-
-	public static void eraseHistory() {
-		histFile.delete();
-	}
-
-	public static List<String> getHistory() {
-		List<String> history = new ArrayList<String>();
-		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(
-					histFile));
-			String line = null;
-			while ((line = dis.readLine()) != null) {
-				history.add(line);
-			}
-		} catch (Exception e) {
-			Log.e(DownloadHelper.class.getName(), e.toString());
-		}
-		return history;
 	}
 
 }

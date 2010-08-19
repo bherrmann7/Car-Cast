@@ -20,12 +20,12 @@ public class EnclosureHandler extends DefaultHandler {
 	
 	public List<MetaNet> metaNets = new ArrayList<MetaNet>();
 	public int max;
-	List<String> history;
+	DownloadHistory history;
 	Sayer sayer;
 
 	public String title = "";
 
-	public EnclosureHandler(int max, List<String> history, Sayer sayer) {
+	public EnclosureHandler(int max, DownloadHistory history, Sayer sayer) {
 		this.max = max;
 		this.history = history;
 		this.sayer = sayer;
