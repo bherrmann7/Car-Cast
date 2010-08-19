@@ -45,6 +45,7 @@ public class DownloadHelper implements Sayer {
 			"history.prop");
 	private static File siteList = new File(Config.CarCastRoot, "podcasts.txt");
 
+	private List<String> history;
 	TextView tv;
 
 	StringBuilder newText = new StringBuilder();
@@ -89,7 +90,7 @@ public class DownloadHelper implements Sayer {
 
 		totalSites = sites.size();
 
-		List<String> history = getHistory();
+		history = getHistory();
 		say("History of downloads contains " + history.size() + " podcasts.");
 
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -164,6 +165,7 @@ public class DownloadHelper implements Sayer {
 				// trust the filename, so it could use some reworking
 				if (castFile.exists()) {
 					say("Skipping already have: " + shortName);
+					addToHistory(shortName);
 					history.add(shortName);
 				} else {
 					currentSubscription = newPodcasts.get(i).getSubscription();
@@ -182,7 +184,9 @@ public class DownloadHelper implements Sayer {
 					is.close();
 					// add before rename, so if rename fails, we remember
 					// that we tried this file and skip it next time.
-					history.add(shortName);
+					
+					addToHistory(shortName);
+
 					tempFile.renameTo(castFile);
 					new MetaFile(newPodcasts.get(i), castFile).save();
 					got++;
@@ -197,15 +201,6 @@ public class DownloadHelper implements Sayer {
 				say("Problem downloading "
 						+ newPodcasts.get(i).getUrlShortName() + " e:" + e);
 			}
-		}
-		try {
-			PrintWriter histOut = new PrintWriter(new FileWriter(histFile));
-			for (String line : history) {
-				histOut.println(line);
-			}
-			histOut.close();
-		} catch (IOException e) {
-			say("problem writting history file: " + histFile + " ex:" + e);
 		}
 		say("finished downloading. Got " + got + " new podcasts.");
 
@@ -335,11 +330,24 @@ public class DownloadHelper implements Sayer {
 	}
 
 	StringBuilder sb = new StringBuilder();
-
 	@Override
 	public void say(String text) {
 		sb.append(text);
 		sb.append('\n');
+	}
+
+	/**
+	 * @param shortName
+	 */
+	private void addToHistory(String shortName) {
+		history.add(shortName);
+		try {
+			PrintWriter histOut = new PrintWriter(new FileWriter(histFile,true));
+			histOut.println(shortName);
+			histOut.close();
+		} catch (IOException e) {
+			say("problem writing history file: " + histFile + " ex:" + e);
+		}
 	}
 
 	public static void eraseHistory() {
@@ -359,7 +367,6 @@ public class DownloadHelper implements Sayer {
 			Log.e(DownloadHelper.class.getName(), e.toString());
 		}
 		return history;
-		
 	}
 
 }
