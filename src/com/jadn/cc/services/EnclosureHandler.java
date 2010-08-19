@@ -107,7 +107,7 @@ public class EnclosureHandler extends DefaultHandler {
 					MetaNet metaNet = new MetaNet(feedName, new URL(atts
 							.getValue("url")),length);
 					metaNet.setTitle(lastTitle);
-					if (history.contains(metaNet.getUrlShortName())) {
+					if (history.contains(metaNet)) {
 						// stop getting podcasts after we find one in our
 						// history.
 						max = STOP;

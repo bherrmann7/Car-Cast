@@ -55,15 +55,15 @@ public class DownloadHistory implements Sayer {
 	/**
 	 * Add a item to the history
 	 * 
-	 * @param shortName
+	 * @param url
 	 *            the filename to be added
 	 */
-	public void add(String shortName) {
-		history.add(shortName);
+	public void add(MetaNet url) {
+		history.add(url.getUrl());
 		try {
 			PrintWriter histOut = new PrintWriter(
 					new FileWriter(histFile, true));
-			histOut.println(shortName);
+			histOut.println(url);
 			histOut.close();
 		} catch (IOException e) {
 			say("problem writing history file: " + histFile + " ex:" + e);
@@ -89,12 +89,12 @@ public class DownloadHistory implements Sayer {
 	/**
 	 * Check if a item is in the history
 	 * 
-	 * @param urlShortName
+	 * @param url
 	 *            the item to check for
 	 * @return true it the item is in the history
 	 */
-	public boolean contains(String urlShortName) {
-		return history.contains(urlShortName);
+	public boolean contains(MetaNet url) {
+		return history.contains(url.getUrl());
 	}
 
 	StringBuilder sb = new StringBuilder();

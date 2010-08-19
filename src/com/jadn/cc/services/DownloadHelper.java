@@ -124,7 +124,7 @@ public class DownloadHelper implements Sayer {
 
 		List<MetaNet> newPodcasts = new ArrayList<MetaNet>();
 		for (MetaNet metaNet : encloseureHandler.metaNets) {
-			if (history.contains(metaNet.getUrlShortName()))
+			if (history.contains(metaNet))
 				continue;
 			newPodcasts.add(metaNet);
 		}
@@ -163,7 +163,7 @@ public class DownloadHelper implements Sayer {
 				// trust the filename, so it could use some reworking
 				if (castFile.exists()) {
 					say("Skipping already have: " + shortName);
-					history.add(shortName);
+					history.add(newPodcasts.get(i));
 				} else {
 					currentSubscription = newPodcasts.get(i).getSubscription();
 					currentTitle = newPodcasts.get(i).getTitle();
@@ -182,7 +182,7 @@ public class DownloadHelper implements Sayer {
 					// add before rename, so if rename fails, we remember
 					// that we tried this file and skip it next time.
 					
-					history.add(shortName);
+					history.add(newPodcasts.get(i));
 
 					tempFile.renameTo(castFile);
 					new MetaFile(newPodcasts.get(i), castFile).save();
