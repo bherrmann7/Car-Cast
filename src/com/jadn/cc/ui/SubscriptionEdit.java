@@ -23,6 +23,7 @@ import com.jadn.cc.core.Sayer;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.core.Util;
 import com.jadn.cc.services.DownloadHelper;
+import com.jadn.cc.services.DownloadHistory;
 import com.jadn.cc.services.EnclosureHandler;
 
 public class SubscriptionEdit extends BaseActivity {
@@ -98,7 +99,7 @@ public class SubscriptionEdit extends BaseActivity {
 								.getText().toString();
 
 						SAXParserFactory spf = SAXParserFactory.newInstance();
-						List<String> history = DownloadHelper.getHistory();
+						DownloadHistory history = DownloadHistory.getInstance();
 						EnclosureHandler encloseureHandler = new EnclosureHandler(
 								Config.getMax(SubscriptionEdit.this), history,
 								new Sayer() {

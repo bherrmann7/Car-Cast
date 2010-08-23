@@ -45,6 +45,8 @@ public class DownloadHelper implements Sayer {
 	TextView tv;
 
 	StringBuilder newText = new StringBuilder();
+	
+	DownloadHistory history = DownloadHistory.getInstance();
 
 	int totalSites;
 	int sitesScanned;
@@ -75,7 +77,6 @@ public class DownloadHelper implements Sayer {
 
 		totalSites = sites.size();
 
-		List<String> history = getHistory();
 		say("History of downloads contains " + history.size() + " podcasts.");
 
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -117,7 +118,7 @@ public class DownloadHelper implements Sayer {
 
 		List<MetaNet> newPodcasts = new ArrayList<MetaNet>();
 		for (MetaNet metaNet : encloseureHandler.metaNets) {
-			if (history.contains(metaNet.getUrlShortName()))
+			if (history.contains(metaNet))
 				continue;
 			newPodcasts.add(metaNet);
 		}
@@ -151,7 +152,7 @@ public class DownloadHelper implements Sayer {
 				// trust the filename, so it could use some reworking
 				if (castFile.exists()) {
 					say("Skipping already have: " + shortName);
-					history.add(shortName);
+					history.add(newPodcasts.get(i));
 				} else {
 					currentSubscription = newPodcasts.get(i).getSubscription();
 					currentTitle = newPodcasts.get(i).getTitle();
@@ -168,7 +169,9 @@ public class DownloadHelper implements Sayer {
 					is.close();
 					// add before rename, so if rename fails, we remember
 					// that we tried this file and skip it next time.
-					history.add(shortName);
+					
+					history.add(newPodcasts.get(i));
+
 					tempFile.renameTo(castFile);
 					new MetaFile(newPodcasts.get(i), castFile).save();
 					got++;
@@ -182,15 +185,6 @@ public class DownloadHelper implements Sayer {
 			} catch (IOException e) {
 				say("Problem downloading " + newPodcasts.get(i).getUrlShortName() + " e:" + e);
 			}
-		}
-		try {
-			PrintWriter histOut = new PrintWriter(new FileWriter(histFile));
-			for (String line : history) {
-				histOut.println(line);
-			}
-			histOut.close();
-		} catch (IOException e) {
-			say("problem writting history file: " + histFile + " ex:" + e);
 		}
 		say("finished downloading. Got " + got + " new podcasts.");
 
@@ -282,30 +276,10 @@ public class DownloadHelper implements Sayer {
 	}
 
 	StringBuilder sb = new StringBuilder();
-
 	@Override
 	public void say(String text) {
 		sb.append(text);
 		sb.append('\n');
-	}
-
-	public static void eraseHistory() {
-		histFile.delete();
-	}
-
-	public static List<String> getHistory() {
-		List<String> history = new ArrayList<String>();
-		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(histFile));
-			String line = null;
-			while ((line = dis.readLine()) != null) {
-				history.add(line);
-			}
-		} catch (Exception e) {
-			Log.e(DownloadHelper.class.getName(), e.toString());
-		}
-		return history;
-
 	}
 
 }
