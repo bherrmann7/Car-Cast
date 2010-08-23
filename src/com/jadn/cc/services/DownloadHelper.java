@@ -40,8 +40,6 @@ public class DownloadHelper implements Sayer {
 		this.max = max;
 	}
 
-	private static File siteList = new File(Config.CarCastRoot, "podcasts.txt");
-
 	TextView tv;
 
 	StringBuilder newText = new StringBuilder();
