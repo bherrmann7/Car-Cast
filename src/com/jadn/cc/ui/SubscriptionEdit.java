@@ -1,6 +1,4 @@
 package com.jadn.cc.ui; import java.net.URL;
-import java.util.List;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -22,7 +20,6 @@ import com.jadn.cc.core.ExternalMediaStatus;
 import com.jadn.cc.core.Sayer;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.core.Util;
-import com.jadn.cc.services.DownloadHelper;
 import com.jadn.cc.services.DownloadHistory;
 import com.jadn.cc.services.EnclosureHandler;
 
