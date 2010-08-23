@@ -378,7 +378,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public void eraseHistory() {
-		DownloadHelper.eraseHistory();
+		DownloadHistory.eraseHistory();
 	}
 
 	public void moveTo(double d) {
