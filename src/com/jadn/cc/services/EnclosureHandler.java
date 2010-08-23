@@ -20,12 +20,12 @@ public class EnclosureHandler extends DefaultHandler {
 	
 	public List<MetaNet> metaNets = new ArrayList<MetaNet>();
 	public int max;
-	List<String> history;
+	DownloadHistory history;
 	Sayer sayer;
 
 	public String title = "";
 
-	public EnclosureHandler(int max, List<String> history, Sayer sayer) {
+	public EnclosureHandler(int max, DownloadHistory history, Sayer sayer) {
 		this.max = max;
 		this.history = history;
 		this.sayer = sayer;
@@ -107,7 +107,7 @@ public class EnclosureHandler extends DefaultHandler {
 					MetaNet metaNet = new MetaNet(feedName, new URL(atts
 							.getValue("url")),length);
 					metaNet.setTitle(lastTitle);
-					if (history.contains(metaNet.getUrlShortName())) {
+					if (history.contains(metaNet)) {
 						// stop getting podcasts after we find one in our
 						// history.
 						max = STOP;
