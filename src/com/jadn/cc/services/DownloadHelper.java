@@ -35,8 +35,6 @@ public class DownloadHelper implements Sayer {
 		this.max = max;
 	}
 
-	private static File histFile = new File(PlaySet.PODCASTS.getRoot(), "history.prop");
-
 	TextView tv;
 
 	StringBuilder newText = new StringBuilder();
