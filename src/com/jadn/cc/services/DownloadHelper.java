@@ -1,6 +1,16 @@
 package com.jadn.cc.services;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -14,6 +24,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import android.app.Service;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -29,8 +40,7 @@ public class DownloadHelper implements Sayer {
 		this.max = max;
 	}
 
-	private static File histFile = new File(PlaySet.PODCASTS.getRoot(),
-			"history.prop");
+	private static File histFile = new File(PlaySet.PODCASTS.getRoot(), "history.prop");
 
 	TextView tv;
 
@@ -48,21 +58,20 @@ public class DownloadHelper implements Sayer {
 	public String getStatus() {
 		if (sitesScanned != totalSites)
 			return "Scanning Sites " + sitesScanned + "/" + totalSites;
-		return "Fetching " + podcastsDownloaded + "/" + totalPodcasts + "\n"
-				+ (podcastsCurrentBytes / 1024) + "k/"
+		return "Fetching " + podcastsDownloaded + "/" + totalPodcasts + "\n" + (podcastsCurrentBytes / 1024) + "k/"
 				+ (podcastsTotalBytes / 1024) + "k";
 	}
 
-	protected void downloadNewPodCasts(ContentService contentService,
-			String accounts) {
+	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
 		say("loading podcast sites.");
 
 		List<Subscription> sites = contentService.getSubscriptions();
 
-		postSitesToJadn(accounts, sites);
+		if (canCollectData) {
+			postSitesToJadn(accounts, sites);
+		}
 
-		say("starting download of podcast " + sites.size()
-				+ " site's rss feeds.");
+		say("starting download of podcast " + sites.size() + " site's rss feeds.");
 
 		totalSites = sites.size();
 
@@ -70,40 +79,37 @@ public class DownloadHelper implements Sayer {
 		say("History of downloads contains " + history.size() + " podcasts.");
 
 		SAXParserFactory spf = SAXParserFactory.newInstance();
-		EnclosureHandler encloseureHandler = new EnclosureHandler(max, history,
-				this);
+		EnclosureHandler encloseureHandler = new EnclosureHandler(max, history, this);
 
 		for (Subscription sub : sites) {
-            try {
-                URL url = new URL(sub.url);
-                int foundStart = encloseureHandler.metaNets.size();
-                if (sub.maxDownloads == -1) {
-                    encloseureHandler.max = max;
+			try {
+				URL url = new URL(sub.url);
+				int foundStart = encloseureHandler.metaNets.size();
+				if (sub.maxDownloads == -1) {
+					encloseureHandler.max = max;
 
-                } else {
-                    encloseureHandler.max = sub.maxDownloads;
-                } // endif
+				} else {
+					encloseureHandler.max = sub.maxDownloads;
+				} // endif
 
-                SAXParser sp = spf.newSAXParser();
-                XMLReader xr = sp.getXMLReader();
-                xr.setContentHandler(encloseureHandler);
-                String name = sub.name;
-                encloseureHandler.setFeedName(name);
-                xr.parse(new InputSource(url.openStream()));
+				SAXParser sp = spf.newSAXParser();
+				XMLReader xr = sp.getXMLReader();
+				xr.setContentHandler(encloseureHandler);
+				String name = sub.name;
+				encloseureHandler.setFeedName(name);
+				xr.parse(new InputSource(url.openStream()));
 
-                String message = sitesScanned + "/" + sites.size() + ": "
-                        + name + " "
-                        + (encloseureHandler.metaNets.size() - foundStart)
-                        + " podcasts";
-                say(message);
-                contentService.updateNotification(message);
+				String message = sitesScanned + "/" + sites.size() + ": " + name + " " + (encloseureHandler.metaNets.size() - foundStart)
+						+ " podcasts";
+				say(message);
+				contentService.updateNotification(message);
 
-            } catch (Throwable e) {
-                /* Display any Error to the GUI. */
-                say("Error: " + e.getMessage());
-                Log.e("BAH", "bad", e);
-            }
-            sitesScanned++;
+			} catch (Throwable e) {
+				/* Display any Error to the GUI. */
+				say("Error: " + e.getMessage());
+				Log.e("BAH", "bad", e);
+			}
+			sitesScanned++;
 
 		} // endforeach
 
@@ -116,8 +122,7 @@ public class DownloadHelper implements Sayer {
 			newPodcasts.add(metaNet);
 		}
 		say(newPodcasts.size() + " podcasts will be downloaded.");
-		contentService.updateNotification(newPodcasts.size()
-				+ " podcasts will be downloaded.");
+		contentService.updateNotification(newPodcasts.size() + " podcasts will be downloaded.");
 
 		totalPodcasts = newPodcasts.size();
 		for (MetaNet metaNet : newPodcasts) {
@@ -130,23 +135,19 @@ public class DownloadHelper implements Sayer {
 		for (int i = 0; i < newPodcasts.size(); i++) {
 			String shortName = newPodcasts.get(i).getUrlShortName();
 			say((i + 1) + "/" + newPodcasts.size() + " " + shortName);
-			contentService.updateNotification((i + 1) + "/"
-					+ newPodcasts.size() + " " + shortName);
+			contentService.updateNotification((i + 1) + "/" + newPodcasts.size() + " " + shortName);
 			podcastsDownloaded = i + 1;
 
 			try {
-				File castFile = new File(PlaySet.PODCASTS.getRoot(), Long
-						.toString(System.currentTimeMillis())
-						+ ".mp3");
-				if (encloseureHandler.isVideo(newPodcasts.get(i).getUrl()
-						.toString())) {
-					castFile = new File(android.os.Environment
-							.getExternalStorageDirectory(), "dcim/Camera/"
-							+ Long.toString(System.currentTimeMillis())
-							+ ".mp4");
+				File castFile = new File(PlaySet.PODCASTS.getRoot(), Long.toString(System.currentTimeMillis()) + ".mp3");
+				if (encloseureHandler.isVideo(newPodcasts.get(i).getUrl().toString())) {
+					castFile = new File(android.os.Environment.getExternalStorageDirectory(), "dcim/Camera/"
+							+ Long.toString(System.currentTimeMillis()) + ".mp4");
 				}
-				// This logic used to ensure we don't download the same file more than once
-				// by using the filename to verify if we have it or not, but now we dont
+				// This logic used to ensure we don't download the same file
+				// more than once
+				// by using the filename to verify if we have it or not, but now
+				// we dont
 				// trust the filename, so it could use some reworking
 				if (castFile.exists()) {
 					say("Skipping already have: " + shortName);
@@ -154,8 +155,7 @@ public class DownloadHelper implements Sayer {
 				} else {
 					currentSubscription = newPodcasts.get(i).getSubscription();
 					currentTitle = newPodcasts.get(i).getTitle();
-					File tempFile = new File(PlaySet.PODCASTS.getRoot(),
-							"tempFile");
+					File tempFile = new File(PlaySet.PODCASTS.getRoot(), "tempFile");
 					InputStream is = getInputStream(new URL(newPodcasts.get(i).getUrl()));
 					FileOutputStream fos = new FileOutputStream(tempFile);
 					byte[] buf = new byte[2048];
@@ -172,16 +172,15 @@ public class DownloadHelper implements Sayer {
 					tempFile.renameTo(castFile);
 					new MetaFile(newPodcasts.get(i), castFile).save();
 					got++;
-					if(podcastsCurrentBytes != newPodcasts.get(i).getSize()){
+					if (podcastsCurrentBytes != newPodcasts.get(i).getSize()) {
 						// subtract out wrong value
 						podcastsTotalBytes -= newPodcasts.get(i).getSize();
 						// add in correct value
 						podcastsTotalBytes += podcastsCurrentBytes;
-					}					
+					}
 				}
 			} catch (IOException e) {
-				say("Problem downloading "
-						+ newPodcasts.get(i).getUrlShortName() + " e:" + e);
+				say("Problem downloading " + newPodcasts.get(i).getUrlShortName() + " e:" + e);
 			}
 		}
 		try {
@@ -218,10 +217,8 @@ public class DownloadHelper implements Sayer {
 			// URL("http://192.168.0.128:9090/carcast/collectSites");
 			URLConnection conn = url.openConnection();
 			conn.setDoOutput(true);
-			OutputStreamWriter wr = new OutputStreamWriter(conn
-					.getOutputStream());
-			wr.write("appVersion="
-					+ URLEncoder.encode(BaseActivity.getVersion(), "UTF-8"));
+			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+			wr.write("appVersion=" + URLEncoder.encode(BaseActivity.getVersion(), "UTF-8"));
 			wr.write('&');
 			wr.write("accounts=" + URLEncoder.encode(accounts, "UTF-8"));
 			wr.write('&');
@@ -229,9 +226,8 @@ public class DownloadHelper implements Sayer {
 			wr.flush();
 
 			// Get the response
-			BufferedReader rd = new BufferedReader(new InputStreamReader(conn
-					.getInputStream()));
-			//String line = null;
+			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			// String line = null;
 			while ((rd.readLine()) != null) {
 				// Process line...
 				// Log.d("carcast",line);
@@ -300,8 +296,7 @@ public class DownloadHelper implements Sayer {
 	public static List<String> getHistory() {
 		List<String> history = new ArrayList<String>();
 		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(
-					histFile));
+			DataInputStream dis = new DataInputStream(new FileInputStream(histFile));
 			String line = null;
 			while ((line = dis.readLine()) != null) {
 				history.add(line);
@@ -310,7 +305,7 @@ public class DownloadHelper implements Sayer {
 			Log.e(DownloadHelper.class.getName(), e.toString());
 		}
 		return history;
-		
+
 	}
 
 }

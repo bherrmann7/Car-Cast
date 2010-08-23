@@ -55,6 +55,9 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	}
 
 	public final static String[] releaseData = new String[] {
+		    "7-Aug-2010", "Updated text size on podcast search page. Added privacy settings. (Also updated podcast search database!) NOTE: includes Patrick's internal changes to podcasts.txt",
+//	WORK IN PROGRESS		"30-Jul-2010", "Privacy changes.  CarCast collects some info to improve everyone's experience, but now you can opt out.",
+      		"27-Jul-2010", "Testing Patricks changes",
           	"18-Jul-2010", "Bug Fixes: delete empty files, tweak download progress bar",
          	"24-Jun-2010", "Make Audio Recorder more obvious.\n\nThanks Patrick Forhan!!\n\n'Car Cast Pro' will get this update in about a week.",
 			"22-Jun-2010b", "Fix allowing phone display to turn off (Thanks to Ofer Webman!!), increase font on download screen.",

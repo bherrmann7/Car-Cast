@@ -26,20 +26,20 @@ import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
 
-public class ContentService extends Service implements OnCompletionListener  {
+public class ContentService extends Service implements OnCompletionListener {
 
-    File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
-    File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
+	File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
+	File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
 
-	//Jam jam;
+	// Jam jam;
 	MediaPlayer mediaPlayer = new MediaPlayer();
 
 	MetaHolder metaHolder;
 	PlaySet currentSet = PlaySet.PODCASTS;
-	
+
 	// CarCast activity;
 	int current;
-	
+
 	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
 
 	private int currentDuration() {
@@ -234,7 +234,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 			}
 			mediaPlayer.seekTo(npos);
 		} catch (Exception e) {
-		    // do nothing
+			// do nothing
 		}
 		if (!mediaPlayer.isPlaying()) {
 			saveState();
@@ -413,7 +413,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 		}
 		metaHolder = new MetaHolder();
 		tryToRestoreLocation();
-		if(location==null)
+		if (location == null)
 			current = 0;
 	}
 
@@ -422,7 +422,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 	}
 
 	public void deleteSubscription(Subscription sub) {
-	    subHelper.removeSubscription(sub);
+		subHelper.removeSubscription(sub);
 	}
 
 	/**
@@ -431,11 +431,11 @@ public class ContentService extends Service implements OnCompletionListener  {
 	 * @return a map keyed on sub url to value of sub name
 	 */
 	public List<Subscription> getSubscriptions() {
-	    List<Subscription> subscriptions = subHelper.getSubscriptions();
-        return subscriptions;
+		List<Subscription> subscriptions = subHelper.getSubscriptions();
+		return subscriptions;
 	}
 
-    boolean wasPausedByPhoneCall;
+	boolean wasPausedByPhoneCall;
 
 	@Override
 	public void onCreate() {
@@ -512,9 +512,19 @@ public class ContentService extends Service implements OnCompletionListener  {
 			new Thread() {
 				@Override
 				public void run() {
-					downloadHelper = new DownloadHelper(max);
-					downloadHelper.downloadNewPodCasts(ContentService.this, PreferenceManager.getDefaultSharedPreferences(
-							getApplicationContext()).getString("accounts", "none"));
+					try {
+						// The intent here is keep the phone from shutting down
+						// during a download.
+						ContentService.this.setForeground(true);
+						downloadHelper = new DownloadHelper(max);
+						String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
+								"none");
+						boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
+								"canCollectData", true);
+						downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
+					} finally {
+						ContentService.this.setForeground(false);
+					}
 				}
 			}.start();
 		}
@@ -568,7 +578,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 	}
 
 	public void resetToDemoSubscriptions() {
-	    subHelper.resetToDemoSubscriptions();
+		subHelper.resetToDemoSubscriptions();
 	}
 
 	public void deletePodcast(int position) {
@@ -583,7 +593,7 @@ public class ContentService extends Service implements OnCompletionListener  {
 		// If we are playing something after what's deleted, adjust the current
 		if (current > position)
 			current--;
-		
+
 	}
 
 	public void play(int position) {
@@ -636,9 +646,9 @@ public class ContentService extends Service implements OnCompletionListener  {
 				sb.append("\nWanted to let you know about this podcast:\n\n");
 				sb.append("\nTitle: " + mf.getTitle());
 				String searchName = mf.getFeedName();
-                sb.append("\nFeed Title: " + searchName);
+				sb.append("\nFeed Title: " + searchName);
 				List<Subscription> subs = getSubscriptions();
-                for (Subscription sub: subs) {
+				for (Subscription sub : subs) {
 					if (sub.name.equals(searchName)) {
 						sb.append("\nFeed URL: " + sub.url);
 						break;
@@ -666,11 +676,11 @@ public class ContentService extends Service implements OnCompletionListener  {
 	}
 
 	public boolean editSubscription(Subscription original, Subscription modified) {
-	    return subHelper.editSubscription(original, modified);
+		return subHelper.editSubscription(original, modified);
 	}
 
 	public boolean addSubscription(Subscription toAdd) {
-	    return subHelper.addSubscription(toAdd);
+		return subHelper.addSubscription(toAdd);
 	}
 
 }

@@ -217,7 +217,7 @@ public class CarCast extends BaseActivity {
 			t.printStackTrace();
 		}
 		String accounts = app_preferences.getString("accounts", null);
-		if (accounts == null) {
+		if (accounts == null ) {
 			GoogleLoginServiceHelper.getAccount(this, 123, true);
 		}
 
