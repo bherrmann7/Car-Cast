@@ -14,6 +14,11 @@ import com.jadn.cc.core.Sayer;
 
 import android.util.Log;
 
+/**
+ * The history of all downloaded episodes
+ *  the data is backed into a file on the SD-card 
+ *
+ */
 public class DownloadHistory implements Sayer {
 
 	private static File histFile = new File(PlaySet.PODCASTS.getRoot(),
@@ -94,7 +99,30 @@ public class DownloadHistory implements Sayer {
 	 * @return true it the item is in the history
 	 */
 	public boolean contains(MetaNet url) {
+		if (history.contains(url.getUrlShortName())) {
+			this.add(url);
+			this.remove(url.getUrlShortName());
+		} 
 		return history.contains(url.getUrl());
+	}
+
+	/**
+	 * Removes a string from the history
+	 * 
+	 * @param s
+	 */
+	private void remove(String s) {
+		history.remove(s);
+		try {
+			PrintWriter histOut = new PrintWriter(
+					new FileWriter(histFile, false));
+			for (String str : history) {
+				histOut.println(str);				
+			}
+			histOut.close();
+		} catch (IOException e) {
+			say("problem writing history file: " + histFile + " ex:" + e);
+		}
 	}
 
 	StringBuilder sb = new StringBuilder();
