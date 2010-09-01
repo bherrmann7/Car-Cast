@@ -68,7 +68,7 @@ public class DownloadHistory implements Sayer {
 		try {
 			PrintWriter histOut = new PrintWriter(
 					new FileWriter(histFile, true));
-			histOut.println(url);
+			histOut.println(url.getUrl());
 			histOut.close();
 		} catch (IOException e) {
 			say("problem writing history file: " + histFile + " ex:" + e);
