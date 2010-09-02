@@ -3,3 +3,9 @@ out*
 target*
 bin/*
 gen/*
+.gradle
+Car-Cast.iml
+build.gradle
+build.properties
+local.properties
+default.properties

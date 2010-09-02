@@ -55,6 +55,7 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	}
 
 	public final static String[] releaseData = new String[] {
+            "2-Sep-2010", "Re-enable screen rotation of player (for people with car docks.)",
 		    "23-Aug-2010", "Patrick Forhan: Sorted subscription list, No rotation in player mode",
 		    "7-Aug-2010", "Updated text size on podcast search page. Added privacy settings. (Also updated podcast search database!) NOTE: includes Patrick's internal changes to podcasts.txt",
 //	WORK IN PROGRESS		"30-Jul-2010", "Privacy changes.  CarCast collects some info to improve everyone's experience, but now you can opt out.",
