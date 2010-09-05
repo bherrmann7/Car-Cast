@@ -1,6 +1,7 @@
 package com.jadn.cc.services;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
@@ -136,13 +137,8 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	private void play() {
 		try {
-			mediaPlayer.reset();
-			if (current >= metaHolder.getSize())
-				return;
-
-			mediaPlayer.setDataSource(currentFile().toString());
-			mediaPlayer.prepare();
-			mediaPlayer.seekTo(metaHolder.get(current).getCurrentPos());
+			if(!fullReset()) return;
+			
 			// say(activity, "started " + currentTitle());
 			mediaPlayer.start();
 			mediaMode = MediaMode.Playing;
@@ -152,6 +148,19 @@ public class ContentService extends Service implements OnCompletionListener {
 		}
 	}
 
+	private boolean fullReset() throws Exception {
+	
+		mediaPlayer.reset();
+	
+		if (current >= metaHolder.getSize())
+			return false;
+	
+		mediaPlayer.setDataSource(currentFile().toString());
+		mediaPlayer.prepare();
+		mediaPlayer.seekTo(metaHolder.get(current).getCurrentPos());
+		return true;
+	}
+	
 	public void previous() {
 
 		boolean playing = false;
@@ -585,6 +594,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (mediaPlayer.isPlaying() && current == position) {
 			pauseNow();
 		}
+		
 		metaHolder.delete(position);
 		if (current >= metaHolder.getSize()) {
 			if (current > 0)
@@ -594,6 +604,11 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (current > position)
 			current--;
 
+		try {
+			fullReset();
+		} catch (Throwable e) {
+			// bummer.
+		}
 	}
 
 	public void play(int position) {
