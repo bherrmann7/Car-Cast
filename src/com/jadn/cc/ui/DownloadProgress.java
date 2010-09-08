@@ -1,5 +1,6 @@
 package com.jadn.cc.ui; import android.app.Activity;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -44,9 +45,19 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 				NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
 				mNotificationManager.cancel(22);
 				mNotificationManager.cancel(23);
+				// Crude... but effective...
 				System.exit(-1);
 			}
 		});
+		
+		final Button downloadDetails = (Button) findViewById(R.id.downloadDetails);
+		downloadDetails.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				startActivity(new Intent(DownloadProgress.this, Downloader.class));
+
+			}
+		});
+
 		startDownloads.setEnabled(false);
 		abort.setEnabled(false);
 

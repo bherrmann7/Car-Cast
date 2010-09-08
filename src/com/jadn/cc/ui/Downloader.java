@@ -8,6 +8,12 @@ import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Sayer;
 
+/** 
+ * Lets the user observe download details in all their command line glory.
+ * 
+ * @author bob
+ *
+ */
 public class Downloader extends BaseActivity implements Sayer, Runnable {
 
 	TextView tv;

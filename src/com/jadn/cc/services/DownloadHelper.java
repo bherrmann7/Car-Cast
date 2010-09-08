@@ -93,8 +93,8 @@ public class DownloadHelper implements Sayer {
 				encloseureHandler.setFeedName(name);
 				xr.parse(new InputSource(url.openStream()));
 
-				String message = sitesScanned + "/" + sites.size() + ": " + name + " " + (encloseureHandler.metaNets.size() - foundStart)
-						+ " podcasts";
+				String message = sitesScanned + "/" + sites.size() + ": " + name + ", " + (encloseureHandler.metaNets.size() - foundStart)
+						+ " new";
 				say(message);
 				contentService.updateNotification(message);
 
@@ -150,13 +150,20 @@ public class DownloadHelper implements Sayer {
 					currentSubscription = newPodcasts.get(i).getSubscription();
 					currentTitle = newPodcasts.get(i).getTitle();
 					File tempFile = new File(PlaySet.PODCASTS.getRoot(), "tempFile");
+					say("fetching: "+new URL(newPodcasts.get(i).getUrl()));
 					InputStream is = getInputStream(new URL(newPodcasts.get(i).getUrl()));
 					FileOutputStream fos = new FileOutputStream(tempFile);
 					byte[] buf = new byte[2048];
 					int amt = 0;
+					int end = sb.length();
+					int expectedSizeKilo = newPodcasts.get(i).getSize()/1024;
+					podcastsCurrentBytes=0;
+					say(String.format("%dk/%dk",podcastsCurrentBytes/1024,expectedSizeKilo));
 					while ((amt = is.read(buf)) > 0) {
 						fos.write(buf, 0, amt);
 						podcastsCurrentBytes += amt;
+						sb.setLength(end);
+						say(String.format("%dk/%dk",podcastsCurrentBytes/1024,expectedSizeKilo));
 					}
 					fos.close();
 					is.close();

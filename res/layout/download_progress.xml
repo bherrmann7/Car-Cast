@@ -66,6 +66,12 @@
 		android:layout_width="fill_parent" android:layout_below="@id/subscriptionName"
 		android:layout_height="wrap_content" android:text="bbbbb"
 		android:singleLine="true"
+		android:paddingBottom="10px" 
 		 />
+
+	<Button android:id="@+id/downloadDetails" android:layout_width="wrap_content"
+		android:layout_below="@id/title"
+		android:layout_height="wrap_content" android:layout_marginLeft="10px"
+		android:text="Show Download Details..." />
 
 </RelativeLayout>
