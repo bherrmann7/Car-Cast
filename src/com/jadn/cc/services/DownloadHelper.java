@@ -175,6 +175,7 @@ public class DownloadHelper implements Sayer {
 						podcastsTotalBytes += podcastsCurrentBytes;
 						
 					}
+					history.add(newPodcasts.get(i));
 				}
 			} catch (Throwable e) {
 				say("Problem downloading " + newPodcasts.get(i).getUrlShortName() + " e:" + e);

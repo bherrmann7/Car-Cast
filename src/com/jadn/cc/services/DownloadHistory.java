@@ -15,16 +15,18 @@ import android.util.Log;
 
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Sayer;
+import com.jadn.cc.core.Util;
 
 /**
  * The history of all downloaded episodes the data is backed into a file on the SD-card
  * 
  */
 public class DownloadHistory implements Sayer {
+	private static final String UNKNOWN_SUBSCRIPTION = "unknown";
 	private static File historyFile = new File(Config.PodcastsRoot, "history.prop");
 	private final static String HISTORY_TWO_HEADER = "history version 2";
 	private static DownloadHistory instance = null;
-	private List<HistoryEntry> history = new ArrayList<HistoryEntry>();
+	private List<HistoryEntry> historyEntries = new ArrayList<HistoryEntry>();
 	StringBuilder sb = new StringBuilder();
 
 	/**
@@ -49,13 +51,13 @@ public class DownloadHistory implements Sayer {
 			String line = dis.readLine();
 			if (!line.startsWith(HISTORY_TWO_HEADER)) {
 				// load old format.
-				history.add(new HistoryEntry("unknown source", line));
+				historyEntries.add(new HistoryEntry(UNKNOWN_SUBSCRIPTION, line));
 				while ((line = dis.readLine()) != null) {
-					history.add(new HistoryEntry("unknown source", line));
+					historyEntries.add(new HistoryEntry(UNKNOWN_SUBSCRIPTION, line));
 				}
 			} else {
 				ObjectInputStream ois = new ObjectInputStream(dis);
-				history =  (List<HistoryEntry>) ois.readObject();
+				historyEntries =  (List<HistoryEntry>) ois.readObject();
 				ois.close();
 			}
 		} catch (Throwable e) {
@@ -71,22 +73,27 @@ public class DownloadHistory implements Sayer {
 	 * @param metaNet podcast metadata
 	 */
 	public void add(MetaNet metaNet) {
-		history.add(new HistoryEntry(metaNet.getSubscription(), metaNet.getUrl()));
+		historyEntries.add(new HistoryEntry(metaNet.getSubscription(), metaNet.getUrl()));
 		save();
 	}
 
 	/**
 	 * Check if a item is in the history
 	 * 
-	 * @param url the item to check for
+	 * @param metaNet the item to check for
 	 * @return true it the item is in the history
 	 */
-	public boolean contains(MetaNet url) {
-		if (history.contains(url.getUrlShortName())) {
-			this.add(url);
-			this.remove(url.getUrlShortName());
+	public boolean contains(MetaNet metaNet) {	
+		for(HistoryEntry historyEntry: historyEntries){
+			if(!historyEntry.subscription.equals(UNKNOWN_SUBSCRIPTION) &&
+					!historyEntry.subscription.equals(metaNet.getSubscription())){
+					continue;				
+			}
+			if(Util.getShortURL(historyEntry.podcastURL).equals(metaNet.getUrlShortName())){
+				return true;
+			}
 		}
-		return history.contains(url.getUrl());
+		return false;
 	}
 
 	/**
@@ -95,8 +102,8 @@ public class DownloadHistory implements Sayer {
 	 * @return number of history items deleted
 	 */
 	public int eraseHistory() {
-		int size = instance.history.size();
-		instance.history = new ArrayList<HistoryEntry>();
+		int size = instance.historyEntries.size();
+		instance.historyEntries = new ArrayList<HistoryEntry>();
 		save();
 		return size;
 	}
@@ -107,25 +114,16 @@ public class DownloadHistory implements Sayer {
 	 * @return number of history items deleted
 	 */
 	public int eraseHistory(String subscription) {
-		int size = instance.history.size();
+		int size = instance.historyEntries.size();
 		List<HistoryEntry> nh = new ArrayList<HistoryEntry>();
-		for (HistoryEntry he : instance.history) {
+		for (HistoryEntry he : instance.historyEntries) {
 			if (!he.subscription.equals(subscription))
 				nh.add(he);
 		}
-		instance.history = nh;
+		instance.historyEntries = nh;
 		return size - nh.size();
 	}
 
-	/**
-	 * Removes a string from the history
-	 * 
-	 * @param s
-	 */
-	private void remove(String s) {
-		history.remove(s);
-		save();
-	}
 
 	private void save() {
 		try {
@@ -133,7 +131,7 @@ public class DownloadHistory implements Sayer {
 			dosDataOutputStream.write(HISTORY_TWO_HEADER.getBytes());
 			dosDataOutputStream.write('\n');
 			ObjectOutputStream oos = new ObjectOutputStream(dosDataOutputStream);
-			oos.writeObject(history);
+			oos.writeObject(historyEntries);
 			oos.close();
 		} catch (IOException e) {
 			say("problem writing history file: " + historyFile + " ex:" + e);
@@ -152,6 +150,6 @@ public class DownloadHistory implements Sayer {
 	 * @return the size
 	 */
 	public int size() {
-		return history.size();
+		return historyEntries.size();
 	}
 }

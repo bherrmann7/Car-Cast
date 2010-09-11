@@ -7,6 +7,13 @@ import android.app.Activity;
 import android.widget.Toast;
 
 public class Util {
+	
+	public static String getShortURL(String url) {
+		String shortName = url.substring(url.lastIndexOf('/') + 1);
+		if (shortName.indexOf('?') != -1)
+			return shortName.substring(0, shortName.indexOf('?'));
+		return shortName;
+	}
 
 	public static boolean isValidURL(String url) {
 		try {

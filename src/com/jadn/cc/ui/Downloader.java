@@ -87,7 +87,9 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 	// Called once a second in the UI thread to update the screen.
 	public void run() {
 		try {
-			tv.setText(contentService.getDownloadProgress());
+			String text = contentService.getDownloadProgress();
+			if(text.length()!=0)
+				tv.setText(text);
 		} catch (Exception e) {
 			esay(e);
 		}

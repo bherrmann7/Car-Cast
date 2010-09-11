@@ -3,6 +3,8 @@ package com.jadn.cc.services;
 import java.net.URL;
 import java.util.Properties;
 
+import com.jadn.cc.core.Util;
+
 /** Meta information about a podcast.  Loosely defined so things can be added later (like time) */
 public class MetaNet {
 
@@ -35,11 +37,7 @@ public class MetaNet {
 	}
 
 	String getUrlShortName() {
-		String url = properties.getProperty("url");
-		String shortName = url.substring(url.lastIndexOf('/') + 1);
-		if (shortName.indexOf('?') != -1)
-			return shortName.substring(0, shortName.indexOf('?'));
-		return shortName;
+		return Util.getShortURL(getUrl());
 	}
 
 	public void setTitle(String value) {
