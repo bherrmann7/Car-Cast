@@ -3,6 +3,8 @@ package com.jadn.cc.ui; import android.os.Handler;
 public class Updater extends Thread {
 
 	Handler handler;
+	private boolean keepGoing = true;
+
 	Runnable runnable;
 
 	public Updater(Handler handler, Runnable runnable) {
@@ -10,8 +12,6 @@ public class Updater extends Thread {
 		this.runnable = runnable;
 		start();
 	}
-
-	private boolean keepGoing = true;
 
 	public void allDone() {
 		keepGoing = false;

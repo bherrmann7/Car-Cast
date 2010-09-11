@@ -27,42 +27,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class SearchResults extends BaseActivity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.siteslist);
-
-		setTitle("Car Cast: subscription search results");
-
-		ListView listView = (ListView) findViewById(R.id.siteList);
-
-		listView.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1,
-					int position, long arg3) {
-				add(position);
-			}
-		});
-		registerForContextMenu(listView);
-	}
-
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		menu.add("Subscribe");
-	}
-
-	@Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		if (item.getItemId() == R.id.searchAgain) {
-			finish();
-			return true;
-		}
-		add(((AdapterContextMenuInfo) item.getMenuInfo()).position);
-		return true;
-	}
+	String lastResults;
 
 	@SuppressWarnings("unchecked")
     private void add(int position) {
@@ -87,58 +52,6 @@ public class SearchResults extends BaseActivity {
 			esay(e);
 		}
 	}
-
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.search_results_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-				.getMenuInfo();
-		if (item.getTitle().equals("Subscribe")) {
-		    add(info.position);
-			return false;
-		}
-		return true;
-	}
-
-	protected void showResults() {
-
-		try {
-			ListView listView = (ListView) findViewById(R.id.siteList);
-
-			List<Subscription> sites = getResults();
-
-			Toast.makeText(getApplicationContext(),
-					"Found " + sites.size() + " results", Toast.LENGTH_LONG)
-					.show();
-
-			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-
-			for (Subscription sub: sites) {
-				Map<String, String> item = new HashMap<String, String>();
-				item.put("name", sub.name);
-				item.put("url", sub.url);
-				list.add(item);
-
-			}
-			SimpleAdapter notes = new SimpleAdapter(this, list,
-					R.layout.main_item_two_line_row, new String[] { "name",
-							"url" }, new int[] { R.id.text1, R.id.text2 });
-			listView.setAdapter(notes);
-		} catch (Throwable t) {
-			TraceUtil.report(new RuntimeException("lastResults="+lastResults,t));
-			Toast.makeText(getApplicationContext(),
-					"Sorry, problem with search results.",
-					Toast.LENGTH_LONG).show();
-		}
-	}
-
-	String lastResults;
 
 	private List<Subscription> getResults() {
 		List<Subscription> res = new ArrayList<Subscription>();
@@ -172,6 +85,93 @@ public class SearchResults extends BaseActivity {
 	@Override
 	void onContentService() throws RemoteException {
 		showResults();
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+		if (item.getTitle().equals("Subscribe")) {
+		    add(info.position);
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.siteslist);
+
+		setTitle("Car Cast: subscription search results");
+
+		ListView listView = (ListView) findViewById(R.id.siteList);
+
+		listView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1,
+					int position, long arg3) {
+				add(position);
+			}
+		});
+		registerForContextMenu(listView);
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		menu.add("Subscribe");
+	}
+
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.search_results_menu, menu);
+		return true;
+	}
+
+	@Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		if (item.getItemId() == R.id.searchAgain) {
+			finish();
+			return true;
+		}
+		add(((AdapterContextMenuInfo) item.getMenuInfo()).position);
+		return true;
+	}
+
+	protected void showResults() {
+
+		try {
+			ListView listView = (ListView) findViewById(R.id.siteList);
+
+			List<Subscription> sites = getResults();
+
+			Toast.makeText(getApplicationContext(),
+					"Found " + sites.size() + " results", Toast.LENGTH_LONG)
+					.show();
+
+			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+
+			for (Subscription sub: sites) {
+				Map<String, String> item = new HashMap<String, String>();
+				item.put("name", sub.name);
+				item.put("url", sub.url);
+				list.add(item);
+
+			}
+			SimpleAdapter notes = new SimpleAdapter(this, list,
+					R.layout.main_item_two_line_row, new String[] { "name",
+							"url" }, new int[] { R.id.text1, R.id.text2 });
+			listView.setAdapter(notes);
+		} catch (Throwable t) {
+			TraceUtil.report(new RuntimeException("lastResults="+lastResults,t));
+			Toast.makeText(getApplicationContext(),
+					"Sorry, problem with search results.",
+					Toast.LENGTH_LONG).show();
+		}
 	}
 
 }

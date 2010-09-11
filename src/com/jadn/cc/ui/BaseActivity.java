@@ -16,49 +16,12 @@ import com.jadn.cc.services.IContentService;
 import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
-	IContentService contentService;
-
-	public IContentService getContentService() {
-		return contentService;
-	}
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);		
-		this.bindService(new Intent(getApplicationContext(),
-				ContentService.class), this, Context.BIND_AUTO_CREATE);
-	}	
- 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();		
-		this.unbindService(this);
-	}
-	
-	public void onServiceConnected(android.content.ComponentName name,
-			android.os.IBinder iservice) {		
-			if (name.getClassName().equals(ContentService.class.getName())){
-				contentService = IContentService.Stub.asInterface(iservice);
-			try {
-				onContentService();
-			} catch (RemoteException re) {
-				esay(re);
-			}
-		}
-	}
-	
-	abstract void onContentService() throws RemoteException ;
-
-	@Override
-	public void onServiceDisconnected(ComponentName name) {
-		//eventService = null;
-	}
-
 	public final static String[] releaseData = new String[] {
+            "11-Sep-2010", "Updated download history to allow per subscriptions history erasing. (will only work on new downloads.)",
+            "10-Sep-2010", "Added a setting for detailed download information (with email option for problem troubleshooting.)",
             "2-Sep-2010", "Re-enable screen rotation of player (for people with car docks.)",
 		    "23-Aug-2010", "Patrick Forhan: Sorted subscription list, No rotation in player mode",
 		    "7-Aug-2010", "Updated text size on podcast search page. Added privacy settings. (Also updated podcast search database!) NOTE: includes Patrick's internal changes to podcasts.txt",
-//	WORK IN PROGRESS		"30-Jul-2010", "Privacy changes.  CarCast collects some info to improve everyone's experience, but now you can opt out.",
       		"27-Jul-2010", "Testing Patricks changes",
           	"18-Jul-2010", "Bug Fixes: delete empty files, tweak download progress bar",
          	"24-Jun-2010", "Make Audio Recorder more obvious.\n\nThanks Patrick Forhan!!\n\n'Car Cast Pro' will get this update in about a week.",
@@ -118,7 +81,32 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 	public static String getVersion() {
 		return releaseData[0];
 	}
+	
+	@SuppressWarnings("unchecked")
+	public  static String getVersionName(Context context, Class cls) 
+	{
+	  try {
+	    ComponentName comp = new ComponentName(context, cls);
+	    PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
+	    return pinfo.versionName;
+	  } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+	    return null;
+	  }
+	}	
+ 
+	public static void report(Throwable e1) {
+		TraceUtil.report(e1);
+	}
+	
+	IContentService contentService;
+	
+	public void esay(Throwable re) {
+		TraceUtil.report(re);		
+	}
 
+	public IContentService getContentService() {
+		return contentService;
+	}
 
 	protected List<Subscription> getSubscriptions() {
 		try {
@@ -130,25 +118,38 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 			return Collections.emptyList();
 		}
 	}
+
+	abstract void onContentService() throws RemoteException ;
+
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);		
+		this.bindService(new Intent(getApplicationContext(),
+				ContentService.class), this, Context.BIND_AUTO_CREATE);
+	}
 	
-	public void esay(Throwable re) {
-		TraceUtil.report(re);		
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();		
+		this.unbindService(this);
 	}
 
-	public static void report(Throwable e1) {
-		TraceUtil.report(e1);
+	public void onServiceConnected(android.content.ComponentName name,
+			android.os.IBinder iservice) {		
+			if (name.getClassName().equals(ContentService.class.getName())){
+				contentService = IContentService.Stub.asInterface(iservice);
+			try {
+				onContentService();
+			} catch (RemoteException re) {
+				esay(re);
+			}
+		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public  static String getVersionName(Context context, Class cls) 
-	{
-	  try {
-	    ComponentName comp = new ComponentName(context, cls);
-	    PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
-	    return pinfo.versionName;
-	  } catch (android.content.pm.PackageManager.NameNotFoundException e) {
-	    return null;
-	  }
+	@Override
+	public void onServiceDisconnected(ComponentName name) {
+		//eventService = null;
 	}
 
 }

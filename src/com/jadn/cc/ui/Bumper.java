@@ -3,8 +3,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 public class Bumper implements OnClickListener {
-	CarCast carCast;
 	int bump;
+	CarCast carCast;
 	
 	public Bumper(CarCast carCast, int bump) {		
 		this.bump = bump;

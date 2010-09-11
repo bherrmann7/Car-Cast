@@ -29,7 +29,6 @@ interface IContentService {
     void setCurrentPaused(int position);
 
     // ??
-    void eraseHistory();    
     String startSearch(String search);
 
     // Podcasts:

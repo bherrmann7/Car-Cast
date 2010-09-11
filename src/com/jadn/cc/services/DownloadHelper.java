@@ -29,32 +29,22 @@ import com.jadn.cc.core.Subscription;
 import com.jadn.cc.ui.BaseActivity;
 
 public class DownloadHelper implements Sayer {
-	int max;
+	public String currentSubscription = " ";
+	public String currentTitle = " ";
+	DownloadHistory history = DownloadHistory.getInstance();
+	int max;	
+	StringBuilder newText = new StringBuilder();
+	int podcastsCurrentBytes;
+	int podcastsDownloaded;
+	int podcastsTotalBytes;
+	StringBuilder sb = new StringBuilder();
+	int sitesScanned;
+	int totalPodcasts;
+	int totalSites;
+	TextView tv;
 
 	public DownloadHelper(int max) {
 		this.max = max;
-	}
-
-	TextView tv;
-
-	StringBuilder newText = new StringBuilder();
-	
-	DownloadHistory history = DownloadHistory.getInstance();
-
-	int totalSites;
-	int sitesScanned;
-	int totalPodcasts;
-	int podcastsTotalBytes;
-	int podcastsDownloaded;
-	int podcastsCurrentBytes;
-	public String currentSubscription = " ";
-	public String currentTitle = " ";
-
-	public String getStatus() {
-		if (sitesScanned != totalSites)
-			return "Scanning Sites " + sitesScanned + "/" + totalSites;
-		return "Fetching " + podcastsDownloaded + "/" + totalPodcasts + "\n" + (podcastsCurrentBytes / 1024) + "k/"
-				+ (podcastsTotalBytes / 1024) + "k";
 	}
 
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
@@ -124,6 +114,7 @@ public class DownloadHelper implements Sayer {
 		}
 
 		System.setProperty("http.maxRedirects", "50");
+		say("\n");
 
 		int got = 0;
 		for (int i = 0; i < newPodcasts.size(); i++) {
@@ -150,20 +141,21 @@ public class DownloadHelper implements Sayer {
 					currentSubscription = newPodcasts.get(i).getSubscription();
 					currentTitle = newPodcasts.get(i).getTitle();
 					File tempFile = new File(PlaySet.PODCASTS.getRoot(), "tempFile");
-					say("fetching: "+new URL(newPodcasts.get(i).getUrl()));
+					say("Subscription: "+currentSubscription);
+					say("Title: "+currentTitle);
+					say("enclosure url: "+new URL(newPodcasts.get(i).getUrl()));
 					InputStream is = getInputStream(new URL(newPodcasts.get(i).getUrl()));
 					FileOutputStream fos = new FileOutputStream(tempFile);
-					byte[] buf = new byte[2048];
+					byte[] buf = new byte[16383];
 					int amt = 0;
-					int end = sb.length();
 					int expectedSizeKilo = newPodcasts.get(i).getSize()/1024;
+					String preDownload = sb.toString();
 					podcastsCurrentBytes=0;
-					say(String.format("%dk/%dk",podcastsCurrentBytes/1024,expectedSizeKilo));
+					say(String.format("%dk/%dk 0",podcastsCurrentBytes/1024,expectedSizeKilo)+"%\n\n");
 					while ((amt = is.read(buf)) > 0) {
 						fos.write(buf, 0, amt);
 						podcastsCurrentBytes += amt;
-						sb.setLength(end);
-						say(String.format("%dk/%dk",podcastsCurrentBytes/1024,expectedSizeKilo));
+						sb = new StringBuilder(preDownload+String.format("%dk/%dk  %d",podcastsCurrentBytes/1024,expectedSizeKilo, (int)((podcastsCurrentBytes/10.24)/expectedSizeKilo))+"%\n\n");
 					}
 					fos.close();
 					is.close();
@@ -176,13 +168,15 @@ public class DownloadHelper implements Sayer {
 					new MetaFile(newPodcasts.get(i), castFile).save();
 					got++;
 					if (podcastsCurrentBytes != newPodcasts.get(i).getSize()) {
+						say("Note: reported size in rss did not match download.");
 						// subtract out wrong value
 						podcastsTotalBytes -= newPodcasts.get(i).getSize();
 						// add in correct value
 						podcastsTotalBytes += podcastsCurrentBytes;
+						
 					}
 				}
-			} catch (IOException e) {
+			} catch (Throwable e) {
 				say("Problem downloading " + newPodcasts.get(i).getUrlShortName() + " e:" + e);
 			}
 		}
@@ -191,6 +185,58 @@ public class DownloadHelper implements Sayer {
 		contentService.doDownloadCompletedNotification(got);
 	}
 
+	// Deal with servers with "location" instead of "Location" in redirect
+	// headers
+	private InputStream getInputStream(URL url) throws IOException {
+		int redirectLimit = 15;
+		while (redirectLimit-- > 0) {
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setInstanceFollowRedirects(false);
+			con.connect();
+			if (con.getResponseCode() == 200) {
+				return con.getInputStream();
+			}
+			if (con.getResponseCode() > 300 && con.getResponseCode() > 399) {
+				say(url + " gave resposneCode " + con.getResponseCode());
+				throw new IOException();
+			}
+			url = null;
+			for (int i = 0; i < 50; i++) {
+				if (con.getHeaderFieldKey(i) == null)
+					continue;
+				// println
+				// "key="+con.getHeaderFieldKey(i)+" field="+con.getHeaderField(i)
+				if (con.getHeaderFieldKey(i).toLowerCase().equals("location")) {
+					url = new URL(con.getHeaderField(i));
+					// say("key=" + con.getHeaderFieldKey(i) + " field="
+					// + con.getHeaderField(i));
+				}
+			}
+			if (url == null) {
+				say("Got 302 without Location");
+				// String x = "";
+				// for (int jj = 0; jj < 50; jj++) {
+				// x += ", " + con.getHeaderFieldKey(jj);
+				// }
+				// say("headers " + x);
+			}
+			// println "next: "+url
+		}
+		throw new IOException("Car Cast redirect limit reached");
+	}
+
+	public String getStatus() {
+		if (sitesScanned != totalSites)
+			return "Scanning Sites " + sitesScanned + "/" + totalSites;
+		return "Fetching " + podcastsDownloaded + "/" + totalPodcasts + "\n" + (podcastsCurrentBytes / 1024) + "k/"
+				+ (podcastsTotalBytes / 1024) + "k";
+	}
+
+	
+	/**
+	 *  CarCast sends your list of subscriptions to jadn.com so that the list can be used to make the populate search the search
+	 *  engine.  This information is collected only if the checkbox is set in the settings  
+	 */
 	private void postSitesToJadn(String accounts, List<Subscription> sites) {
 
 		try {
@@ -234,48 +280,6 @@ public class DownloadHelper implements Sayer {
 		}
 
 	}
-
-	// Deal with servers with "location" instead of "Location" in redirect
-	// headers
-	private InputStream getInputStream(URL url) throws IOException {
-		int redirectLimit = 15;
-		while (redirectLimit-- > 0) {
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setInstanceFollowRedirects(false);
-			con.connect();
-			if (con.getResponseCode() == 200) {
-				return con.getInputStream();
-			}
-			if (con.getResponseCode() > 300 && con.getResponseCode() > 399) {
-				say(url + " gave resposneCode " + con.getResponseCode());
-				throw new IOException();
-			}
-			url = null;
-			for (int i = 0; i < 50; i++) {
-				if (con.getHeaderFieldKey(i) == null)
-					continue;
-				// println
-				// "key="+con.getHeaderFieldKey(i)+" field="+con.getHeaderField(i)
-				if (con.getHeaderFieldKey(i).toLowerCase().equals("location")) {
-					url = new URL(con.getHeaderField(i));
-					// say("key=" + con.getHeaderFieldKey(i) + " field="
-					// + con.getHeaderField(i));
-				}
-			}
-			if (url == null) {
-				say("Got 302 without Location");
-				// String x = "";
-				// for (int jj = 0; jj < 50; jj++) {
-				// x += ", " + con.getHeaderFieldKey(jj);
-				// }
-				// say("headers " + x);
-			}
-			// println "next: "+url
-		}
-		throw new IOException("Car Cast redirect limit reached");
-	}
-
-	StringBuilder sb = new StringBuilder();
 	@Override
 	public void say(String text) {
 		sb.append(text);

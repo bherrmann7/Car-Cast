@@ -19,11 +19,60 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.jadn.cc.R;
+import com.jadn.cc.core.Util;
 import com.jadn.cc.services.ContentService;
+import com.jadn.cc.services.DownloadHistory;
 import com.jadn.cc.services.MetaFile;
 import com.jadn.cc.services.MetaHolder;
 
 public class PodcastList extends BaseActivity {
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == RESULT_OK) {
+			showPodcasts();
+		}
+	}
+
+	@Override
+	void onContentService() throws RemoteException {
+		showPodcasts();
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		if (item.getTitle().equals("Delete")) {
+			try {
+				contentService.deletePodcast(info.position);
+			} catch (RemoteException e) {
+				// humm.
+			}
+			showPodcasts();
+			return false;
+		}
+		if (item.getTitle().equals("Delete All Before")) {
+			try {
+				contentService.setCurrentPaused(info.position);
+				contentService.purgeToCurrent();
+			} catch (RemoteException e) {
+				// humm.
+			}
+			showPodcasts();
+			return false;
+		}
+		if (item.getTitle().equals("Play")) {
+			try {
+				contentService.play(info.position);
+			} catch (RemoteException e) {
+				// humm.
+			}
+			finish();
+			return false;
+		}
+		return true;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,37 +117,29 @@ public class PodcastList extends BaseActivity {
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		if (item.getTitle().equals("Delete")) {
-			try {
-				contentService.deletePodcast(info.position);
-			} catch (RemoteException e) {
-				// humm.
-			}
-			showPodcasts();
-			return false;
-		}
-		if (item.getTitle().equals("Delete All Before")) {
-			try {
-				contentService.setCurrentPaused(info.position);
-				contentService.purgeToCurrent();
-			} catch (RemoteException e) {
-				// humm.
-			}
-			showPodcasts();
-			return false;
-		}
-		if (item.getTitle().equals("Play")) {
-			try {
-				contentService.play(info.position);
-			} catch (RemoteException e) {
-				// humm.
-			}
-			finish();
-			return false;
-		}
+    public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.podcasts_menu, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		try {
+			if (item.getItemId() == R.id.deleteAllPodcasts) {
+				contentService.purgeAll();
+				showPodcasts();
+				finish();
+			}
+			if (item.getItemId() == R.id.eraseDownloadHistory) {
+				int historyDeleted = DownloadHistory.getInstance().eraseHistory();
+				Util.toast(this, "Erased "+historyDeleted+" podcast from dowload history.");
+				return true;
+			}
+		} catch (RemoteException e) {
+			esay(e);
+		}
+		return super.onMenuItemSelected(featureId, item);
 	}
 
 	protected void showPodcasts() {
@@ -137,44 +178,6 @@ public class PodcastList extends BaseActivity {
 				R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx","line2" }, new int[] { R.id.firstLine, R.id.amountHeard, R.id.secondLine });
 		listView.setAdapter(notes);
 		
-	}
-
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.podcast_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		try {
-			if (item.getItemId() == R.id.deleteAllPodcasts) {
-				contentService.purgeAll();
-				showPodcasts();
-				finish();
-			}
-			if (item.getItemId() == R.id.eraseDownloadHistory) {
-				contentService.eraseHistory();
-				return true;
-			}
-		} catch (RemoteException e) {
-			esay(e);
-		}
-		return super.onMenuItemSelected(featureId, item);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == RESULT_OK) {
-			showPodcasts();
-		}
-	}
-
-	@Override
-	void onContentService() throws RemoteException {
-		showPodcasts();
 	}
 
 }

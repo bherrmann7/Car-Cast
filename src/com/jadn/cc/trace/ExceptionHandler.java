@@ -25,13 +25,13 @@ import android.util.Log;
 
 public class ExceptionHandler {
 
+	private static boolean busySendingTraces;
+
 	private static String[] stackTraceFileList = null;
 
 	public static void clearStackTraceCache() {
 		stackTraceFileList = null;
 	}
-
-	private static boolean busySendingTraces;
 
 	public static boolean register(Context context) {
 		PackageManager pm = context.getPackageManager();

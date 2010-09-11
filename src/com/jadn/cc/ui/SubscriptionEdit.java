@@ -1,4 +1,5 @@
 package com.jadn.cc.ui; import java.net.URL;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -28,6 +29,15 @@ public class SubscriptionEdit extends BaseActivity {
 	Subscription currentSub;
 
 	@Override
+	void onContentService() throws RemoteException {
+	    if (currentSub != null) {
+	        ((TextView) findViewById(R.id.editsite_name)).setText(currentSub.name);
+	        ((TextView) findViewById(R.id.editsite_url)).setText(currentSub.url);
+	        // TODO: add max count, ordering here
+        } // endif
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.editsite);
@@ -51,7 +61,7 @@ public class SubscriptionEdit extends BaseActivity {
 						
 						// try out the url:
 						if (!Util.isValidURL(url)) {
-                            Util.say(SubscriptionEdit.this, "URL to site is malformed."); 
+                            Util.toast(SubscriptionEdit.this, "URL to site is malformed."); 
                             return;
                         } // endif
 
@@ -102,7 +112,7 @@ public class SubscriptionEdit extends BaseActivity {
 								new Sayer() {
 									@Override
 									public void say(String text) {
-										Util.say(SubscriptionEdit.this, text);
+										Util.toast(SubscriptionEdit.this, text);
 									}
 								});
 						try {
@@ -113,11 +123,11 @@ public class SubscriptionEdit extends BaseActivity {
 									.parse(new InputSource(new URL(url)
 											.openStream()));
 
-							Util.say(SubscriptionEdit.this, "Feed is OK.  Would download "
+							Util.toast(SubscriptionEdit.this, "Feed is OK.  Would download "
 									+ encloseureHandler.metaNets.size() + " podcasts.");
 						} catch (Exception e) {		
 							Log.e("editSite", "testURL", e);
-							Util.say(SubscriptionEdit.this, "Problem accessing feed. "+e.toString());
+							Util.toast(SubscriptionEdit.this, "Problem accessing feed. "+e.toString());
 						}
 
 						TextView nameTV = ((TextView) findViewById(R.id.editsite_name));
@@ -141,15 +151,6 @@ public class SubscriptionEdit extends BaseActivity {
 //					}
 //
 //				});
-	}
-
-	@Override
-	void onContentService() throws RemoteException {
-	    if (currentSub != null) {
-	        ((TextView) findViewById(R.id.editsite_name)).setText(currentSub.name);
-	        ((TextView) findViewById(R.id.editsite_url)).setText(currentSub.url);
-	        // TODO: add max count, ordering here
-        } // endif
 	}
 
 }

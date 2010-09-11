@@ -15,8 +15,8 @@ public class ContentServiceStub extends IContentService.Stub {
 	}
 
 	@Override
-	public String getCurrentTitle() throws RemoteException {
-		return contentService.currentTitle();
+	public boolean addSubscription(Subscription toAdd) throws RemoteException {
+	    return contentService.addSubscription(toAdd);
 	}
 
 	@Override
@@ -30,9 +30,46 @@ public class ContentServiceStub extends IContentService.Stub {
 	}
 
 	@Override
-	public void eraseHistory() throws RemoteException {
-		contentService.eraseHistory();
+	public void deleteAllSubscriptions() throws RemoteException {
+		contentService.deleteAllSubscriptions();
+
 	}
+
+	@Override
+	public void deleteCurrentPodcast() throws RemoteException {
+		contentService.deleteCurrentPodcast();
+	}
+
+	@Override
+	public void deletePodcast(int position) throws RemoteException {
+		contentService.deletePodcast(position);
+	}
+
+	@Override
+	public void deleteSubscription(Subscription toDelete) throws RemoteException {
+	    contentService.deleteSubscription(toDelete);
+	}
+
+	@Override
+	public boolean editSubscription(Subscription original, Subscription modified) throws RemoteException {
+	    return contentService.editSubscription(original, modified);
+	}
+
+	@Override
+	public String encodedDownloadStatus() throws RemoteException {
+		return contentService.encodedDownloadStatus();
+	}
+
+	// @Override
+	// public String[] getPlaySet() throws RemoteException {
+	// String[] files = new String[contentService.met().length];
+	// int i = 0;
+	// for (File file : contentService.getPlaySetCache()) {
+	// files[i++] = file.toString();
+	// }
+	// return files;
+	// }
+
 
 	@Override
 	public int getCount() throws RemoteException {
@@ -42,6 +79,21 @@ public class ContentServiceStub extends IContentService.Stub {
 	@Override
 	public String getCurrentPlaySetName() throws RemoteException {
 		return contentService.currentSet.toString();
+	}
+
+	@Override
+	public String getCurrentSubscriptionName() throws RemoteException {
+		return contentService.getCurrentSubscriptionName();
+	}
+
+	@Override
+	public String getCurrentTitle() throws RemoteException {
+		return contentService.currentTitle();
+	}
+
+	@Override
+	public String getDownloadProgress() throws RemoteException {
+		return contentService.downloadHelper.sb.toString();
 	}
 
 	@Override
@@ -59,19 +111,25 @@ public class ContentServiceStub extends IContentService.Stub {
 		return contentService.getMediaMode().toString();
 	}
 
-	// @Override
-	// public String[] getPlaySet() throws RemoteException {
-	// String[] files = new String[contentService.met().length];
-	// int i = 0;
-	// for (File file : contentService.getPlaySetCache()) {
-	// files[i++] = file.toString();
-	// }
-	// return files;
-	// }
+	@Override
+	public String getPodcastEmailSummary() throws RemoteException {
+		return contentService.getPodcastEmailSummary();
+	}
+
+	@Override
+    public List<Subscription> getSubscriptions() throws RemoteException {
+       List<Subscription> subscriptions = contentService.getSubscriptions();
+       return subscriptions;
+    }
 
 	@Override
 	public String getWhereString() throws RemoteException {
 		return contentService.getWhereString();
+	}
+
+	@Override
+	public boolean isPlaying() throws RemoteException {
+		return contentService.mediaPlayer.isPlaying();
 	}
 
 	@Override
@@ -96,6 +154,11 @@ public class ContentServiceStub extends IContentService.Stub {
 	}
 
 	@Override
+	public void play(int position) throws RemoteException {
+		contentService.play(position);
+	}
+
+	@Override
 	public void previous() throws RemoteException {
 		contentService.previous();
 	}
@@ -111,54 +174,8 @@ public class ContentServiceStub extends IContentService.Stub {
 	}
 
 	@Override
-	public void deleteSubscription(Subscription toDelete) throws RemoteException {
-	    contentService.deleteSubscription(toDelete);
-	}
-
-	@Override
-	public void startDownloadingNewPodCasts(int max) throws RemoteException {
-		contentService.startDownloadingNewPodCasts(max);
-	}
-
-	@Override
-	public String getDownloadProgress() throws RemoteException {
-		return contentService.downloadHelper.sb.toString();
-	}
-
-	@Override
-	public String getPodcastEmailSummary() throws RemoteException {
-		return contentService.getPodcastEmailSummary();
-	}
-
-	@Override
-	public void deleteCurrentPodcast() throws RemoteException {
-		contentService.deleteCurrentPodcast();
-	}
-
-	@Override
-	public void deleteAllSubscriptions() throws RemoteException {
-		contentService.deleteAllSubscriptions();
-
-	}
-
-	@Override
 	public void resetToDemoSubscriptions() throws RemoteException {
 		contentService.resetToDemoSubscriptions();
-	}
-
-	@Override
-	public void deletePodcast(int position) throws RemoteException {
-		contentService.deletePodcast(position);
-	}
-
-	@Override
-	public void play(int position) throws RemoteException {
-		contentService.play(position);
-	}
-
-	@Override
-	public boolean isPlaying() throws RemoteException {
-		return contentService.mediaPlayer.isPlaying();
 	}
 
 	@Override
@@ -167,35 +184,14 @@ public class ContentServiceStub extends IContentService.Stub {
 	}
 
 	@Override
-	public String getCurrentSubscriptionName() throws RemoteException {
-		return contentService.getCurrentSubscriptionName();
-	}
-
-	@Override
-	public String startSearch(String search) throws RemoteException {
-		return contentService.startSearch(search);
-	}
-
-	@Override
-	public String encodedDownloadStatus() throws RemoteException {
-		return contentService.encodedDownloadStatus();
-	}
-
-	@Override
-	public boolean addSubscription(Subscription toAdd) throws RemoteException {
-	    return contentService.addSubscription(toAdd);
-	}
-
-	@Override
-	public boolean editSubscription(Subscription original, Subscription modified) throws RemoteException {
-	    return contentService.editSubscription(original, modified);
+	public void startDownloadingNewPodCasts(int max) throws RemoteException {
+		contentService.startDownloadingNewPodCasts(max);
 	}
 
     @Override
-    public List<Subscription> getSubscriptions() throws RemoteException {
-       List<Subscription> subscriptions = contentService.getSubscriptions();
-       return subscriptions;
-    }
+	public String startSearch(String search) throws RemoteException {
+		return contentService.startSearch(search);
+	}
 
 	
 

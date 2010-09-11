@@ -8,14 +8,9 @@ import java.util.Properties;
 
 public class Location {
 
-	public Location(String title, int pos) {
-		super();
-		this.title = title;
-		this.pos = pos;
+	private static int atoi(Properties prop, String string) {
+		return Integer.parseInt(prop.get(string).toString());
 	}
-
-	public String title;
-	public int pos;
 
 	public static Location load(File stateFile) throws IOException {
 		try {
@@ -31,11 +26,6 @@ public class Location {
 			return null;
 		}
 	}
-
-	private static int atoi(Properties prop, String string) {
-		return Integer.parseInt(prop.get(string).toString());
-	}
-
 	public static Location save(File stateFile, String title, int pos, int duration)
 			throws IOException {
 		Properties prop = new Properties();
@@ -45,6 +35,16 @@ public class Location {
 		prop.save(fos, "");
 		fos.close();
 		return new Location(title,pos);
+	}
+
+	public int pos;
+
+	public String title;
+
+	public Location(String title, int pos) {
+		super();
+		this.title = title;
+		this.pos = pos;
 	}
 
 }

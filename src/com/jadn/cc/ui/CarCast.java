@@ -32,22 +32,23 @@ public class CarCast extends BaseActivity {
 	final static String tag = CarCast.class.getSimpleName();
 
 	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
+	private SharedPreferences app_preferences;
 
-	@Override
-	void onContentService() throws RemoteException {
-		final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
-		if (contentService.isPlaying()) {
-			pausePlay.setImageResource(R.drawable.mpause);
-		} else {
-			pausePlay.setImageResource(R.drawable.mplay);
+	int bgcolor;
+
+	// Need handler for callbacks to the UI thread
+	final Handler handler = new Handler();
+
+	// Create runnable for posting
+	final Runnable mUpdateResults = new Runnable() {
+		public void run() {
+			updateUI();
 		}
+	};
 
-		updateUI();
-	}
+	boolean toggleOnPause;
+
+	Updater updater;
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -68,7 +69,17 @@ public class CarCast extends BaseActivity {
 		updateUI();
 	}
 
-	private SharedPreferences app_preferences;
+	@Override
+	void onContentService() throws RemoteException {
+		final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
+		if (contentService.isPlaying()) {
+			pausePlay.setImageResource(R.drawable.mpause);
+		} else {
+			pausePlay.setImageResource(R.drawable.mplay);
+		}
+
+		updateUI();
+	}
 
 	/** Called when the activity is first created. */
 	@Override
@@ -223,33 +234,17 @@ public class CarCast extends BaseActivity {
 
 	}
 
-	private void saveLastRun() {
-		SharedPreferences.Editor editor = app_preferences.edit();
-		editor.putString("lastRun", releaseData[0]);
-		if (!app_preferences.contains("listmax")) {
-			editor.putString("listmax", "2");
-		}
-		editor.commit();
-	}
-
-	// Need handler for callbacks to the UI thread
-	final Handler handler = new Handler();
-
-	// Create runnable for posting
-	final Runnable mUpdateResults = new Runnable() {
-		public void run() {
-			updateUI();
-		}
-	};
-
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
+		inflater.inflate(R.menu.player_menu, menu);
 		return true;
 	}
 
-	int bgcolor;
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -275,7 +270,7 @@ public class CarCast extends BaseActivity {
 			if (item.getItemId() == R.id.feedback) {
 				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 				emailIntent.setType("plain/text");
-				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "bob@jadn.com" });
+				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "carcast-devs@googlegroups.com" });
 				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Car Cast: feedback ");
 				startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
 			}
@@ -302,7 +297,28 @@ public class CarCast extends BaseActivity {
 		return false;
 	}
 
-	boolean toggleOnPause;
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		updater.allDone();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		updater = new Updater(handler, mUpdateResults);
+	}
+
+	private void saveLastRun() {
+		SharedPreferences.Editor editor = app_preferences.edit();
+		editor.putString("lastRun", releaseData[0]);
+		if (!app_preferences.contains("listmax")) {
+			editor.putString("listmax", "2");
+		}
+		editor.commit();
+	}
 
 	public void updateUI() {
 		if (contentService == null)
@@ -353,22 +369,6 @@ public class CarCast extends BaseActivity {
 		} catch (Throwable e) {
 			Log.e("cc", "", e);
 		}
-	}
-
-	Updater updater;
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		updater = new Updater(handler, mUpdateResults);
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-
-		updater.allDone();
 	}
 
 

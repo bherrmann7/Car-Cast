@@ -1,6 +1,13 @@
 package com.jadn.cc.services;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,93 +69,6 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
     }
 
     /**
-     * Scan the list for a subscription by its URL
-     * 
-     * @param subs the list to scan
-     * @param url the URL to look for
-     * @return the index in the list, or -1 if not found
-     */
-    private int indexOfSubscriptionURL(List<Subscription> subs, String url) {
-        for (int i = 0; i < subs.size(); i++) {
-            Subscription sub = subs.get(i);
-            if (sub.url.equals(url)) {
-                return i;
-            } // endif
-        } // endfor
-
-        // not found:
-        return -1;
-    }
-
-    @Override
-    public List<Subscription> getSubscriptions() {
-        if (legacyFile.exists()) {
-            // we need to convert to the new format first:
-            List<Subscription> legacy = getLegacySitesFromFile();
-            saveSubscriptions(legacy);
-            legacyFile.delete();
-            // short-cut out:
-            return legacy;
-        }
-
-        if (!subscriptionFile.exists()) {
-            subscriptionFile.getParentFile().mkdirs();
-            return resetToDemoSubscriptions();
-        }
-        if (!subscriptionFile.exists()) {
-            return null;
-        }
-        try {
-            InputStream dis = new BufferedInputStream(new FileInputStream(subscriptionFile));
-            Properties props = new Properties();
-            props.load(dis);
-
-            return convertProperties(props);
-
-        } catch (Exception e1) {
-            TraceUtil.report(e1);
-            return Collections.emptyList();
-        }
-    }
-
-    List<Subscription> getLegacySitesFromFile() {
-        if (!legacyFile.exists()) {
-            return Collections.emptyList();
-        }
-        try {
-            InputStream input = new FileInputStream(legacyFile);
-            return readLegacySites(input);
-
-        } catch (Exception e1) {
-            TraceUtil.report(e1);
-            return Collections.emptyList();
-        }
-    }
-
-    List<Subscription> readLegacySites(InputStream input) throws IOException {
-        List<Subscription> sites = new ArrayList<Subscription>();
-        DataInputStream dis = new DataInputStream(input);
-        String line = null;
-        while ((line = dis.readLine()) != null) {
-            int eq = line.indexOf('=');
-            if (eq != -1) {
-                String name = line.substring(0, eq);
-                String url = line.substring(eq + 1);
-                if (Util.isValidURL(url)) {
-                    sites.add(new Subscription(name, url));
-                } else {
-                    TraceUtil.report(new RuntimeException("invalid URL in line: '" + line + "'; URL was: " + url));
-                } // endif
-
-            } else {
-                TraceUtil.report(new RuntimeException("missing equals in line: " + line));
-            }
-        }
-
-        return sites;
-    }
-
-    /**
      * Insure that all properties are keyed properly, by URL. If a key is not a
      * url, but the value is, then the pair is removed, then placed back in
      * reverse.
@@ -199,6 +119,113 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
     }
 
     @Override
+    public void deleteAllSubscriptions() {
+        List<Subscription> emptyList = Collections.emptyList();
+        saveSubscriptions(emptyList);
+    }
+
+    @Override
+    public boolean editSubscription(Subscription original, Subscription updated) {
+        List<Subscription> subs = getSubscriptions();
+        int idx = indexOfSubscriptionURL(subs, original.url);
+        if (idx != -1) {
+            subs.remove(idx);
+            subs.add(updated);
+            saveSubscriptions(subs);
+            return true;
+        } // endif
+
+        return false;
+    }
+
+    List<Subscription> getLegacySitesFromFile() {
+        if (!legacyFile.exists()) {
+            return Collections.emptyList();
+        }
+        try {
+            InputStream input = new FileInputStream(legacyFile);
+            return readLegacySites(input);
+
+        } catch (Exception e1) {
+            TraceUtil.report(e1);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<Subscription> getSubscriptions() {
+        if (legacyFile.exists()) {
+            // we need to convert to the new format first:
+            List<Subscription> legacy = getLegacySitesFromFile();
+            saveSubscriptions(legacy);
+            legacyFile.delete();
+            // short-cut out:
+            return legacy;
+        }
+
+        if (!subscriptionFile.exists()) {
+            subscriptionFile.getParentFile().mkdirs();
+            return resetToDemoSubscriptions();
+        }
+        if (!subscriptionFile.exists()) {
+            return null;
+        }
+        try {
+            InputStream dis = new BufferedInputStream(new FileInputStream(subscriptionFile));
+            Properties props = new Properties();
+            props.load(dis);
+
+            return convertProperties(props);
+
+        } catch (Exception e1) {
+            TraceUtil.report(e1);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Scan the list for a subscription by its URL
+     * 
+     * @param subs the list to scan
+     * @param url the URL to look for
+     * @return the index in the list, or -1 if not found
+     */
+    private int indexOfSubscriptionURL(List<Subscription> subs, String url) {
+        for (int i = 0; i < subs.size(); i++) {
+            Subscription sub = subs.get(i);
+            if (sub.url.equals(url)) {
+                return i;
+            } // endif
+        } // endfor
+
+        // not found:
+        return -1;
+    }
+
+    List<Subscription> readLegacySites(InputStream input) throws IOException {
+        List<Subscription> sites = new ArrayList<Subscription>();
+        DataInputStream dis = new DataInputStream(input);
+        String line = null;
+        while ((line = dis.readLine()) != null) {
+            int eq = line.indexOf('=');
+            if (eq != -1) {
+                String name = line.substring(0, eq);
+                String url = line.substring(eq + 1);
+                if (Util.isValidURL(url)) {
+                    sites.add(new Subscription(name, url));
+                } else {
+                    TraceUtil.report(new RuntimeException("invalid URL in line: '" + line + "'; URL was: " + url));
+                } // endif
+
+            } else {
+                TraceUtil.report(new RuntimeException("missing equals in line: " + line));
+            }
+        }
+
+        return sites;
+    }
+
+    @Override
     public boolean removeSubscription(Subscription toRemove) {
         List<Subscription> subs = getSubscriptions();
         int idx = indexOfSubscriptionURL(subs, toRemove.url);
@@ -211,6 +238,21 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
         return false;
     }
 
+    @Override
+    public List<Subscription> resetToDemoSubscriptions() {
+        List<Subscription> subs = new ArrayList<Subscription>();
+        subs.add(new Subscription("Science Channel", "http://www.discovery.com/radio/xml/sciencechannel.xml"));
+        subs.add(new Subscription("Quirks and Quarks", "http://www.cbc.ca/podcasting/includes/quirks.xml"));
+        subs.add(new Subscription("Cringely", "http://www.cringely.com/feed/podcast/"));
+        subs.add(new Subscription("60 second science", "http://rss.sciam.com/sciam/60secsciencepodcast"));
+        subs.add(new Subscription("60 second psych", "http://rss.sciam.com/sciam/60-second-psych"));
+        subs.add(new Subscription("60 second earth", "http://rss.sciam.com/sciam/60-second-earth"));
+        subs.add(new Subscription("New York Times Tech Talk",
+                "http://nytimes.com/services/xml/rss/nyt/podcasts/techtalk.xml"));
+        saveSubscriptions(subs);
+        return subs;
+    }
+    
     private boolean saveSubscriptions(List<Subscription> subscriptions) {
         try {
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(subscriptionFile));
@@ -232,40 +274,5 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
             // failure:
             return false;
         }
-    }
-
-    @Override
-    public List<Subscription> resetToDemoSubscriptions() {
-        List<Subscription> subs = new ArrayList<Subscription>();
-        subs.add(new Subscription("Science Channel", "http://www.discovery.com/radio/xml/sciencechannel.xml"));
-        subs.add(new Subscription("Quirks and Quarks", "http://www.cbc.ca/podcasting/includes/quirks.xml"));
-        subs.add(new Subscription("Cringely", "http://www.cringely.com/feed/podcast/"));
-        subs.add(new Subscription("60 second science", "http://rss.sciam.com/sciam/60secsciencepodcast"));
-        subs.add(new Subscription("60 second psych", "http://rss.sciam.com/sciam/60-second-psych"));
-        subs.add(new Subscription("60 second earth", "http://rss.sciam.com/sciam/60-second-earth"));
-        subs.add(new Subscription("New York Times Tech Talk",
-                "http://nytimes.com/services/xml/rss/nyt/podcasts/techtalk.xml"));
-        saveSubscriptions(subs);
-        return subs;
-    }
-
-    @Override
-    public boolean editSubscription(Subscription original, Subscription updated) {
-        List<Subscription> subs = getSubscriptions();
-        int idx = indexOfSubscriptionURL(subs, original.url);
-        if (idx != -1) {
-            subs.remove(idx);
-            subs.add(updated);
-            saveSubscriptions(subs);
-            return true;
-        } // endif
-
-        return false;
-    }
-    
-    @Override
-    public void deleteAllSubscriptions() {
-        List<Subscription> emptyList = Collections.emptyList();
-        saveSubscriptions(emptyList);
     }
 }

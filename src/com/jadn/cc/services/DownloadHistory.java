@@ -1,34 +1,36 @@
 package com.jadn.cc.services;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+
 import com.jadn.cc.core.PlaySet;
 import com.jadn.cc.core.Sayer;
 
-import android.util.Log;
-
 /**
- * The history of all downloaded episodes
- *  the data is backed into a file on the SD-card 
- *
+ * The history of all downloaded episodes the data is backed into a file on the SD-card
+ * 
  */
 public class DownloadHistory implements Sayer {
-
-	private static File histFile = new File(PlaySet.PODCASTS.getRoot(),
-			"history.prop");
-	private List<String> history;
-
+	private static File histFile = new File(PlaySet.PODCASTS.getRoot(), "history.prop");
+	private final static String HISTORY_TWO_HEADER = "history version 2";
 	private static DownloadHistory instance = null;
+	private List<HistoryEntry> history = new ArrayList<HistoryEntry>();
+	StringBuilder sb = new StringBuilder();
 
 	/**
-	 * Get the history object
+	 * Get the history singleton
 	 * 
 	 * @return the history
 	 */
@@ -40,35 +42,42 @@ public class DownloadHistory implements Sayer {
 	}
 
 	/**
-	 * Create a object that represents the download history. It is backed to a
-	 * file.
+	 * Create a object that represents the download history. It is backed to a file.
 	 */
 	private DownloadHistory() {
-		history = new ArrayList<String>();
 		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(
-					histFile));
-			String line = null;
-			while ((line = dis.readLine()) != null) {
-				history.add(line);
+			DataInputStream dis = new DataInputStream(new FileInputStream(histFile));
+			String line = dis.readLine();
+			if (!line.startsWith(HISTORY_TWO_HEADER)) {
+				// load old format.
+				history.add(new HistoryEntry("unknown source", line));
+				while ((line = dis.readLine()) != null) {
+					history.add(new HistoryEntry("unknown source", line));
+				}
+			} else {
+				ObjectInputStream ois = new ObjectInputStream(dis);
+				HistoryEntry historyEntry = null;
+				while ((historyEntry = (HistoryEntry) ois.readObject()) != null) {
+					history.add(historyEntry);
+				}
 			}
-		} catch (Exception e) {
-			Log.e(DownloadHelper.class.getName(), e.toString());
+		} catch (Throwable e) {
+			// would be nice to ask the user if we can submit his history file
+			// to the devs for review
+			Log.e(DownloadHelper.class.getName(), "error reading history file " + histFile.toString(), e);
 		}
 	}
 
 	/**
 	 * Add a item to the history
 	 * 
-	 * @param url
-	 *            the filename to be added
+	 * @param metaNet podcast metadata
 	 */
-	public void add(MetaNet url) {
-		history.add(url.getUrl());
+	public void add(MetaNet metaNet) {
+		history.add(new HistoryEntry(metaNet.getSubscription(), metaNet.getUrl()));
 		try {
-			PrintWriter histOut = new PrintWriter(
-					new FileWriter(histFile, true));
-			histOut.println(url.getUrl());
+			PrintWriter histOut = new PrintWriter(new FileWriter(histFile, true));
+			histOut.println(metaNet.getUrl());
 			histOut.close();
 		} catch (IOException e) {
 			say("problem writing history file: " + histFile + " ex:" + e);
@@ -76,34 +85,45 @@ public class DownloadHistory implements Sayer {
 	}
 
 	/**
-	 * Remove the backing storage
-	 */
-	public static void eraseHistory() {
-		histFile.delete();
-	}
-
-	/**
-	 * Get the current size of the download history
-	 * 
-	 * @return the size
-	 */
-	public int size() {
-		return history.size();
-	}
-
-	/**
 	 * Check if a item is in the history
 	 * 
-	 * @param url
-	 *            the item to check for
+	 * @param url the item to check for
 	 * @return true it the item is in the history
 	 */
 	public boolean contains(MetaNet url) {
 		if (history.contains(url.getUrlShortName())) {
 			this.add(url);
 			this.remove(url.getUrlShortName());
-		} 
+		}
 		return history.contains(url.getUrl());
+	}
+
+	/**
+	 * Remove history of all downloaded podcasts
+	 * 
+	 * @return number of history items deleted
+	 */
+	public int eraseHistory() {
+		int size = instance.history.size();
+		histFile.delete();
+		instance.history = new ArrayList<HistoryEntry>();
+		return size;
+	}
+
+	/**
+	 * Remove history of all downloaded podcasts for the specified subscription
+	 * 
+	 * @return number of history items deleted
+	 */
+	public int eraseHistory(String subscription) {
+		int size = instance.history.size();
+		List<HistoryEntry> nh = new ArrayList<HistoryEntry>();
+		for (HistoryEntry he : instance.history) {
+			if (!he.subscription.equals(subscription))
+				nh.add(he);
+		}
+		instance.history = nh;
+		return size - nh.size();
 	}
 
 	/**
@@ -113,23 +133,34 @@ public class DownloadHistory implements Sayer {
 	 */
 	private void remove(String s) {
 		history.remove(s);
+		save();
+	}
+
+	private void save() {
 		try {
-			PrintWriter histOut = new PrintWriter(
-					new FileWriter(histFile, false));
-			for (String str : history) {
-				histOut.println(str);				
-			}
-			histOut.close();
+			DataOutputStream dosDataOutputStream = new DataOutputStream(new FileOutputStream(histFile));
+			dosDataOutputStream.write(HISTORY_TWO_HEADER.getBytes());
+			dosDataOutputStream.write('\n');
+			ObjectOutputStream oos = new ObjectOutputStream(dosDataOutputStream);
+			oos.writeObject(history);
+			oos.close();
 		} catch (IOException e) {
 			say("problem writing history file: " + histFile + " ex:" + e);
 		}
 	}
 
-	StringBuilder sb = new StringBuilder();
-
 	@Override
 	public void say(String text) {
 		sb.append(text);
 		sb.append('\n');
+	}
+
+	/**
+	 * Get the current size of the download history
+	 * 
+	 * @return the size
+	 */
+	public int size() {
+		return history.size();
 	}
 }

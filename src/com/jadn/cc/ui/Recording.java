@@ -15,28 +15,28 @@ import com.jadn.cc.core.Config;
 
 public class Recording {
 
+	static File recordDir = new File(Config.CarCastRoot, "recordings");
+	static MediaRecorder recorder;
+
+	static File recordFile;
+
 	static SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d h:mm a");
-	File file;
 
-	public Recording(File file) {
-		this.file = file;
+	static {
+		recordDir.mkdirs();
 	}
 
-	public String getTimeString() {
-		long millis = Long.parseLong(file.getName().substring(0,
-				file.getName().indexOf('-')));
-		return sdf.format(new Date(millis));
+	public static void cancel() {
+		recorder.stop();
+		recorder = null;
+		recordFile.delete();
 	}
 
-	public String getDurationString() {
-		int millis = Integer.parseInt(file.getName().substring(
-				file.getName().indexOf('-') + 1, file.getName().indexOf('.')));
-		int min = millis / 60;
-		int sec = millis - (60 * min);
-		if (sec <= 9) {
-			return min + ":0" + sec;
+	public static void deleteAll() {
+		for (File file : recordDir.listFiles()) {
+			if(file.getName().endsWith(".3gp"))
+				file.delete();
 		}
-		return min + ":" + sec;
 	}
 
 	public static List<Recording> getRecordings() {
@@ -47,22 +47,6 @@ public class Recording {
 		}
 		return list;
 	}
-
-	public static void deleteAll() {
-		for (File file : recordDir.listFiles()) {
-			if(file.getName().endsWith(".3gp"))
-				file.delete();
-		}
-	}
-
-	static File recordDir = new File(Config.CarCastRoot, "recordings");
-	static {
-		recordDir.mkdirs();
-	}
-	
-	static File recordFile;
-	static MediaRecorder recorder;
-
 	public static void record() {
 		recordFile = new File(recordDir, System.currentTimeMillis() + ".tmp");
 		recorder = new MediaRecorder();
@@ -76,13 +60,7 @@ public class Recording {
 		}
 		recorder.start();
 	}
-
-	public static void cancel() {
-		recorder.stop();
-		recorder = null;
-		recordFile.delete();
-	}
-
+	
 	public static void save() {
 		recorder.stop();
 		recorder = null;
@@ -102,6 +80,32 @@ public class Recording {
 			Log.e("carcast", "Recording.save", e);
 		}
 	}
+	File file;
+
+	public Recording(File file) {
+		this.file = file;
+	}
+
+	public void delete() {
+		file.delete();
+	}
+
+	public String getDurationString() {
+		int millis = Integer.parseInt(file.getName().substring(
+				file.getName().indexOf('-') + 1, file.getName().indexOf('.')));
+		int min = millis / 60;
+		int sec = millis - (60 * min);
+		if (sec <= 9) {
+			return min + ":0" + sec;
+		}
+		return min + ":" + sec;
+	}
+
+	public String getTimeString() {
+		long millis = Long.parseLong(file.getName().substring(0,
+				file.getName().indexOf('-')));
+		return sdf.format(new Date(millis));
+	}
 
 	public void play() {
 		try {
@@ -118,10 +122,6 @@ public class Recording {
 			Log.e("carcast", "Recording.play", e);
 		}
 
-	}
-
-	public void delete() {
-		file.delete();
 	}
 
 }

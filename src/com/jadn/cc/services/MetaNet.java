@@ -3,6 +3,7 @@ package com.jadn.cc.services;
 import java.net.URL;
 import java.util.Properties;
 
+/** Meta information about a podcast.  Loosely defined so things can be added later (like time) */
 public class MetaNet {
 
 	 Properties properties = new Properties();
@@ -11,22 +12,6 @@ public class MetaNet {
 		properties.setProperty("feedName", feedName);
 		properties.setProperty("url", url.toString());
 		properties.setProperty("size", Integer.toString(size));
-	}
-
-	String getUrl() {
-		return properties.getProperty("url");
-	}
-
-	String getUrlShortName() {
-		String url = properties.getProperty("url");
-		String shortName = url.substring(url.lastIndexOf('/') + 1);
-		if (shortName.indexOf('?') != -1)
-			return shortName.substring(0, shortName.indexOf('?'));
-		return shortName;
-	}
-
-	public void setTitle(String value) {
-		properties.setProperty("title", value);		
 	}
 
 	public int getSize() {
@@ -43,5 +28,21 @@ public class MetaNet {
 
 	public String getTitle() {
 		return properties.getProperty("title");
+	}
+
+	String getUrl() {
+		return properties.getProperty("url");
+	}
+
+	String getUrlShortName() {
+		String url = properties.getProperty("url");
+		String shortName = url.substring(url.lastIndexOf('/') + 1);
+		if (shortName.indexOf('?') != -1)
+			return shortName.substring(0, shortName.indexOf('?'));
+		return shortName;
+	}
+
+	public void setTitle(String value) {
+		properties.setProperty("title", value);		
 	}
 }

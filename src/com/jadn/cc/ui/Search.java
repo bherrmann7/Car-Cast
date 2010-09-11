@@ -44,19 +44,7 @@ public class Search extends BaseActivity {
 	Updater updater;
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		TextView searchText = (TextView) findViewById(R.id.searchText);
-		Button searchButton = (Button) findViewById(R.id.searchButton);
-		searchButton.setEnabled(true);
-		searchText.setEnabled(true);
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		if (updater!=null)
-			updater.allDone();
+	void onContentService() throws RemoteException {
 	}
 
 	@Override
@@ -104,7 +92,19 @@ public class Search extends BaseActivity {
 	}
 
 	@Override
-	void onContentService() throws RemoteException {
+	protected void onPause() {
+		super.onPause();
+		if (updater!=null)
+			updater.allDone();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		TextView searchText = (TextView) findViewById(R.id.searchText);
+		Button searchButton = (Button) findViewById(R.id.searchButton);
+		searchButton.setEnabled(true);
+		searchText.setEnabled(true);
 	}
 
 }

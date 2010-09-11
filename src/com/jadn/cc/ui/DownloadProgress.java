@@ -1,9 +1,11 @@
 package com.jadn.cc.ui; import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -17,6 +19,19 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 
 	final Handler handler = new Handler();
 
+	Updater updater;
+
+	boolean wasStarted;
+
+	@Override
+	void onContentService() throws RemoteException {
+		boolean idle = contentService.encodedDownloadStatus().equals("");
+		Button startDownloads = (Button) findViewById(R.id.startDownloads);
+		Button abort = (Button) findViewById(R.id.AbortDownloads);
+		startDownloads.setEnabled(idle);
+		abort.setEnabled(!idle);
+	}
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -26,6 +41,12 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		final Button startDownloads = (Button) findViewById(R.id.startDownloads);
 		startDownloads.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
+				SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(DownloadProgress.this);
+				if (app_preferences.getBoolean("downloadDetails", false)) {
+					startActivity(new Intent(DownloadProgress.this, Downloader.class));
+					return;
+				}
+
 				try {
 					reset();
 					contentService.startDownloadingNewPodCasts(Config
@@ -50,19 +71,25 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 			}
 		});
 		
-		final Button downloadDetails = (Button) findViewById(R.id.downloadDetails);
-		downloadDetails.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				startActivity(new Intent(DownloadProgress.this, Downloader.class));
-
-			}
-		});
-
 		startDownloads.setEnabled(false);
 		abort.setEnabled(false);
 
 		reset();
 
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		// stop display thread
+		updater.allDone();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		updater = new Updater(handler, this);
 	}
 
 	private void reset() {
@@ -90,8 +117,6 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		subscriptionName.setText("");
 		title.setText("");
 	}
-
-	boolean wasStarted;
 
 	// Called once a second in the UI thread to update the screen.
 	public void run() {
@@ -164,31 +189,6 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		} catch (Exception e) {
 			esay(new RuntimeException("downloadStatus was: "+downloadStatus,e));
 		}
-	}
-
-	Updater updater;
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		updater = new Updater(handler, this);
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-
-		// stop display thread
-		updater.allDone();
-	}
-
-	@Override
-	void onContentService() throws RemoteException {
-		boolean idle = contentService.encodedDownloadStatus().equals("");
-		Button startDownloads = (Button) findViewById(R.id.startDownloads);
-		Button abort = (Button) findViewById(R.id.AbortDownloads);
-		startDownloads.setEnabled(idle);
-		abort.setEnabled(!idle);
 	}
 
 }

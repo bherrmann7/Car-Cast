@@ -5,10 +5,23 @@ import android.os.Parcelable;
 
 public class Subscription implements Parcelable, Comparable<Subscription> {
 
-    public final String             name;
-    public final String             url;
+    public static final Parcelable.Creator<Subscription> CREATOR = new Parcelable.Creator<Subscription>() {
+         public Subscription createFromParcel(Parcel in) {
+             return new Subscription(in.readString(),   // name
+                                     in.readString(),   // URL
+                                     in.readInt(),      // max count
+                                     OrderingPreference.values()[in.readInt()]); // order pref
+         }
+
+         public Subscription[] newArray(int size) {
+             return new Subscription[size];
+         }
+     };
     public final int                maxDownloads;
+    public final String             name;
     public final OrderingPreference orderingPreference;
+
+    public final String             url;
 
     public Subscription(String name, String url) {
         this(name, url, -1, OrderingPreference.FIFO);
@@ -22,8 +35,8 @@ public class Subscription implements Parcelable, Comparable<Subscription> {
     }
 
     @Override
-    public String toString() {
-        return "Subscription: url=" + url + " ; name="+ name + "; max=" + maxDownloads + " ; ordering=" + orderingPreference;
+    public int compareTo(Subscription another) {
+        return name.compareTo(another.name);
     }
 
     @Override
@@ -32,29 +45,16 @@ public class Subscription implements Parcelable, Comparable<Subscription> {
     }
 
     @Override
+    public String toString() {
+        return "Subscription: url=" + url + " ; name="+ name + "; max=" + maxDownloads + " ; ordering=" + orderingPreference;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeString(url);
         dest.writeInt(maxDownloads);
         dest.writeInt(orderingPreference.ordinal());
-    }
-
-    public static final Parcelable.Creator<Subscription> CREATOR = new Parcelable.Creator<Subscription>() {
-         public Subscription createFromParcel(Parcel in) {
-             return new Subscription(in.readString(),   // name
-                                     in.readString(),   // URL
-                                     in.readInt(),      // max count
-                                     OrderingPreference.values()[in.readInt()]); // order pref
-         }
-
-         public Subscription[] newArray(int size) {
-             return new Subscription[size];
-         }
-     };
-
-    @Override
-    public int compareTo(Subscription another) {
-        return name.compareTo(another.name);
     }
 
 }

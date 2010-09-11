@@ -3,7 +3,7 @@ package com.jadn.cc.core;
 import android.os.Environment;
 
 public enum ExternalMediaStatus {
-    writeable, readable, unavailable;
+    readable, unavailable, writeable;
 
     public static ExternalMediaStatus getExternalMediaStatus() {
         // adapted from

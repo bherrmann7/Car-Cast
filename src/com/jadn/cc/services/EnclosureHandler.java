@@ -15,14 +15,21 @@ import com.jadn.cc.core.Sayer;
 
 public class EnclosureHandler extends DefaultHandler {
 
-	private static final int UNLIMITED = -1;
 	private static final int STOP = -2;
+	private static final int UNLIMITED = -1;
 	
-	public List<MetaNet> metaNets = new ArrayList<MetaNet>();
-	public int max;
+	String feedName;
+	private boolean grabTitle;
 	DownloadHistory history;
-	Sayer sayer;
+	private String lastTitle = "";
 
+	public int max;
+
+	public List<MetaNet> metaNets = new ArrayList<MetaNet>();
+
+	private boolean needTitle = true;
+	Sayer sayer;
+	private boolean startTitle;
 	public String title = "";
 
 	public EnclosureHandler(int max, DownloadHistory history, Sayer sayer) {
@@ -30,11 +37,6 @@ public class EnclosureHandler extends DefaultHandler {
 		this.history = history;
 		this.sayer = sayer;
 	}
-
-	private boolean needTitle = true;
-	private boolean startTitle;
-	private boolean grabTitle;
-	private String lastTitle = "";
 
 	@Override
 	public void characters(char[] ch, int start, int length)
@@ -60,6 +62,32 @@ public class EnclosureHandler extends DefaultHandler {
 			needTitle = false;
 		}
 		grabTitle = false;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	private boolean isAudio(String url) {
+		if (url.toLowerCase().endsWith(".mp3"))
+			return true;
+		if (url.toLowerCase().endsWith(".m4a"))
+			return true;
+		if (url.indexOf(".mp3?") != -1)
+			return true;
+		return false;
+	}
+
+	boolean isVideo(String url) {
+		if (url.toLowerCase().endsWith(".mp4"))
+			return true;
+		if (url.indexOf(".mp4?") != -1)
+			return true;
+		return false;
+	}
+
+	public void setFeedName(String feedName) {
+		this.feedName = feedName;
 	}
 
 	@Override
@@ -119,33 +147,5 @@ public class EnclosureHandler extends DefaultHandler {
 				Log.e("CarCast", this.getClass().getSimpleName(),e);
 			}
 		}
-	}
-
-	private boolean isAudio(String url) {
-		if (url.toLowerCase().endsWith(".mp3"))
-			return true;
-		if (url.toLowerCase().endsWith(".m4a"))
-			return true;
-		if (url.indexOf(".mp3?") != -1)
-			return true;
-		return false;
-	}
-
-	boolean isVideo(String url) {
-		if (url.toLowerCase().endsWith(".mp4"))
-			return true;
-		if (url.indexOf(".mp4?") != -1)
-			return true;
-		return false;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	String feedName;
-
-	public void setFeedName(String feedName) {
-		this.feedName = feedName;
 	}
 }

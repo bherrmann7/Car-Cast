@@ -11,16 +11,29 @@ import com.jadn.cc.core.PlaySet;
 /** Meta information about podcasts. **/
 public class MetaHolder {
 
+	private List<MetaFile> metas = new ArrayList<MetaFile>();
+
 	public MetaHolder() {
 		// start up.. load meta and scan podcast folder for user 'dropped
 		// entries'
 		loadMeta();
 	}
 
-	private List<MetaFile> metas = new ArrayList<MetaFile>();
+	public void delete(int i) {
+		metas.get(i).delete();
+		metas.remove(i);
+	}
+
+	public MetaFile get(int current) {
+		return metas.get(current);
+	}
 
 	public List<MetaFile> getMeta() {
 		return metas;
+	}
+
+	public int getSize() {
+		return metas.size();
 	}
 
 	public void loadMeta() {
@@ -47,19 +60,6 @@ public class MetaHolder {
 			}
 		});
 		// playSetCache = (File[]) list.toArray(new File[list.size()]);
-	}
-
-	public int getSize() {
-		return metas.size();
-	}
-
-	public MetaFile get(int current) {
-		return metas.get(current);
-	}
-
-	public void delete(int i) {
-		metas.get(i).delete();
-		metas.remove(i);
 	}
 
 }

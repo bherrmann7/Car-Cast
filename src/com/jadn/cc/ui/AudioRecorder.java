@@ -25,6 +25,32 @@ import com.jadn.cc.R;
 
 public class AudioRecorder extends BaseActivity {
 	
+	private Button fb(int id) {
+		return (Button)findViewById(id);		
+	}
+	
+	@Override
+	void onContentService() throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+		if (item.getTitle().equals("Play")) {
+			Recording recording = Recording.getRecordings().get(info.position);
+			recording.play();		
+		}
+		if (item.getTitle().equals("Delete")) {
+			Recording recording = Recording.getRecordings().get(info.position);
+			recording.delete();
+			showRecordings();
+		}
+		return true;
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -76,31 +102,7 @@ public class AudioRecorder extends BaseActivity {
 		showRecordings();
 
 	}
-	
-	private void showRecordings() {
-		ListView listView = (ListView) findViewById(R.id.audioRecorderListing);
 
-		List<Recording> recordings = Recording.getRecordings();
-		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
-
-		for (Recording recording: recordings){
-			HashMap<String, String> item = new HashMap<String, String>();
-            item.put("line1", recording.getTimeString());
-			item.put("line2", recording.getDurationString());
-			list.add(item);
-
-		}
-		/*
-		ArrayAdapter<HashMap<String, String>> notes = new ArrayAdapter<HashMap<String, String>>(this, R.layout.podcast_items, list);
-*/
-	SimpleAdapter notes = new SimpleAdapter(this,
-				list,
-				R.layout.podcast_items, new String[] { "line1", "line2" },
-				new int[] { R.id.firstLine, R.id.secondLine });
-		
-		listView.setAdapter(notes);
-		
-	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
@@ -108,39 +110,6 @@ public class AudioRecorder extends BaseActivity {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.add("Play");
 		menu.add("Delete");
-	}
-	
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-				.getMenuInfo();
-		if (item.getTitle().equals("Play")) {
-			Recording recording = Recording.getRecordings().get(info.position);
-			recording.play();		
-		}
-		if (item.getTitle().equals("Delete")) {
-			Recording recording = Recording.getRecordings().get(info.position);
-			recording.delete();
-			showRecordings();
-		}
-		return true;
-	}
-
-
-	private void setReadyToRecord(boolean ready) {
-		if (ready) {
-			fb(R.id.audioRecorderRecordButton).setVisibility(View.VISIBLE);
-			fb(R.id.audioRecorderCancelButton).setVisibility(View.INVISIBLE);
-			fb(R.id.audioRecorderSaveButton).setVisibility(View.INVISIBLE);
-			((ProgressBar)findViewById(R.id.audioRecorderBusy)).setVisibility(View.INVISIBLE);
-		} else {
-			fb(R.id.audioRecorderRecordButton).setVisibility(View.INVISIBLE);
-			fb(R.id.audioRecorderCancelButton).setVisibility(View.VISIBLE);
-			fb(R.id.audioRecorderSaveButton).setVisibility(View.VISIBLE);
-			((ProgressBar)findViewById(R.id.audioRecorderBusy)).setVisibility(View.VISIBLE);
-		}
-		
-		
 	}
 
 	@Override
@@ -163,13 +132,44 @@ public class AudioRecorder extends BaseActivity {
 	}
 
 	
-	private Button fb(int id) {
-		return (Button)findViewById(id);		
+	private void setReadyToRecord(boolean ready) {
+		if (ready) {
+			fb(R.id.audioRecorderRecordButton).setVisibility(View.VISIBLE);
+			fb(R.id.audioRecorderCancelButton).setVisibility(View.INVISIBLE);
+			fb(R.id.audioRecorderSaveButton).setVisibility(View.INVISIBLE);
+			((ProgressBar)findViewById(R.id.audioRecorderBusy)).setVisibility(View.INVISIBLE);
+		} else {
+			fb(R.id.audioRecorderRecordButton).setVisibility(View.INVISIBLE);
+			fb(R.id.audioRecorderCancelButton).setVisibility(View.VISIBLE);
+			fb(R.id.audioRecorderSaveButton).setVisibility(View.VISIBLE);
+			((ProgressBar)findViewById(R.id.audioRecorderBusy)).setVisibility(View.VISIBLE);
+		}
+		
+		
 	}
 
-	@Override
-	void onContentService() throws RemoteException {
-		// TODO Auto-generated method stub
+	private void showRecordings() {
+		ListView listView = (ListView) findViewById(R.id.audioRecorderListing);
+
+		List<Recording> recordings = Recording.getRecordings();
+		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+
+		for (Recording recording: recordings){
+			HashMap<String, String> item = new HashMap<String, String>();
+            item.put("line1", recording.getTimeString());
+			item.put("line2", recording.getDurationString());
+			list.add(item);
+
+		}
+		/*
+		ArrayAdapter<HashMap<String, String>> notes = new ArrayAdapter<HashMap<String, String>>(this, R.layout.podcast_items, list);
+*/
+	SimpleAdapter notes = new SimpleAdapter(this,
+				list,
+				R.layout.podcast_items, new String[] { "line1", "line2" },
+				new int[] { R.id.firstLine, R.id.secondLine });
+		
+		listView.setAdapter(notes);
 		
 	}
 

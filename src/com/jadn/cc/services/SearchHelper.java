@@ -9,10 +9,10 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class SearchHelper extends Thread {
 
-	String search;
-
 	boolean done;
+
 	String results = "";
+	String search;
 
 	public SearchHelper(String search) {
 		this.search = search;
