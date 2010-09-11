@@ -6,14 +6,12 @@ import com.jadn.cc.core.Subscription;
 interface IContentService {
     // player status:
 
-	//String[] getPlaySet();
 	void moveTo(in double d);
 	boolean pauseOrPlay();
 	void bump(in int bump);
 	void next();
 	void previous();
 	int getCount();
-	String getCurrentPlaySetName();
 	void pause();
 	void purgeAll();
 	void purgeToCurrent();	
@@ -27,7 +25,7 @@ interface IContentService {
 	int currentProgress();
     boolean isPlaying();
     void setCurrentPaused(int position);
-
+    
     // ??
     String startSearch(String search);
 

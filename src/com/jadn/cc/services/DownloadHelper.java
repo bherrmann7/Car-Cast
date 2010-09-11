@@ -23,7 +23,7 @@ import org.xml.sax.XMLReader;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.jadn.cc.core.PlaySet;
+import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Sayer;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.ui.BaseActivity;
@@ -124,7 +124,7 @@ public class DownloadHelper implements Sayer {
 			podcastsDownloaded = i + 1;
 
 			try {
-				File castFile = new File(PlaySet.PODCASTS.getRoot(), Long.toString(System.currentTimeMillis()) + ".mp3");
+				File castFile = new File(Config.PodcastsRoot, Long.toString(System.currentTimeMillis()) + ".mp3");
 				if (encloseureHandler.isVideo(newPodcasts.get(i).getUrl().toString())) {
 					castFile = new File(android.os.Environment.getExternalStorageDirectory(), "dcim/Camera/"
 							+ Long.toString(System.currentTimeMillis()) + ".mp4");
@@ -140,7 +140,7 @@ public class DownloadHelper implements Sayer {
 				} else {
 					currentSubscription = newPodcasts.get(i).getSubscription();
 					currentTitle = newPodcasts.get(i).getTitle();
-					File tempFile = new File(PlaySet.PODCASTS.getRoot(), "tempFile");
+					File tempFile = new File(Config.PodcastsRoot, "tempFile");
 					say("Subscription: "+currentSubscription);
 					say("Title: "+currentTitle);
 					say("enclosure url: "+new URL(newPodcasts.get(i).getUrl()));

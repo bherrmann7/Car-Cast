@@ -330,8 +330,8 @@ public class CarCast extends BaseActivity {
 				textView.setText("ERROR ** Car Cast requires the sdcard ** ");
 				return;
 			}
-			if (!Config.CarCastRoot.exists()) {
-				if (!Config.CarCastRoot.mkdirs()) {
+			if (!Config.PodcastsRoot.exists()) {
+				if (!Config.PodcastsRoot.mkdirs()) {
 					TextView textView = (TextView) findViewById(R.id.title);
 					textView.setText("ERROR ** Car Cast cannot write to sdcard ** ");
 					return;

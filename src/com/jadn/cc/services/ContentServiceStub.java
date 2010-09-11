@@ -77,11 +77,6 @@ public class ContentServiceStub extends IContentService.Stub {
 	}
 
 	@Override
-	public String getCurrentPlaySetName() throws RemoteException {
-		return contentService.currentSet.toString();
-	}
-
-	@Override
 	public String getCurrentSubscriptionName() throws RemoteException {
 		return contentService.getCurrentSubscriptionName();
 	}
@@ -173,7 +168,7 @@ public class ContentServiceStub extends IContentService.Stub {
 
 	@Override
 	public void purgeToCurrent() throws RemoteException {
-		contentService.deleteUpTo(contentService.current);
+		contentService.deleteUpTo(contentService.currentPodcastInPlayer);
 	}
 
 	@Override

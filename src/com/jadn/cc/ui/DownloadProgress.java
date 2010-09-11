@@ -90,6 +90,14 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 	protected void onResume() {
 		super.onResume();
 		updater = new Updater(handler, this);
+		
+		try {
+			if(!contentService.encodedDownloadStatus().equals("")){
+				findViewById(R.id.startDownloads).setEnabled(false);
+				findViewById(R.id.AbortDownloads).setEnabled(true);
+			}
+		} catch (RemoteException e) {
+		}
 	}
 
 	private void reset() {
@@ -184,7 +192,6 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 				TextView title = (TextView) findViewById(R.id.title);
 				subscriptionName.setText(status[6]);
 				title.setText(status[7]);
-
 			}
 		} catch (Exception e) {
 			esay(new RuntimeException("downloadStatus was: "+downloadStatus,e));

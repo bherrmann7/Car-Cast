@@ -13,7 +13,7 @@ import java.util.List;
 
 import android.util.Log;
 
-import com.jadn.cc.core.PlaySet;
+import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Sayer;
 
 /**
@@ -21,7 +21,7 @@ import com.jadn.cc.core.Sayer;
  * 
  */
 public class DownloadHistory implements Sayer {
-	private static File historyFile = new File(PlaySet.PODCASTS.getRoot(), "history.prop");
+	private static File historyFile = new File(Config.PodcastsRoot, "history.prop");
 	private final static String HISTORY_TWO_HEADER = "history version 2";
 	private static DownloadHistory instance = null;
 	private List<HistoryEntry> history = new ArrayList<HistoryEntry>();

@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.jadn.cc.core.PlaySet;
+import com.jadn.cc.core.Config;
 
 /** Meta information about podcasts. **/
 public class MetaHolder {
@@ -37,7 +37,7 @@ public class MetaHolder {
 	}
 
 	public void loadMeta() {
-		File[] files = PlaySet.PODCASTS.getRoot().listFiles();
+		File[] files = Config.PodcastsRoot.listFiles();
 		if (files == null)
 			return;
 

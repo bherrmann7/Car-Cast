@@ -20,7 +20,6 @@ import android.telephony.TelephonyManager;
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Location;
-import com.jadn.cc.core.PlaySet;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
@@ -28,9 +27,24 @@ import com.jadn.cc.ui.CarCast;
 
 public class ContentService extends Service implements OnCompletionListener {
 
+	private final IContentService.Stub binder = new ContentServiceStub(this);
+	// CarCast activity;
+	int currentPodcastInPlayer;
+	DownloadHelper downloadHelper;
+	private File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
+	Location location;
+	MediaMode mediaMode = MediaMode.UnInitialized;
+	MediaPlayer mediaPlayer = new MediaPlayer();
+	MetaHolder metaHolder;
+	SearchHelper searchHelper;
+	File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
+	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
+	boolean wasPausedByPhoneCall;
+
 	enum MediaMode {
 		Paused, Playing, UnInitialized
 	}
+
 	public static String getTimeString(int time) {
 		StringBuilder sb = new StringBuilder();
 		int min = time / (1000 * 60);
@@ -45,39 +59,12 @@ public class ContentService extends Service implements OnCompletionListener {
 		return sb.toString();
 	}
 
-	private final IContentService.Stub binder = new ContentServiceStub(this);
-
-	// CarCast activity;
-	int current;
-	PlaySet currentSet = PlaySet.PODCASTS;
-
-	DownloadHelper downloadHelper;
-
-	File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
-
-	Location location;
-
-	MediaMode mediaMode = MediaMode.UnInitialized;
-
-	// Jam jam;
-	MediaPlayer mediaPlayer = new MediaPlayer();
-
-	MetaHolder metaHolder;
-
-	SearchHelper searchHelper;
-
-	File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
-
-	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
-
-	boolean wasPausedByPhoneCall;
-
 	public boolean addSubscription(Subscription toAdd) {
 		return subHelper.addSubscription(toAdd);
 	}
 
 	public void bump(int bump) {
-		if (current >= metaHolder.getSize())
+		if (currentPodcastInPlayer >= metaHolder.getSize())
 			return;
 		try {
 			int npos = mediaPlayer.getCurrentPosition() + bump * 1000;
@@ -96,13 +83,13 @@ public class ContentService extends Service implements OnCompletionListener {
 		}
 
 	}
-	
+
 	private MetaFile cm() {
-		return metaHolder.get(current);
+		return metaHolder.get(currentPodcastInPlayer);
 	}
 
 	private int currentDuration() {
-		if (current >= metaHolder.getSize()) {
+		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			return 0;
 		}
 		int dur = cm().getDuration();
@@ -130,10 +117,10 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	int currentPostion() {
-		if (current >= metaHolder.getSize()) {
+		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			return 0;
 		}
-		return metaHolder.get(current).getCurrentPos();
+		return metaHolder.get(currentPodcastInPlayer).getCurrentPos();
 	}
 
 	public int currentProgress() {
@@ -148,19 +135,10 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public CharSequence currentSummary() {
 		StringBuilder sb = new StringBuilder();
-		if (currentSet == PlaySet.NOTES_HOME)
-			sb.append("--Home Notes--\n");
-		if (currentSet == PlaySet.NOTES_WORK)
-			sb.append("--Work Notes--\n");
-		if (current >= metaHolder.getSize()) {
-			if (currentSet == PlaySet.PODCASTS) {
-				if (downloadHelper != null)
-					return "\nDownloading podcasts";
-				return "\nNo Podcasts have been downloaded.";
-			}
-			if (currentSet == PlaySet.NOTES_HOME)
-				return "No Home Notes";
-			return "No Work Notes";
+		if (currentPodcastInPlayer >= metaHolder.getSize()) {
+			if (downloadHelper != null)
+				return "\nDownloading podcasts";
+			return "\nNo Podcasts have been downloaded.";
 		}
 		sb.append(cm().getFeedName());
 		sb.append('\n');
@@ -169,16 +147,11 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public String currentTitle() {
-		if (current >= metaHolder.getSize()) {
-			if (currentSet == PlaySet.PODCASTS) {
-				if (downloadHelper != null) {
-					return "\nDownloading podcasts\n" + downloadHelper.getStatus();
-				}
-				return "No podcasts loaded.\nUse 'Menu' and 'Download Podcasts'";
+		if (currentPodcastInPlayer >= metaHolder.getSize()) {
+			if (downloadHelper != null) {
+				return "\nDownloading podcasts\n" + downloadHelper.getStatus();
 			}
-			if (currentSet == PlaySet.NOTES_HOME)
-				return "No Home Notes";
-			return "No Work Notes";
+			return "No podcasts loaded.\nUse 'Menu' and 'Download Podcasts'";
 		}
 		return cm().getTitle();
 	}
@@ -193,26 +166,26 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (mediaMode == MediaMode.Playing) {
 			pauseNow();
 		}
-		metaHolder.get(current).delete();
+		metaHolder.get(currentPodcastInPlayer).delete();
 		metaHolder = new MetaHolder();
-		if (current >= metaHolder.getSize()) {
-			current = 0;
+		if (currentPodcastInPlayer >= metaHolder.getSize()) {
+			currentPodcastInPlayer = 0;
 		}
 	}
 
 	public void deletePodcast(int position) {
-		if (mediaPlayer.isPlaying() && current == position) {
+		if (mediaPlayer.isPlaying() && currentPodcastInPlayer == position) {
 			pauseNow();
 		}
-		
+
 		metaHolder.delete(position);
-		if (current >= metaHolder.getSize()) {
-			if (current > 0)
-				current--;
+		if (currentPodcastInPlayer >= metaHolder.getSize()) {
+			if (currentPodcastInPlayer > 0)
+				currentPodcastInPlayer--;
 		}
 		// If we are playing something after what's deleted, adjust the current
-		if (current > position)
-			current--;
+		if (currentPodcastInPlayer > position)
+			currentPodcastInPlayer--;
 
 		try {
 			fullReset();
@@ -240,7 +213,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		metaHolder = new MetaHolder();
 		tryToRestoreLocation();
 		if (location == null)
-			current = 0;
+			currentPodcastInPlayer = 0;
 	}
 
 	void doDownloadCompletedNotification(int got) {
@@ -270,8 +243,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		downloadHelper = null;
 
 		metaHolder = new MetaHolder();
-		if (current >= metaHolder.getSize()) {
-			current = 0;
+		if (currentPodcastInPlayer >= metaHolder.getSize()) {
+			currentPodcastInPlayer = 0;
 		}
 	}
 
@@ -291,15 +264,15 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	private boolean fullReset() throws Exception {
-	
+
 		mediaPlayer.reset();
-	
-		if (current >= metaHolder.getSize())
+
+		if (currentPodcastInPlayer >= metaHolder.getSize())
 			return false;
-	
+
 		mediaPlayer.setDataSource(currentFile().toString());
 		mediaPlayer.prepare();
-		mediaPlayer.seekTo(metaHolder.get(current).getCurrentPos());
+		mediaPlayer.seekTo(metaHolder.get(currentPodcastInPlayer).getCurrentPos());
 		return true;
 	}
 
@@ -308,7 +281,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public String getCurrentSubscriptionName() {
-		if (current >= metaHolder.getSize()) {
+		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			return "";
 		}
 		return cm().getFeedName();
@@ -336,7 +309,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public String getPodcastEmailSummary() {
 		StringBuilder sb = new StringBuilder();
-		if (current < metaHolder.getSize()) {
+		if (currentPodcastInPlayer < metaHolder.getSize()) {
 			MetaFile mf = cm();
 			if (mf != null) {
 				sb.append("\nWanted to let you know about this podcast:\n\n");
@@ -375,7 +348,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (metaHolder.getSize() == 0)
 			sb.append('0');
 		else
-			sb.append(current + 1);
+			sb.append(currentPodcastInPlayer + 1);
 		sb.append('/');
 		sb.append(metaHolder.getSize());
 		return sb.toString();
@@ -385,7 +358,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (mediaMode == MediaMode.UnInitialized) {
 			if (currentDuration() == 0)
 				return;
-			metaHolder.get(current).setCurrentPos((int) (d * currentDuration()));
+			metaHolder.get(currentPodcastInPlayer).setCurrentPos((int) (d * currentDuration()));
 			mediaPlayer.reset();
 			try {
 				mediaPlayer.setDataSource(currentFile().toString());
@@ -412,7 +385,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		mediaMode = MediaMode.UnInitialized;
 
 		// if we are at end.
-		if (current + 1 >= metaHolder.getSize()) {
+		if (currentPodcastInPlayer + 1 >= metaHolder.getSize()) {
 			saveState();
 			// activity.disableJumpButtons();
 			mediaPlayer.reset();
@@ -423,7 +396,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			return;
 		}
 
-		current++;
+		currentPodcastInPlayer++;
 		if (playing)
 			play();
 	}
@@ -469,15 +442,12 @@ public class ContentService extends Service implements OnCompletionListener {
 		final TelephonyManager telMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
 		telMgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
-		Config.CarCastRoot.mkdirs();
-		for (PlaySet playset : PlaySet.values()) {
-			playset.getRoot().mkdir();
-		}
+		Config.PodcastsRoot.mkdirs();
 		metaHolder = new MetaHolder();
 		mediaPlayer.setOnCompletionListener(this);
 
 		// restore state;
-		current = 0;
+		currentPodcastInPlayer = 0;
 
 		restoreState();
 	}
@@ -517,8 +487,9 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	private void play() {
 		try {
-			if(!fullReset()) return;
-			
+			if (!fullReset())
+				return;
+
 			// say(activity, "started " + currentTitle());
 			mediaPlayer.start();
 			mediaMode = MediaMode.Playing;
@@ -532,7 +503,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (mediaPlayer.isPlaying()) {
 			mediaPlayer.stop();
 		}
-		current = position;
+		currentPodcastInPlayer = position;
 		play();
 	}
 
@@ -545,10 +516,10 @@ public class ContentService extends Service implements OnCompletionListener {
 			// say(activity, "stopped " + currentTitle());
 		}
 		mediaMode = MediaMode.UnInitialized;
-		if (current > 0) {
-			current--;
+		if (currentPodcastInPlayer > 0) {
+			currentPodcastInPlayer--;
 		}
-		if (current >= metaHolder.getSize())
+		if (currentPodcastInPlayer >= metaHolder.getSize())
 			return;
 		if (playing)
 			play();
@@ -559,7 +530,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public void purgeHeard() {
-		deleteUpTo(current);
+		deleteUpTo(currentPodcastInPlayer);
 	}
 
 	public void resetToDemoSubscriptions() {
@@ -567,7 +538,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public void restoreState() {
-		final File stateFile = new File(currentSet.getRoot(), "state.dat");
+		final File stateFile = new File(Config.PodcastsRoot, "state.dat");
 		if (!stateFile.exists()) {
 			location = null;
 			return;
@@ -585,7 +556,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public void saveState() {
 		try {
-			final File stateFile = new File(currentSet.getRoot(), "state.dat");
+			final File stateFile = new File(Config.PodcastsRoot, "state.dat");
 			location = Location.save(stateFile, currentTitle(), mediaPlayer.getCurrentPosition(), mediaPlayer.getDuration());
 		} catch (Throwable e) {
 			// bummer.
@@ -599,7 +570,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			mediaPlayer.stop();
 		}
 		mediaMode = MediaMode.Paused;
-		current = position;
+		currentPodcastInPlayer = position;
 	}
 
 	public void setMediaMode(MediaMode mediaMode) {
@@ -659,7 +630,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			boolean found = false;
 			for (int i = 0; i < metaHolder.getSize(); i++) {
 				if (metaHolder.get(i).getTitle().equals(location.title)) {
-					current = i;
+					currentPodcastInPlayer = i;
 					found = true;
 					break;
 				}

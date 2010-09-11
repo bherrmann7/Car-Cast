@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 public class Config {
 	
 	public static final File CarCastRoot = new File(android.os.Environment.getExternalStorageDirectory(),"carcast");
+	public static final File PodcastsRoot = new File(CarCastRoot,"podcasts");
 		
 	public static int getMax(Activity activity){
 		SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(activity);
