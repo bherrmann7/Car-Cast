@@ -5,11 +5,9 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +21,7 @@ import com.jadn.cc.core.Sayer;
  * 
  */
 public class DownloadHistory implements Sayer {
-	private static File histFile = new File(PlaySet.PODCASTS.getRoot(), "history.prop");
+	private static File historyFile = new File(PlaySet.PODCASTS.getRoot(), "history.prop");
 	private final static String HISTORY_TWO_HEADER = "history version 2";
 	private static DownloadHistory instance = null;
 	private List<HistoryEntry> history = new ArrayList<HistoryEntry>();
@@ -44,9 +42,10 @@ public class DownloadHistory implements Sayer {
 	/**
 	 * Create a object that represents the download history. It is backed to a file.
 	 */
+	@SuppressWarnings("unchecked")
 	private DownloadHistory() {
 		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(histFile));
+			DataInputStream dis = new DataInputStream(new FileInputStream(historyFile));
 			String line = dis.readLine();
 			if (!line.startsWith(HISTORY_TWO_HEADER)) {
 				// load old format.
@@ -56,15 +55,13 @@ public class DownloadHistory implements Sayer {
 				}
 			} else {
 				ObjectInputStream ois = new ObjectInputStream(dis);
-				HistoryEntry historyEntry = null;
-				while ((historyEntry = (HistoryEntry) ois.readObject()) != null) {
-					history.add(historyEntry);
-				}
+				history =  (List<HistoryEntry>) ois.readObject();
+				ois.close();
 			}
 		} catch (Throwable e) {
 			// would be nice to ask the user if we can submit his history file
 			// to the devs for review
-			Log.e(DownloadHelper.class.getName(), "error reading history file " + histFile.toString(), e);
+			Log.e(DownloadHelper.class.getName(), "error reading history file " + historyFile.toString(), e);
 		}
 	}
 
@@ -75,13 +72,7 @@ public class DownloadHistory implements Sayer {
 	 */
 	public void add(MetaNet metaNet) {
 		history.add(new HistoryEntry(metaNet.getSubscription(), metaNet.getUrl()));
-		try {
-			PrintWriter histOut = new PrintWriter(new FileWriter(histFile, true));
-			histOut.println(metaNet.getUrl());
-			histOut.close();
-		} catch (IOException e) {
-			say("problem writing history file: " + histFile + " ex:" + e);
-		}
+		save();
 	}
 
 	/**
@@ -105,8 +96,8 @@ public class DownloadHistory implements Sayer {
 	 */
 	public int eraseHistory() {
 		int size = instance.history.size();
-		histFile.delete();
 		instance.history = new ArrayList<HistoryEntry>();
+		save();
 		return size;
 	}
 
@@ -138,14 +129,14 @@ public class DownloadHistory implements Sayer {
 
 	private void save() {
 		try {
-			DataOutputStream dosDataOutputStream = new DataOutputStream(new FileOutputStream(histFile));
+			DataOutputStream dosDataOutputStream = new DataOutputStream(new FileOutputStream(historyFile));
 			dosDataOutputStream.write(HISTORY_TWO_HEADER.getBytes());
 			dosDataOutputStream.write('\n');
 			ObjectOutputStream oos = new ObjectOutputStream(dosDataOutputStream);
 			oos.writeObject(history);
 			oos.close();
 		} catch (IOException e) {
-			say("problem writing history file: " + histFile + " ex:" + e);
+			say("problem writing history file: " + historyFile + " ex:" + e);
 		}
 	}
 

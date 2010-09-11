@@ -93,6 +93,9 @@ public class ContentServiceStub extends IContentService.Stub {
 
 	@Override
 	public String getDownloadProgress() throws RemoteException {
+		if ( contentService.downloadHelper == null ){
+			return "";
+		}
 		return contentService.downloadHelper.sb.toString();
 	}
 
