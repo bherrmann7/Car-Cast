@@ -21,16 +21,17 @@
         android:singleLine="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
+        android:paddingRight="5dip"
         android:text="" />
     <TextView
         android:layout_below="@id/firstLine"
         android:id="@+id/secondLine"
         android:textSize="18dp"
-        android:layout_width="fill_parent"
-        android:layout_height="1dip"        
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:singleLine="true"
-        android:ellipsize="marquee"
-        android:text="Simple application that shows how to use RelativeLayout" />
+        android:ellipsize="marquee"  
+        android:text="Simple application that shows how to use RelativeLayout" /> 
+        
 </RelativeLayout>

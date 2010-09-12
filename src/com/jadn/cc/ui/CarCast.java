@@ -30,10 +30,9 @@ import com.jadn.cc.trace.ExceptionHandler;
 
 public class CarCast extends BaseActivity {
 	final static String tag = CarCast.class.getSimpleName();
-
-	
+	boolean toggleOnPause;
+	Updater updater;
 	private SharedPreferences app_preferences;
-
 	int bgcolor;
 
 	// Need handler for callbacks to the UI thread
@@ -45,10 +44,6 @@ public class CarCast extends BaseActivity {
 			updateUI();
 		}
 	};
-
-	boolean toggleOnPause;
-
-	Updater updater;
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -104,34 +99,21 @@ public class CarCast extends BaseActivity {
 			}
 
 			String lastRun = app_preferences.getString("lastRun", null);
-
-			// If it's false (the default) then we need to display an alert
-			// dialog
-			if (lastRun == null) {
-				// Start Splash
+			if (lastRun == null || app_preferences.getBoolean("showSplash", false) ) {
 				startActivity(new Intent(this, Splash.class));
-
-				// new AlertDialog.Builder(CarCast.this).setTitle(
-				// "Thanks for trying Car Cast").setMessage(
-				// "Car Cast is a media player for your commute  Enjoy!")
-				// .setNeutralButton("Close", null).show();
-
-				saveLastRun();
-			} else if (app_preferences.getBoolean("showSplash", false)) {
-				// Start Splash
-				startActivity(new Intent(this, Splash.class));
-
 				SharedPreferences.Editor editor = app_preferences.edit();
 				editor.putBoolean("showSplash", false);
 				editor.commit();
+				return;
 			} else if (!lastRun.equals(releaseData[0])) {
 				new AlertDialog.Builder(CarCast.this).setTitle("Car Cast updated").setMessage(releaseData[1]).setNeutralButton("Close",
 						null).show();
-				saveLastRun();
 			}
+			saveLastRun();
 
 			int width = getWindow().getWindowManager().getDefaultDisplay().getWidth();
 			int height = getWindow().getWindowManager().getDefaultDisplay().getHeight();
+			// how horrible... the shame.  (should be phone neutral.)
 			if (width == 320 && height == 480) {
 				setContentView(R.layout.main_relative_g1);
 			} else if (width == 480 && height == 854) {
@@ -202,13 +184,12 @@ public class CarCast extends BaseActivity {
 			textView.setOnTouchListener(new OnTouchListener() {
 
 				@Override
-				public boolean onTouch(View v, MotionEvent event) {		
-					if(event.getAction() != MotionEvent.ACTION_UP)
+				public boolean onTouch(View v, MotionEvent event) {
+					if (event.getAction() != MotionEvent.ACTION_UP)
 						return true;
 					// if clicking on the audio recorder (lower 1/3 of screen on 1/2 of right)
-					if ( event.getAction() == MotionEvent.ACTION_UP &&
-							event.getX() > (v.getWidth() * 0.66) && 
-							(event.getY()) > (v.getHeight() * 0.5) ){
+					if (event.getAction() == MotionEvent.ACTION_UP && event.getX() > (v.getWidth() * 0.66)
+							&& (event.getY()) > (v.getHeight() * 0.5)) {
 						try {
 							if (contentService.isPlaying()) {
 								contentService.pause();
@@ -228,14 +209,14 @@ public class CarCast extends BaseActivity {
 			t.printStackTrace();
 		}
 		String accounts = app_preferences.getString("accounts", null);
-		if (accounts == null ) {
+		if (accounts == null) {
 			GoogleLoginServiceHelper.getAccount(this, 123, true);
 		}
 
 	}
 
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.player_menu, menu);
 		return true;
@@ -370,7 +351,5 @@ public class CarCast extends BaseActivity {
 			Log.e("cc", "", e);
 		}
 	}
-
-
 
 }

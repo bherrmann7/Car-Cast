@@ -151,7 +151,7 @@ public class Subscriptions extends BaseActivity {
 		for (Subscription sub: sites) {
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put("name", sub.name);
-			item.put("url", sub.url);
+			item.put("url", ""); // URL is too geeky sub.url);
 			item.put("subscription", sub);
 			rows.add(item);
 		}

@@ -1,11 +1,11 @@
-package com.jadn.cc.ui; import android.app.Activity;
+package com.jadn.cc.ui;
+
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -41,12 +41,6 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		final Button startDownloads = (Button) findViewById(R.id.startDownloads);
 		startDownloads.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(DownloadProgress.this);
-				if (app_preferences.getBoolean("downloadDetails", false)) {
-					startActivity(new Intent(DownloadProgress.this, Downloader.class));
-					return;
-				}
-
 				try {
 					reset();
 					contentService.startDownloadingNewPodCasts(Config
@@ -68,6 +62,14 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 				mNotificationManager.cancel(23);
 				// Crude... but effective...
 				System.exit(-1);
+			}
+		});
+		
+		final Button downloadDetails = (Button) findViewById(R.id.downloadDetails);
+		downloadDetails.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				startActivity(new Intent(DownloadProgress.this, Downloader.class));
+
 			}
 		});
 		

@@ -48,7 +48,7 @@ public class DownloadHelper implements Sayer {
 	}
 
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
-		say("loading podcast sites.");
+		say("Starting to find and download new podcasts.");
 
 		List<Subscription> sites = contentService.getSubscriptions();
 
@@ -151,17 +151,16 @@ public class DownloadHelper implements Sayer {
 					int expectedSizeKilo = newPodcasts.get(i).getSize()/1024;
 					String preDownload = sb.toString();
 					podcastsCurrentBytes=0;
-					say(String.format("%dk/%dk 0",podcastsCurrentBytes/1024,expectedSizeKilo)+"%\n\n");
+					say(String.format("%dk/%dk 0",podcastsCurrentBytes/1024,expectedSizeKilo)+"%\n");
 					while ((amt = is.read(buf)) > 0) {
 						fos.write(buf, 0, amt);
 						podcastsCurrentBytes += amt;
-						sb = new StringBuilder(preDownload+String.format("%dk/%dk  %d",podcastsCurrentBytes/1024,expectedSizeKilo, (int)((podcastsCurrentBytes/10.24)/expectedSizeKilo))+"%\n\n");
+						sb = new StringBuilder(preDownload+String.format("%dk/%dk  %d",podcastsCurrentBytes/1024,expectedSizeKilo, (int)((podcastsCurrentBytes/10.24)/expectedSizeKilo))+"%\n");
 					}
 					fos.close();
 					is.close();
 					// add before rename, so if rename fails, we remember
-					// that we tried this file and skip it next time.
-					
+					// that we tried this file and skip it next time.					
 					history.add(newPodcasts.get(i));
 
 					tempFile.renameTo(castFile);
@@ -175,13 +174,13 @@ public class DownloadHelper implements Sayer {
 						podcastsTotalBytes += podcastsCurrentBytes;
 						
 					}
-					history.add(newPodcasts.get(i));
+					say("-");
 				}
 			} catch (Throwable e) {
 				say("Problem downloading " + newPodcasts.get(i).getUrlShortName() + " e:" + e);
 			}
 		}
-		say("finished downloading. Got " + got + " new podcasts.");
+		say("Finished. Downloaded " + got + " new podcasts.");
 
 		contentService.doDownloadCompletedNotification(got);
 	}
