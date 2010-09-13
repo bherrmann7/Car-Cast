@@ -167,7 +167,11 @@ public class PodcastList extends BaseActivity {
 				esay(e);
 				item.put("line1", metaFile.getFeedName());
 			}
-			item.put("xx:xx-xx:xx", ContentService.getTimeString(metaFile.getCurrentPos()+5)+"-"+ContentService.getTimeString(metaFile.getDuration()));
+			String time = ContentService.getTimeString(metaFile.getCurrentPos())+"-"+ContentService.getTimeString(metaFile.getDuration());
+			if (metaFile.getCurrentPos() == 0 && metaFile.getDuration() == -1 ) {
+				time = "";
+			}			
+			item.put("xx:xx-xx:xx", time);
 			item.put("line2", metaFile.getTitle());
 			list.add(item);
 

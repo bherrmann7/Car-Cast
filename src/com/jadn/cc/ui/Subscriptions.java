@@ -76,13 +76,10 @@ public class Subscriptions extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.siteslist);
-
+		setContentView(R.layout.subscription_list);
 		setTitle("Car Cast: Subscriptions");
-
 		ListView listView = (ListView) findViewById(R.id.siteList);
 		registerForContextMenu(listView);
-
 	}
 
 	@Override

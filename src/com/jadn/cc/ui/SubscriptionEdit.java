@@ -34,13 +34,13 @@ public class SubscriptionEdit extends BaseActivity {
 	        ((TextView) findViewById(R.id.editsite_name)).setText(currentSub.name);
 	        ((TextView) findViewById(R.id.editsite_url)).setText(currentSub.url);
 	        // TODO: add max count, ordering here
-        } // endif
+        } // end if
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.editsite);
+		setContentView(R.layout.edit_subscription);
 
 		currentSub = null;
 		

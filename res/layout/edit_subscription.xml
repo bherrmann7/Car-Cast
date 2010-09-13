@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent" 
+                android:layout_height="wrap_content"
+                android:padding="10px" >
+
+    <TextView android:id="@+id/label" 
+              android:layout_width="fill_parent" 
+              android:layout_height="wrap_content" 
+              android:text="Podcast Site URL:" />
+
+    <EditText android:id="@+id/editsite_url" 
+              android:layout_width="fill_parent" 
+              android:layout_height="wrap_content" 
+              android:layout_below="@id/label" android:text="http://"/>
+  
+
+    <Button android:id="@+id/testEditSite" 
+    		android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editsite_url"
+            android:layout_alignParentRight="true"            
+            android:text="Test" />
+
+    <TextView android:id="@+id/label2" 
+              android:layout_width="fill_parent" 
+              android:layout_below="@id/testEditSite" 
+              android:layout_height="wrap_content" 
+              android:text="Site Name:" />
+
+    <EditText android:id="@+id/editsite_name" 
+              android:layout_below="@id/label2" 
+              android:layout_width="fill_parent" 
+              android:layout_height="wrap_content" 
+              android:paddingBottom="20dip"              
+              /> 
+              
+              
+     <Button android:id="@+id/saveEditSite" 
+     		android:layout_marginTop="20px"
+     		android:layout_marginLeft="100px"
+            android:layout_width="100px"
+            android:layout_height="wrap_content" 
+            android:layout_below="@id/editsite_name"
+            android:text="Save" />
+
+   
+              
+            
+</RelativeLayout>
