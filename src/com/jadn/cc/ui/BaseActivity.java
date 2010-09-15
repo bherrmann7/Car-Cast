@@ -17,7 +17,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
-            "11-Sep-2010", "Updated download history to allow per subscriptions history erasing. (will only work on new downloads.)",
+            "14-Sep-2010", "Updated download history to allow per subscriptions history erasing. (will only work on new downloads.)",
             "10-Sep-2010", "Added a setting for detailed download information (with email option for problem troubleshooting.)",
             "2-Sep-2010", "Re-enable screen rotation of player (for people with car docks.)",
 		    "23-Aug-2010", "Patrick Forhan: Sorted subscription list, No rotation in player mode",

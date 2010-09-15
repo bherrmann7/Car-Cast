@@ -11,7 +11,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.SAXParser;
@@ -46,9 +48,11 @@ public class DownloadHelper implements Sayer {
 	public DownloadHelper(int max) {
 		this.max = max;
 	}
+	
+	SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd HHh:mma");
 
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
-		say("Starting to find and download new podcasts.");
+		say("Starting find/download new podcasts "+BaseActivity.getVersion()+" "+sdf.format(new Date()));
 
 		List<Subscription> sites = contentService.getSubscriptions();
 
@@ -56,7 +60,7 @@ public class DownloadHelper implements Sayer {
 			postSitesToJadn(accounts, sites);
 		}
 
-		say("starting download of podcast " + sites.size() + " site's rss feeds.");
+		say("Searching " + sites.size() + " subscriptions. "+sdf.format(new Date()));
 
 		totalSites = sites.size();
 
@@ -71,7 +75,6 @@ public class DownloadHelper implements Sayer {
 				int foundStart = encloseureHandler.metaNets.size();
 				if (sub.maxDownloads == -1) {
 					encloseureHandler.max = max;
-
 				} else {
 					encloseureHandler.max = sub.maxDownloads;
 				} // endif
@@ -180,7 +183,7 @@ public class DownloadHelper implements Sayer {
 				say("Problem downloading " + newPodcasts.get(i).getUrlShortName() + " e:" + e);
 			}
 		}
-		say("Finished. Downloaded " + got + " new podcasts.");
+		say("Finished. Downloaded " + got + " new podcasts. "+sdf.format(new Date()));
 
 		contentService.doDownloadCompletedNotification(got);
 	}

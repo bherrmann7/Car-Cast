@@ -40,6 +40,7 @@ public class DownloadHistory implements Sayer {
 		}
 		return instance;
 	}
+	
 
 	/**
 	 * Create a object that represents the download history. It is backed to a file.
