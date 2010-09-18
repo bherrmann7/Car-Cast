@@ -17,8 +17,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
-            "14-Sep-2010", "Updated download history to allow per subscriptions history erasing. (will only work on new downloads.)",
-            "10-Sep-2010", "Added a setting for detailed download information (with email option for problem troubleshooting.)",
+            "18-Sep-2010", "Added 'details' button to downloads.  Use it if you have downloading problems (use Menu/email... to send in results.)",
+            "10-Sep-2010", "Added a setting for detailed download information (with email option for problem troubleshooting - THANKS!!)",
             "2-Sep-2010", "Re-enable screen rotation of player (for people with car docks.)",
 		    "23-Aug-2010", "Patrick Forhan: Sorted subscription list, No rotation in player mode",
 		    "7-Aug-2010", "Updated text size on podcast search page. Added privacy settings. (Also updated podcast search database!) NOTE: includes Patrick's internal changes to podcasts.txt",

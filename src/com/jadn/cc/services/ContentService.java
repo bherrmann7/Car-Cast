@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -589,10 +590,16 @@ public class ContentService extends Service implements OnCompletionListener {
 			new Thread() {
 				@Override
 				public void run() {
+					// Lets not the phone go to sleep while doing downloads....
+					PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+					PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK , "ContentService download thread");
+
 					try {
 						// The intent here is keep the phone from shutting down
 						// during a download.
-						ContentService.this.setForeground(true);
+						ContentService.this.setForeground(true);					
+						wl.acquire();
+	
 						downloadHelper = new DownloadHelper(max);
 						String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
 								"none");
@@ -601,6 +608,7 @@ public class ContentService extends Service implements OnCompletionListener {
 						downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
 					} finally {
 						ContentService.this.setForeground(false);
+						wl.release();
 					}
 				}
 			}.start();
@@ -621,7 +629,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		searchHelper.start();
 		return "";
 	}
-
+	
 	private void tryToRestoreLocation() {
 		try {
 			if (location == null) {

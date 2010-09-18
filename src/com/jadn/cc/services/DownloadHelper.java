@@ -22,6 +22,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import android.content.Context;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -49,10 +51,11 @@ public class DownloadHelper implements Sayer {
 		this.max = max;
 	}
 	
-	SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd HHh:mma");
+	SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd hh:mma");
 
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
-		say("Starting find/download new podcasts "+BaseActivity.getVersion()+" "+sdf.format(new Date()));
+		
+		say("Starting find/download new podcasts. CarCast ver "+BaseActivity.getVersion());
 
 		List<Subscription> sites = contentService.getSubscriptions();
 
