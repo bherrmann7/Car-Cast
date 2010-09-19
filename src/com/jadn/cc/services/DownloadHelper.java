@@ -22,8 +22,6 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-import android.content.Context;
-import android.os.PowerManager;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -156,12 +154,13 @@ public class DownloadHelper implements Sayer {
 					int amt = 0;
 					int expectedSizeKilo = newPodcasts.get(i).getSize()/1024;
 					String preDownload = sb.toString();
-					podcastsCurrentBytes=0;
-					say(String.format("%dk/%dk 0",podcastsCurrentBytes/1024,expectedSizeKilo)+"%\n");
+					int totalForThisPodcast = 0;
+					say(String.format("%dk/%dk 0",totalForThisPodcast/1024,expectedSizeKilo)+"%\n");
 					while ((amt = is.read(buf)) > 0) {
 						fos.write(buf, 0, amt);
 						podcastsCurrentBytes += amt;
-						sb = new StringBuilder(preDownload+String.format("%dk/%dk  %d",podcastsCurrentBytes/1024,expectedSizeKilo, (int)((podcastsCurrentBytes/10.24)/expectedSizeKilo))+"%\n");
+						totalForThisPodcast += amt;
+						sb = new StringBuilder(preDownload+String.format("%dk/%dk  %d",totalForThisPodcast/1024,expectedSizeKilo, (int)((totalForThisPodcast/10.24)/expectedSizeKilo))+"%\n");
 					}
 					fos.close();
 					is.close();
@@ -172,12 +171,12 @@ public class DownloadHelper implements Sayer {
 					tempFile.renameTo(castFile);
 					new MetaFile(newPodcasts.get(i), castFile).save();
 					got++;
-					if (podcastsCurrentBytes != newPodcasts.get(i).getSize()) {
+					if (totalForThisPodcast != newPodcasts.get(i).getSize()) {
 						say("Note: reported size in rss did not match download.");
 						// subtract out wrong value
 						podcastsTotalBytes -= newPodcasts.get(i).getSize();
 						// add in correct value
-						podcastsTotalBytes += podcastsCurrentBytes;
+						podcastsTotalBytes += totalForThisPodcast;
 						
 					}
 					say("-");
