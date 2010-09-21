@@ -35,11 +35,11 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 	
 	@Override
 	void onContentService() throws RemoteException {
-		try {
-			contentService.startDownloadingNewPodCasts(Config.getMax(this));
-		} catch (RemoteException re) {
-			esay(re);
-		}		
+//		try {
+//			contentService.startDownloadingNewPodCasts(Config.getMax(this));
+//		} catch (RemoteException re) {
+//			esay(re);
+//		}		
 	}
 	
 	PowerManager.WakeLock wl; 
@@ -101,6 +101,9 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 			String text = contentService.getDownloadProgress();
 			if(text.length()!=0)
 				tv.setText(text);
+			else {
+				tv.setText("\n\n\nNo download has run or is running.");
+			}
 		} catch (Exception e) {
 			esay(e);
 		}

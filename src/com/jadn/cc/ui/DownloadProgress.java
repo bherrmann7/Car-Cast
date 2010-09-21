@@ -1,5 +1,9 @@
 package com.jadn.cc.ui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -18,21 +22,25 @@ import com.jadn.cc.core.Config;
 public class DownloadProgress extends BaseActivity implements Runnable {
 
 	final Handler handler = new Handler();
-
 	Updater updater;
-
-	boolean wasStarted;
 
 	@Override
 	void onContentService() throws RemoteException {
-		boolean idle = contentService.encodedDownloadStatus().equals("");
+		String status = contentService.encodedDownloadStatus();
+		boolean idle = false;
+		if (status.equals("")) {
+			idle = true;
+		} else {
+			if (status.split(",")[0].equals("idle")) {
+				idle = true;
+			}
+		}
 		Button startDownloads = (Button) findViewById(R.id.startDownloads);
 		Button abort = (Button) findViewById(R.id.AbortDownloads);
 		startDownloads.setEnabled(idle);
 		abort.setEnabled(!idle);
 	}
 
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,8 +51,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 			public void onClick(View v) {
 				try {
 					reset();
-					contentService.startDownloadingNewPodCasts(Config
-							.getMax(DownloadProgress.this));
+					contentService.startDownloadingNewPodCasts(Config.getMax(DownloadProgress.this));
 				} catch (RemoteException re) {
 					esay(re);
 				}
@@ -64,7 +71,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 				System.exit(-1);
 			}
 		});
-		
+
 		final Button downloadDetails = (Button) findViewById(R.id.downloadDetails);
 		downloadDetails.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -72,18 +79,15 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 
 			}
 		});
-		
+
 		startDownloads.setEnabled(false);
 		abort.setEnabled(false);
-
 		reset();
-
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-
 		// stop display thread
 		updater.allDone();
 	}
@@ -91,11 +95,10 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		updater = new Updater(handler, this);		
+		updater = new Updater(handler, this);
 	}
 
 	private void reset() {
-
 		TextView labelSubscriptionSites = (TextView) findViewById(R.id.labelSubscriptionSites);
 		TextView scanning = (TextView) findViewById(R.id.scanning);
 		TextView downloadingLabel = (TextView) findViewById(R.id.downloadingLabel);
@@ -124,73 +127,74 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 	public void run() {
 		String downloadStatus = null;
 		try {
-			downloadStatus=contentService.encodedDownloadStatus();
-			if (downloadStatus.equals("")) {
-				if (wasStarted) {
-					wasStarted = false;
-					TextView downloadingLabel = (TextView) findViewById(R.id.downloadingLabel);
-					TextView progressSimple = (TextView) findViewById(R.id.progressSimple);
-					if (progressSimple.getText().equals("")) {
-						downloadingLabel.setVisibility(TextView.VISIBLE);
-						progressSimple.setVisibility(TextView.VISIBLE);
-						progressSimple.setText("  No new podcasts found.");
-					} else {
-						TextView subscriptionName = (TextView) findViewById(R.id.subscriptionName);
-						TextView title = (TextView) findViewById(R.id.title);
-						subscriptionName.setText("");
-						title.setText("   *** COMPLETED ***");
-					}
-				}
+			downloadStatus = contentService.encodedDownloadStatus();
+			if (!downloadStatus.equals("")) {
+				updateFromString(downloadStatus);
+			}
+			if (downloadStatus.equals("") || downloadStatus.startsWith("idle,")) {
 				findViewById(R.id.startDownloads).setEnabled(true);
 				findViewById(R.id.AbortDownloads).setEnabled(false);
 			} else {
-				wasStarted = true;
-				TextView labelSubscriptionSites = (TextView) findViewById(R.id.labelSubscriptionSites);
-				TextView scanning = (TextView) findViewById(R.id.scanning);
-				labelSubscriptionSites.setVisibility(TextView.VISIBLE);
-				scanning.setVisibility(TextView.VISIBLE);
-				TextView downloadingLabel = (TextView) findViewById(R.id.downloadingLabel);
-				TextView progressSimple = (TextView) findViewById(R.id.progressSimple);
-				TextView progressBytes = (TextView) findViewById(R.id.progressBytes);
-				ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
-
-				String[] status = downloadStatus.split(",");
-				labelSubscriptionSites.setVisibility(TextView.VISIBLE);
-				scanning.setText("  Scanning sites " + status[0] + "/"
-						+ status[1]);
-				if (status[3].equals("0")) {
-					downloadingLabel.setVisibility(TextView.INVISIBLE);
-					progressSimple.setVisibility(TextView.INVISIBLE);
-					progressBytes.setVisibility(TextView.INVISIBLE);
-					progressBar.setVisibility(TextView.INVISIBLE);
-					progressBar.setProgress(0);
-				} else {
-					downloadingLabel.setVisibility(TextView.VISIBLE);
-					progressSimple.setVisibility(TextView.VISIBLE);
-					progressBytes.setVisibility(TextView.VISIBLE);
-					progressBar.setVisibility(TextView.VISIBLE);
-					progressSimple.setText("   Podcast " + status[2] + "/"
-							+ status[3]);
-					long cb = Long.parseLong(status[4]);
-					long tb = Long.parseLong(status[5]);
-					if (tb == 0) {
-						progressBytes.setText("");
-						progressBar.setProgress(0);
-					} else {
-						progressBytes.setText("   " + cb / 1024 + "k/" + tb
-								/ 1024 + "k");
-						progressBar.setProgress((int) ((cb * 100) / tb));
-					}
-				}
-				TextView subscriptionName = (TextView) findViewById(R.id.subscriptionName);
-				TextView title = (TextView) findViewById(R.id.title);
-				subscriptionName.setText(status[6]);
-				title.setText(status[7]);
+				// wasStarted = true;
 				findViewById(R.id.startDownloads).setEnabled(false);
 				findViewById(R.id.AbortDownloads).setEnabled(true);
 			}
 		} catch (Exception e) {
-			esay(new RuntimeException("downloadStatus was: "+downloadStatus,e));
+			esay(new RuntimeException("downloadStatus was: " + downloadStatus, e));
+		}
+	}
+
+	private void updateFromString(String downloadStatus) {
+		// Toss out first comma separated value (busy or idle)
+		List<String> fullStatus = new ArrayList<String>(Arrays.asList(downloadStatus.split(",")));
+		fullStatus.remove(0);
+		String[] status = fullStatus.toArray(new String[fullStatus.size()]);
+
+		TextView labelSubscriptionSites = (TextView) findViewById(R.id.labelSubscriptionSites);
+		TextView scanning = (TextView) findViewById(R.id.scanning);
+		labelSubscriptionSites.setVisibility(TextView.VISIBLE);
+		scanning.setVisibility(TextView.VISIBLE);
+		TextView downloadingLabel = (TextView) findViewById(R.id.downloadingLabel);
+		TextView progressSimple = (TextView) findViewById(R.id.progressSimple);
+		TextView progressBytes = (TextView) findViewById(R.id.progressBytes);
+		ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
+
+		labelSubscriptionSites.setVisibility(TextView.VISIBLE);
+		scanning.setText("  Scanning sites " + status[0] + "/" + status[1]);
+		if (status[3].equals("0")) {
+			downloadingLabel.setVisibility(TextView.INVISIBLE);
+			progressSimple.setVisibility(TextView.INVISIBLE);
+			progressBytes.setVisibility(TextView.INVISIBLE);
+			progressBar.setVisibility(TextView.INVISIBLE);
+			progressBar.setProgress(0);
+		} else {
+			downloadingLabel.setVisibility(TextView.VISIBLE);
+			progressSimple.setVisibility(TextView.VISIBLE);
+			progressBytes.setVisibility(TextView.VISIBLE);
+			progressBar.setVisibility(TextView.VISIBLE);
+			progressSimple.setText("   Podcast " + status[2] + "/" + status[3]);
+			long cb = Long.parseLong(status[4]);
+			long tb = Long.parseLong(status[5]);
+			if (tb == 0) {
+				progressBytes.setText("");
+				progressBar.setProgress(0);
+			} else {
+				progressBytes.setText("   " + cb / 1024 + "k/" + tb / 1024 + "k");
+				progressBar.setProgress((int) ((cb * 100) / tb));
+			}
+		}
+		TextView subscriptionName = (TextView) findViewById(R.id.subscriptionName);
+		TextView title = (TextView) findViewById(R.id.title);
+		subscriptionName.setText(status[6]);
+		title.setText(status[7]);
+
+		if (downloadStatus.startsWith("idle,")) {
+			if (status[3].equals("0")) {
+				progressSimple.setVisibility(TextView.VISIBLE);
+				progressSimple.setText("  No new podcasts found.");
+			}
+			subscriptionName.setText("");
+			title.setText("   *** COMPLETED ***");
 		}
 	}
 

@@ -67,6 +67,8 @@ public class CarCast extends BaseActivity {
 	@Override
 	void onContentService() throws RemoteException {
 		final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
+		if (pausePlay == null)
+			return;
 		if (contentService.isPlaying()) {
 			pausePlay.setImageResource(R.drawable.mpause);
 		} else {
@@ -81,138 +83,132 @@ public class CarCast extends BaseActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		ExceptionHandler.register(this);
 
-		try {
-			super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 
-			Intent csIntent = new Intent(getApplicationContext(), ContentService.class);
-			startService(csIntent);
-			bindService(csIntent, this, Context.BIND_AUTO_CREATE);
+		Intent csIntent = new Intent(getApplicationContext(), ContentService.class);
+		startService(csIntent);
+		bindService(csIntent, this, Context.BIND_AUTO_CREATE);
 
-			setTitle("Car Cast " + getVersion());
+		setTitle("Car Cast " + getVersion());
 
-			app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		int width = getWindow().getWindowManager().getDefaultDisplay().getWidth();
+		int height = getWindow().getWindowManager().getDefaultDisplay().getHeight();
+		// how horrible... the shame. (should be phone neutral.)
+		if (width == 320 && height == 480) {
+			setContentView(R.layout.main_relative_g1);
+		} else if (width == 480 && height == 854) {
+			setContentView(R.layout.main_relative_droid);
+		} else {
+			setContentView(R.layout.main_relative);
 
-			if (!app_preferences.contains("listmax")) {
-				SharedPreferences.Editor editor = app_preferences.edit();
-				editor.putString("listmax", "2");
-				editor.commit();
+		}
+
+		ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
+		progressBar.setProgress(0);
+		progressBar.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				try {
+					contentService.moveTo(event.getX() / v.getWidth());
+				} catch (RemoteException e) {
+					esay(e);
+				}
+				updateUI();
+				return true;
 			}
+		});
 
-			String lastRun = app_preferences.getString("lastRun", null);
-			if (lastRun == null || app_preferences.getBoolean("showSplash", false) ) {
-				startActivity(new Intent(this, Splash.class));
-				SharedPreferences.Editor editor = app_preferences.edit();
-				editor.putBoolean("showSplash", false);
-				editor.commit();
-				return;
-			} else if (!lastRun.equals(releaseData[0])) {
-				new AlertDialog.Builder(CarCast.this).setTitle("Car Cast updated").setMessage(releaseData[1]).setNeutralButton("Close",
-						null).show();
-			}
-			saveLastRun();
-
-			int width = getWindow().getWindowManager().getDefaultDisplay().getWidth();
-			int height = getWindow().getWindowManager().getDefaultDisplay().getHeight();
-			// how horrible... the shame.  (should be phone neutral.)
-			if (width == 320 && height == 480) {
-				setContentView(R.layout.main_relative_g1);
-			} else if (width == 480 && height == 854) {
-				setContentView(R.layout.main_relative_droid);
-			} else {
-				setContentView(R.layout.main_relative);
-
-			}
-
-			ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
-			progressBar.setProgress(0);
-			progressBar.setOnTouchListener(new OnTouchListener() {
-
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					try {
-						contentService.moveTo(event.getX() / v.getWidth());
-					} catch (RemoteException e) {
-						esay(e);
+		final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
+		pausePlay.setBackgroundColor(0x0);
+		pausePlay.setSoundEffectsEnabled(true);
+		pausePlay.setImageResource(R.drawable.mplay);
+		pausePlay.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				try {
+					if (contentService.getCount() == 0)
+						return;
+					if (contentService.pauseOrPlay()) {
+						pausePlay.setImageResource(R.drawable.mpause);
+					} else {
+						pausePlay.setImageResource(R.drawable.mplay);
 					}
 					updateUI();
-					return true;
+				} catch (RemoteException e) {
+					esay(e);
 				}
-			});
+			}
+		});
 
-			final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
-			pausePlay.setBackgroundColor(0x0);
-			pausePlay.setSoundEffectsEnabled(true);
-			pausePlay.setImageResource(R.drawable.mplay);
-			pausePlay.setOnClickListener(new OnClickListener() {
-				public void onClick(View v) {
+		ImageButton rewind30Button = (ImageButton) findViewById(R.id.rewind30);
+		rewind30Button.setBackgroundColor(0x0);
+		rewind30Button.setSoundEffectsEnabled(true);
+		rewind30Button.setOnClickListener(new Bumper(this, -30));
+
+		ImageButton forward60Button = (ImageButton) findViewById(R.id.forward30);
+		forward60Button.setBackgroundColor(0x0);
+		forward60Button.setSoundEffectsEnabled(true);
+		forward60Button.setOnClickListener(new Bumper(this, 30));
+
+		ImageButton nextButton = (ImageButton) findViewById(R.id.next);
+		nextButton.setBackgroundColor(0x0);
+		nextButton.setSoundEffectsEnabled(true);
+		nextButton.setOnClickListener(new BumpCast(this, true));
+
+		ImageButton previousButton = (ImageButton) findViewById(R.id.previous);
+		previousButton.setBackgroundColor(0x0);
+		previousButton.setSoundEffectsEnabled(true);
+		previousButton.setOnClickListener(new BumpCast(this, false));
+
+		TextView textView = (TextView) findViewById(R.id.title);
+		textView.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() != MotionEvent.ACTION_UP)
+					return true;
+				// if clicking on the audio recorder (lower 1/3 of screen on 1/2 of right)
+				if (event.getAction() == MotionEvent.ACTION_UP && event.getX() > (v.getWidth() * 0.66)
+						&& (event.getY()) > (v.getHeight() * 0.5)) {
 					try {
-						if (contentService.getCount() == 0)
-							return;
-						if (contentService.pauseOrPlay()) {
-							pausePlay.setImageResource(R.drawable.mpause);
-						} else {
-							pausePlay.setImageResource(R.drawable.mplay);
+						if (contentService.isPlaying()) {
+							contentService.pause();
 						}
-						updateUI();
-					} catch (RemoteException e) {
+					} catch (Exception e) {
 						esay(e);
 					}
+
+					pausePlay.setImageResource(R.drawable.mplay);
+					startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
 				}
-			});
+				return true;
+			}
+		});
 
-			ImageButton rewind30Button = (ImageButton) findViewById(R.id.rewind30);
-			rewind30Button.setBackgroundColor(0x0);
-			rewind30Button.setSoundEffectsEnabled(true);
-			rewind30Button.setOnClickListener(new Bumper(this, -30));
+		app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-			ImageButton forward60Button = (ImageButton) findViewById(R.id.forward30);
-			forward60Button.setBackgroundColor(0x0);
-			forward60Button.setSoundEffectsEnabled(true);
-			forward60Button.setOnClickListener(new Bumper(this, 30));
-
-			ImageButton nextButton = (ImageButton) findViewById(R.id.next);
-			nextButton.setBackgroundColor(0x0);
-			nextButton.setSoundEffectsEnabled(true);
-			nextButton.setOnClickListener(new BumpCast(this, true));
-
-			ImageButton previousButton = (ImageButton) findViewById(R.id.previous);
-			previousButton.setBackgroundColor(0x0);
-			previousButton.setSoundEffectsEnabled(true);
-			previousButton.setOnClickListener(new BumpCast(this, false));
-
-			TextView textView = (TextView) findViewById(R.id.title);
-			textView.setOnTouchListener(new OnTouchListener() {
-
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					if (event.getAction() != MotionEvent.ACTION_UP)
-						return true;
-					// if clicking on the audio recorder (lower 1/3 of screen on 1/2 of right)
-					if (event.getAction() == MotionEvent.ACTION_UP && event.getX() > (v.getWidth() * 0.66)
-							&& (event.getY()) > (v.getHeight() * 0.5)) {
-						try {
-							if (contentService.isPlaying()) {
-								contentService.pause();
-							}
-						} catch (Exception e) {
-							esay(e);
-						}
-
-						pausePlay.setImageResource(R.drawable.mplay);
-						startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
-					}
-					return true;
-				}
-			});
-
-		} catch (Throwable t) {
-			t.printStackTrace();
+		if (!app_preferences.contains("listmax")) {
+			SharedPreferences.Editor editor = app_preferences.edit();
+			editor.putString("listmax", "2");
+			editor.commit();
 		}
+
+		String lastRun = app_preferences.getString("lastRun", null);
+		if (lastRun == null || app_preferences.getBoolean("showSplash", false)) {
+			startActivity(new Intent(this, Splash.class));
+			SharedPreferences.Editor editor = app_preferences.edit();
+			editor.putBoolean("showSplash", false);
+			editor.commit();
+		} else if (!lastRun.equals(releaseData[0])) {
+			new AlertDialog.Builder(CarCast.this).setTitle("Car Cast updated").setMessage(releaseData[1]).setNeutralButton("Close", null)
+					.show();
+		}
+		saveLastRun();
+
 		String accounts = app_preferences.getString("accounts", null);
 		if (accounts == null) {
 			GoogleLoginServiceHelper.getAccount(this, 123, true);
 		}
-
 	}
 
 	@Override

@@ -17,7 +17,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
-            "18-Sep-2010", "Trying to slay download problems. Added 'details' button to downloads.  Use it if you have downloading problems (use Menu/email... to send in results -- THANKS!!)",
+            "21-Sep-2010", "Added 'details' button to 'Download Podcasts' screen.",
             "10-Sep-2010", "Added a setting for detailed download information (with email option for problem troubleshooting)",
             "2-Sep-2010", "Re-enable screen rotation of player (for people with car docks.)",
 		    "23-Aug-2010", "Patrick Forhan: Sorted subscription list, No rotation in player mode",

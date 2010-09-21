@@ -39,11 +39,12 @@ public class DownloadHelper implements Sayer {
 	int podcastsCurrentBytes;
 	int podcastsDownloaded;
 	int podcastsTotalBytes;
-	StringBuilder sb = new StringBuilder();
 	int sitesScanned;
 	int totalPodcasts;
 	int totalSites;
 	TextView tv;
+	boolean idle;
+	StringBuilder sb = new StringBuilder();
 
 	public DownloadHelper(int max) {
 		this.max = max;
@@ -54,6 +55,7 @@ public class DownloadHelper implements Sayer {
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
 		
 		say("Starting find/download new podcasts. CarCast ver "+BaseActivity.getVersion());
+		say("Problems? please use Menu / Email Download Report - THANKS!");
 
 		List<Subscription> sites = contentService.getSubscriptions();
 
@@ -187,7 +189,8 @@ public class DownloadHelper implements Sayer {
 		}
 		say("Finished. Downloaded " + got + " new podcasts. "+sdf.format(new Date()));
 
-		contentService.doDownloadCompletedNotification(got);
+		contentService.doDownloadCompletedNotification(got); 
+		idle = true;
 	}
 
 	// Deal with servers with "location" instead of "Location" in redirect

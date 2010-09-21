@@ -29,7 +29,6 @@ import com.jadn.cc.ui.CarCast;
 public class ContentService extends Service implements OnCompletionListener {
 
 	private final IContentService.Stub binder = new ContentServiceStub(this);
-	// CarCast activity;
 	int currentPodcastInPlayer;
 	DownloadHelper downloadHelper;
 	private File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
@@ -41,6 +40,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
 	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
 	boolean wasPausedByPhoneCall;
+	boolean idle = false;
 
 	enum MediaMode {
 		Paused, Playing, UnInitialized
@@ -241,7 +241,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		mNotificationManager.notify(22, notification);
 
 		// clear so next user request will start new download
-		downloadHelper = null;
+		//downloadHelper = null;
 
 		metaHolder = new MetaHolder();
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
@@ -257,10 +257,9 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (downloadHelper == null) {
 			return "";
 		}
-		String status = downloadHelper.sitesScanned + "," + downloadHelper.totalSites + "," + downloadHelper.podcastsDownloaded + ","
+		String status = (downloadHelper.idle ? "idle":"busy")+","+downloadHelper.sitesScanned + "," + downloadHelper.totalSites + "," + downloadHelper.podcastsDownloaded + ","
 				+ downloadHelper.totalPodcasts + "," + downloadHelper.podcastsCurrentBytes + "," + downloadHelper.podcastsTotalBytes + ","
 				+ downloadHelper.currentSubscription + "," + downloadHelper.currentTitle;
-		// Log.w("CarCast",status);
 		return status;
 	}
 
@@ -580,7 +579,9 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	void startDownloadingNewPodCasts(final int max) {
 
-		if (downloadHelper == null) {
+		if (downloadHelper == null || downloadHelper.idle ) {
+			// cause display to reflect that we are getting ready to do a download
+			downloadHelper = null;
 
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
 			mNotificationManager.cancel(22);
