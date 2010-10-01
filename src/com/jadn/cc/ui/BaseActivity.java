@@ -17,6 +17,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
+            "1-Oct-2010", "Added confirm to 'Delete All' menu item on Podcasts screen for Jim Fulner.",
             "21-Sep-2010", "Added 'details' button to 'Download Podcasts' screen.",
             "10-Sep-2010", "Added a setting for detailed download information (with email option for problem troubleshooting)",
             "2-Sep-2010", "Re-enable screen rotation of player (for people with car docks.)",

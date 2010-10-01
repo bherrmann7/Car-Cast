@@ -3,6 +3,8 @@ package com.jadn.cc.ui;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -125,20 +127,38 @@ public class PodcastList extends BaseActivity {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		try {
+		
 			if (item.getItemId() == R.id.deleteAllPodcasts) {
-				contentService.purgeAll();
-				showPodcasts();
-				finish();
+				
+				//Ask the user if they want to really delete all
+		        new AlertDialog.Builder(this)
+		        .setIcon(android.R.drawable.ic_dialog_alert)
+		        .setTitle("Delete All?")
+		        .setMessage("Do you really want to Delete all Downloaded Podcasts?")
+		        .setPositiveButton("Confirm Delete All", new DialogInterface.OnClickListener() {
+		            @Override
+		            public void onClick(DialogInterface dialog, int which) {
+		            	try {
+							contentService.purgeAll();
+							showPodcasts();
+							finish();
+		        		} catch (RemoteException e) {
+		        			esay(e);
+		        		}
+
+		            }
+
+		        })
+		        .setNegativeButton("Cancel", null)
+		        .show();
+
+		        return true;				
 			}
 			if (item.getItemId() == R.id.eraseDownloadHistory) {
 				int historyDeleted = DownloadHistory.getInstance().eraseHistory();
 				Util.toast(this, "Erased "+historyDeleted+" podcast from dowload history.");
 				return true;
 			}
-		} catch (RemoteException e) {
-			esay(e);
-		}
 		return super.onMenuItemSelected(featureId, item);
 	}
 
