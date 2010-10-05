@@ -62,8 +62,7 @@ public class PodcastList extends BaseActivity {
 			try {
 				contentService.setCurrentPaused(info.position);
 				contentService.purgeToCurrent();
-				list.clear();
-				podcastsAdapter.notifyDataSetChanged();
+				showPodcasts();
 			} catch (RemoteException e) {
 				// humm.
 			}
@@ -198,13 +197,19 @@ public class PodcastList extends BaseActivity {
 			list.add(item);
 
 		}
-		podcastsAdapter = new SimpleAdapter(this, list,
-		// R.layout.main_item_two_line_row, new String[] { "line1",
-				// "line2" }, new int[] { R.id.text1, R.id.text2 });
-				R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine, R.id.amountHeard,
-						R.id.secondLine });
 
-		listView.setAdapter(podcastsAdapter);
+		// When doing a delete before, we rebuild the list, but the adapter is ok.
+		if (podcastsAdapter == null) {
+			podcastsAdapter = new SimpleAdapter(this, list,
+			// R.layout.main_item_two_line_row, new String[] { "line1",
+					// "line2" }, new int[] { R.id.text1, R.id.text2 });
+					R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine, R.id.amountHeard,
+							R.id.secondLine });
+
+			listView.setAdapter(podcastsAdapter);
+		} else {
+			podcastsAdapter.notifyDataSetChanged();
+		}
 
 	}
 
