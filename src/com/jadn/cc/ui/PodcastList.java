@@ -29,6 +29,9 @@ import com.jadn.cc.services.MetaHolder;
 
 public class PodcastList extends BaseActivity {
 
+	SimpleAdapter podcastsAdapter;
+	ArrayList<HashMap<String, String>> list;
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -48,20 +51,22 @@ public class PodcastList extends BaseActivity {
 		if (item.getTitle().equals("Delete")) {
 			try {
 				contentService.deletePodcast(info.position);
+				list.remove(info.position);
+				podcastsAdapter.notifyDataSetChanged();
 			} catch (RemoteException e) {
 				// humm.
 			}
-			showPodcasts();
 			return false;
 		}
 		if (item.getTitle().equals("Delete All Before")) {
 			try {
 				contentService.setCurrentPaused(info.position);
 				contentService.purgeToCurrent();
+				list.clear();
+				podcastsAdapter.notifyDataSetChanged();
 			} catch (RemoteException e) {
 				// humm.
 			}
-			showPodcasts();
 			return false;
 		}
 		if (item.getTitle().equals("Play")) {
@@ -98,11 +103,11 @@ public class PodcastList extends BaseActivity {
 						contentService.pauseOrPlay();
 					} else {
 						// This saves our position
-						if(contentService.isPlaying())
+						if (contentService.isPlaying())
 							contentService.pause();
 						contentService.play(position);
 					}
-					showPodcasts();
+					podcastsAdapter.notifyDataSetChanged();
 				} catch (RemoteException e) {
 					// humm.
 				}
@@ -119,7 +124,7 @@ public class PodcastList extends BaseActivity {
 	}
 
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.podcasts_menu, menu);
 		return true;
@@ -127,38 +132,35 @@ public class PodcastList extends BaseActivity {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		
-			if (item.getItemId() == R.id.deleteAllPodcasts) {
-				
-				//Ask the user if they want to really delete all
-		        new AlertDialog.Builder(this)
-		        .setIcon(android.R.drawable.ic_dialog_alert)
-		        .setTitle("Delete All?")
-		        .setMessage("Do you really want to Delete all Downloaded Podcasts?")
-		        .setPositiveButton("Confirm Delete All", new DialogInterface.OnClickListener() {
-		            @Override
-		            public void onClick(DialogInterface dialog, int which) {
-		            	try {
-							contentService.purgeAll();
-							showPodcasts();
-							finish();
-		        		} catch (RemoteException e) {
-		        			esay(e);
-		        		}
 
-		            }
+		if (item.getItemId() == R.id.deleteAllPodcasts) {
 
-		        })
-		        .setNegativeButton("Cancel", null)
-		        .show();
+			// Ask the user if they want to really delete all
+			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete All?").setMessage(
+					"Do you really want to Delete all Downloaded Podcasts?").setPositiveButton("Confirm Delete All",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							try {
+								contentService.purgeAll();
+								list.clear();
+								podcastsAdapter.notifyDataSetChanged();
+								finish();
+							} catch (RemoteException e) {
+								esay(e);
+							}
 
-		        return true;				
-			}
-			if (item.getItemId() == R.id.eraseDownloadHistory) {
-				int historyDeleted = DownloadHistory.getInstance().eraseHistory();
-				Util.toast(this, "Erased "+historyDeleted+" podcast from dowload history.");
-				return true;
-			}
+						}
+
+					}).setNegativeButton("Cancel", null).show();
+
+			return true;
+		}
+		if (item.getItemId() == R.id.eraseDownloadHistory) {
+			int historyDeleted = DownloadHistory.getInstance().eraseHistory();
+			Util.toast(this, "Erased " + historyDeleted + " podcast from dowload history.");
+			return true;
+		}
 		return super.onMenuItemSelected(featureId, item);
 	}
 
@@ -167,8 +169,7 @@ public class PodcastList extends BaseActivity {
 		ListView listView = (ListView) findViewById(R.id.podcastList);
 
 		MetaHolder metaHolder = new MetaHolder();
-		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
-		
+		list = new ArrayList<HashMap<String, String>>();
 
 		for (int i = 0; i < metaHolder.getSize(); i++) {
 			MetaFile metaFile = metaHolder.get(i);
@@ -187,21 +188,24 @@ public class PodcastList extends BaseActivity {
 				esay(e);
 				item.put("line1", metaFile.getFeedName());
 			}
-			String time = ContentService.getTimeString(metaFile.getCurrentPos())+"-"+ContentService.getTimeString(metaFile.getDuration());
-			if (metaFile.getCurrentPos() == 0 && metaFile.getDuration() == -1 ) {
+			String time = ContentService.getTimeString(metaFile.getCurrentPos()) + "-"
+					+ ContentService.getTimeString(metaFile.getDuration());
+			if (metaFile.getCurrentPos() == 0 && metaFile.getDuration() == -1) {
 				time = "";
-			}			
+			}
 			item.put("xx:xx-xx:xx", time);
 			item.put("line2", metaFile.getTitle());
 			list.add(item);
 
 		}
-		SimpleAdapter notes = new SimpleAdapter(this, list,
+		podcastsAdapter = new SimpleAdapter(this, list,
 		// R.layout.main_item_two_line_row, new String[] { "line1",
 				// "line2" }, new int[] { R.id.text1, R.id.text2 });
-				R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx","line2" }, new int[] { R.id.firstLine, R.id.amountHeard, R.id.secondLine });
-		listView.setAdapter(notes);
-		
+				R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine, R.id.amountHeard,
+						R.id.secondLine });
+
+		listView.setAdapter(podcastsAdapter);
+
 	}
 
 }
