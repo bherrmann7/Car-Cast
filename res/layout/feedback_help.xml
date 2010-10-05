@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent" 
+				android:background="#000"
+				android:layout_height="fill_parent"
+                android:padding="5dip"
+                android:layout_margin="5dip" >
+                
+	<Button android:id="@+id/quickTour"
+	 android:layout_alignParentTop="true"
+	 android:layout_centerInParent="true"
+	 android:text="View Quick Tour" 
+	 android:layout_height="wrap_content"
+     android:layout_width="200px"	
+     android:onClick="quickTour" 
+	 />
+	 
+	<Button android:id="@+id/email"
+	android:text="Email Feedback"	
+	 android:layout_centerInParent="true"
+	 android:layout_below="@id/quickTour"
+	 android:layout_height="wrap_content"
+     android:layout_width="200px"
+      android:onClick="email"
+	 />
+	<Button android:id="@+id/qanda"
+	android:text="View Questions / Answers"	
+	 android:layout_centerInParent="true"
+	 android:layout_below="@id/email"
+	 android:layout_height="wrap_content"
+    android:layout_width="200px"
+     android:onClick="qanda"	
+	 />
+	<Button android:id="@+id/ccwebsite"
+	 android:text="View Car Cast web site"	
+	 android:layout_centerInParent="true"
+	 android:layout_below="@id/qanda"
+	 android:layout_height="wrap_content"
+     android:layout_width="200px"
+      android:onClick="ccwebsite"
+	 />
+
+</RelativeLayout>

@@ -245,11 +245,8 @@ public class CarCast extends BaseActivity {
 				startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
 			}
 			if (item.getItemId() == R.id.feedback) {
-				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-				emailIntent.setType("plain/text");
-				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "carcast-devs@googlegroups.com" });
-				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Car Cast: feedback ");
-				startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
+				startActivityForResult(new Intent(this, FeedbackHelp.class), 0);
+				return true;
 			}
 			if (item.getItemId() == R.id.settings) {
 				startActivity(new Intent(this, Settings.class));

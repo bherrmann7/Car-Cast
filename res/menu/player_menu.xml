@@ -2,7 +2,7 @@
 	<item android:id="@+id/menuSiteList" android:title="Subscriptions"></item>
 	<item android:id="@+id/listPodcasts" android:title="Podcasts"></item>
 	<item android:id="@+id/email" android:title="Email Podcast"  />	
-	<item android:id="@+id/feedback" android:title="Email Feedback"  />	
+	<item android:id="@+id/feedback" android:title="Feedback / Help"  />	
 	<item android:id="@+id/downloadNewPodcasts" android:title="Download Podcasts" />
 	<item android:title="Purge All" android:id="@+id/purgeAll" android:visible='false'  />
 	<item android:id="@+id/settings" android:title="Settings"></item>
