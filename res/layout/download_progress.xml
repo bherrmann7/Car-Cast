@@ -14,7 +14,8 @@
 	<TextView android:id="@+id/informational" android:paddingTop="10px"
 		android:textSize="18dp" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:layout_below="@id/AbortDownloads"
-		android:text="( Downloads occur in background )" />
+		android:layout_centerInParent="true"
+		android:text="Downloads occur in background" />
 
 	<TextView android:id="@+id/labelSubscriptionSites"
 		android:paddingTop="10px" android:textSize="18dp"
