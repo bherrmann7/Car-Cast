@@ -1,9 +1,9 @@
-package com.jadn.cc.ui; import android.content.Context;
+package com.jadn.cc.ui;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
 import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,14 +34,9 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 	
 	@Override
 	void onContentService() throws RemoteException {
-//		try {
-//			contentService.startDownloadingNewPodCasts(Config.getMax(this));
-//		} catch (RemoteException re) {
-//			esay(re);
-//		}		
 	}
 	
-	PowerManager.WakeLock wl; 
+	//PowerManager.WakeLock wl; 
 
 
 	/** Called when the activity is first created. */
@@ -52,10 +47,10 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 
 		tv = (TextView) findViewById(R.id.textconsole);
 		
-		// If you are running the debug screen, then do not go to sleep 
-		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-		wl.acquire();			
+		// If you are running the debug screen, then do not go to sleep
+//		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//		wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
+//		wl.acquire();			
 	}
 
 	@Override
@@ -85,7 +80,8 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 		// stop display thread
 		updater.allDone();
 		
-		wl.release();
+		// *** This was causing a force quit 
+		//wl.release();
 	}
 
 	@Override
