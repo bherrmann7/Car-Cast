@@ -19,6 +19,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
+			"9-Oct-2010",
+			"Adjusting main screen layout.   Experiementing with Ads.",
 			"6-Oct-2010",
 			"Fix feedback email (headsmack), fix Podcast and Subscription screens so delete doesnt loose place.  Also delete last works right.  Thanks Yoav Weiss!",
 			"1-Oct-2010",

@@ -31,8 +31,7 @@ public class AudioRecorder extends BaseActivity {
 	
 	@Override
 	void onContentService() throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 
 	@Override

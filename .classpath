@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="libs/framework.jar"/>
+	<classpathentry kind="lib" path="/home/bob/cc/cc/libs/admob-sdk-android.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
