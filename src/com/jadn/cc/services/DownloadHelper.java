@@ -96,7 +96,7 @@ public class DownloadHelper implements Sayer {
 
 			} catch (Throwable e) {
 				/* Display any Error to the GUI. */
-				say("Error: " + e.getMessage());
+				say("Error processing "+sub.url+" ex:" + e.getMessage());
 				Log.e("BAH", "bad", e);
 			}
 			sitesScanned++;

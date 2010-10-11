@@ -61,12 +61,10 @@
 		android:ellipsize="none" android:textColor="#000" android:layout_x="0dip"
 		android:text="" android:background="#c7cbd7"
 		android:layout_alignParentTop="true" android:layout_height="35dip" />
-		
+
 	<TextView android:textSize="20dp" android:id="@+id/title"
 		android:layout_width="fill_parent" android:layout_height="110dip"
 		android:textColor="#FFF" android:textStyle="bold" android:text=""
-		android:layout_below="@id/subscriptionName" android:layout_above="@id/progress"
-		android:background="@drawable/carcastbg" />
-	<!-- android:background="#2a3859"  -->
+		android:layout_below="@id/subscriptionName" android:layout_above="@id/progress" />
 
 </RelativeLayout>
