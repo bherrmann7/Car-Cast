@@ -1,19 +1,54 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<ListPreference android:key="listmax"
-		 android:title="Max downloads"
+	<CheckBoxPreference 
+		android:key="autoDownload" 
+		android:title="Auto download" 
+		android:summary="Download podcasts automatically" 
+		android:defaultValue="true" />
+	<ListPreference 
+		android:key="listDownloadHour"
+		android:title="Download hour"
+		android:entries="@array/downloadHours"
+		android:entryValues="@array/downloadHoursValues"
+		android:dialogTitle="Hour of day to download podcasts"
+		android:summary="Set hour of day on which to download podcasts"
+		android:defaultValue="1" />
+	<CheckBoxPreference 
+		android:key="wifiDownload"
+		android:title="Require WIFI" 
+	 	android:summary="Require WIFI for auto download"
+	 	android:defaultValue="true" />
+	<!--<ListPreference 
+		android:key="listWifi"
+		android:title="WIFI Options"
+		android:entries="@array/wifiChoices"
+		android:entryValues="@array/wifiChoicesValues"
+		android:dialogTitle="WIFI Options"
+		android:summary="Choose how to use WIFI with auto download"
+		android:defaultValue="1" />-->
+	<ListPreference 
+		android:key="listmax"
+		android:title="Max downloads"
 		android:entries="@array/maxs"
 		android:entryValues="@array/maxsValues"
 		android:dialogTitle="Max podcasts to download per site per run"
-		 android:summary="Set max number of downloads to obtain from one site in a run"/>
-
-<CheckBoxPreference android:title="Enable Splash Screen" android:key="showSplash"
- android:summary="On startup show splash screen once more"></CheckBoxPreference>
-<CheckBoxPreference android:title="Auto play next" android:key="autoPlayNext"
-	 android:summary="When the current podcast finishes, play the next one"
-	 android:defaultValue="true"
-	 >	 
-	 </CheckBoxPreference>
-
-<CheckBoxPreference android:key="canCollectData" android:summary="data helps us improve" android:title="Allow data collection" android:defaultValue="true"></CheckBoxPreference>
-<CheckBoxPreference android:key="emailSecret" android:title="keep email address secret" android:summary="Used for internal tracking only" android:defaultValue="false"></CheckBoxPreference>
+		android:summary="Set max number of downloads to obtain from one site in a run" />
+	<CheckBoxPreference 
+		android:key="showSplash" 
+		android:title="Enable splash screen" 
+		android:summary="On startup show splash screen once more" />
+	<CheckBoxPreference 
+		android:key="autoPlayNext"
+		android:title="Auto play next" 
+	 	android:summary="When the current podcast finishes, play the next one"
+	 	android:defaultValue="true" />
+	<CheckBoxPreference 
+		android:key="canCollectData" 
+		android:title="Allow data collection" 
+		android:summary="Data helps us improve" 
+		android:defaultValue="true" />
+	<CheckBoxPreference 
+		android:key="emailSecret" 
+		android:title="Keep email address secret" 
+		android:summary="Used for internal tracking only" 
+		android:defaultValue="false" />
 </PreferenceScreen>

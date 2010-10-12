@@ -41,6 +41,16 @@ public class ContentService extends Service implements OnCompletionListener {
 	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
 	boolean wasPausedByPhoneCall;
 	boolean idle = false;
+	
+	/*private boolean _wifiWasDisabledBeforeAutoDownload = false;
+	
+    public boolean getWifiWasDisabledBeforeAutoDownload() {
+        return _wifiWasDisabledBeforeAutoDownload;
+    }
+
+    public void setWifiWasDisabledBeforeAutoDownload(boolean value) {
+        _wifiWasDisabledBeforeAutoDownload = value;
+    }*/
 
 	enum MediaMode {
 		Paused, Playing, UnInitialized
