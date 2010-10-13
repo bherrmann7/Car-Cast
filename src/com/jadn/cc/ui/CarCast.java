@@ -93,7 +93,7 @@ public class CarCast extends BaseActivity {
 
 		int width = getWindow().getWindowManager().getDefaultDisplay().getWidth();
 		int height = getWindow().getWindowManager().getDefaultDisplay().getHeight();
-		// how horrible... the shame. (should be phone neutral.)
+		// how horrible... the shame. (this should be phone neutral.)
 		if (width == 320 && height == 480) {
 			setContentView(R.layout.main_relative_g1);
 		} else if (width == 480 && height == 854) {

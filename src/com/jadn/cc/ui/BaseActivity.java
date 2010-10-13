@@ -19,6 +19,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
+			"13-Oct-2010",
+			"Move Ads to top (based on user feedback!)\n\nNever Ads in Car Cast Pro.",
 			"10-Oct-2010",
 			"Experiement with Ads (I want to continue to improve Car Cast, Ads can help make that possible.  Note: No Ads in Car Cast Pro.)",
 			"9-Oct-2010",
