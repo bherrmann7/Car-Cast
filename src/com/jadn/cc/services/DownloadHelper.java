@@ -74,6 +74,7 @@ public class DownloadHelper implements Sayer {
 
 		for (Subscription sub : sites) {
 			try {
+				say("scanning subscription/feed: " + sub.url);
 				URL url = new URL(sub.url);
 				int foundStart = encloseureHandler.metaNets.size();
 				if (sub.maxDownloads == -1) {
@@ -96,7 +97,7 @@ public class DownloadHelper implements Sayer {
 
 			} catch (Throwable e) {
 				/* Display any Error to the GUI. */
-				say("Error processing "+sub.url+" ex:" + e.getMessage());
+				say("Error ex:" + e.getMessage());
 				Log.e("BAH", "bad", e);
 			}
 			sitesScanned++;
