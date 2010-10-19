@@ -10,7 +10,6 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".ui.AudioRecorder"></activity>
-		<activity android:name=".ui.Delete"></activity>
 		<activity android:name=".ui.Downloader" android:screenOrientation="portrait"></activity>
 		<activity android:name=".ui.DownloadProgress"
 			android:screenOrientation="portrait"></activity>
