@@ -231,7 +231,7 @@ public class DownloadHelper implements Sayer {
 			}
 			// println "next: "+url
 		}
-		throw new IOException("Car Cast redirect limit reached");
+		throw new IOException(BaseActivity.getAppTitle()+" redirect limit reached");
 	}
 
 	public String getStatus() {

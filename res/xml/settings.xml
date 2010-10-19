@@ -16,4 +16,6 @@
 
 <CheckBoxPreference android:key="canCollectData" android:summary="data helps us improve" android:title="Allow data collection" android:defaultValue="true"></CheckBoxPreference>
 <CheckBoxPreference android:key="emailSecret" android:title="keep email address secret" android:summary="Used for internal tracking only" android:defaultValue="false"></CheckBoxPreference>
+
+
 </PreferenceScreen>

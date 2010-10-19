@@ -19,6 +19,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
+		"18-Oct-2010",
+		"Move version info into settings title.",
 			"13-Oct-2010",
 			"Move Ads to top (based on user feedback!)\n\nNever Ads in Car Cast Pro.",
 			"10-Oct-2010",
@@ -54,7 +56,7 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 			"12-Jan",
 			"Fix 'podcast' list font sizes on Droid (for Clyde.)",
 			"2-Jan",
-			"Car Cast is now open source.\n\nsee http://jadn.com/cc/",
+			getAppTitle()+" is now open source.\n\nsee http://jadn.com/cc/",
 			"27-Dec",
 			"Change Droid layout to use g1 layout (for larger buttons.)",
 			"17-Dec",
@@ -191,4 +193,7 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 		// eventService = null;
 	}
 
+	public static String getAppTitle(){
+		return "Car Cast";
+	}
 }

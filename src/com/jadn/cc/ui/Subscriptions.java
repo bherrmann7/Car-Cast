@@ -47,7 +47,7 @@ public class Subscriptions extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.subscription_list);
-		setTitle("Car Cast: Subscriptions");
+		setTitle(getAppTitle()+": Subscriptions");
 		listView = (ListView) findViewById(R.id.siteList);
 		registerForContextMenu(listView);
 

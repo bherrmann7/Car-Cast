@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.jadn.cc" android:versionCode="76" android:versionName="1.0.76">
+	package="com.jadn.cc" android:versionCode="78" android:versionName="1.0.78">
 	<application android:icon="@drawable/icon3" android:label="Car Cast"
 		android:debuggable="true">
 		<activity android:name=".ui.CarCast" android:label="Car Cast">
@@ -45,5 +45,5 @@
 
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
 
-
+	<meta-data android:name="ADMOB_ALLOW_LOCATION_FOR_ADS" android:value="true" />
 </manifest> 

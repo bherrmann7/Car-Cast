@@ -13,7 +13,7 @@ public class Splash extends Activity {
           super.onCreate(icicle);
           setContentView(R.layout.splash);
           
-          setTitle("Car Cast");
+          setTitle(BaseActivity.getAppTitle()+"");
           
           ImageView imageView = (ImageView)findViewById(R.id.splashscreen);
           imageView.setOnClickListener(new OnClickListener(){
