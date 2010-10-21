@@ -37,7 +37,7 @@ public class FeedbackHelp extends Activity {
 		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 		emailIntent.setType("plain/text");
 		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "carcast-devs@jadn.com" });
-		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Car Cast: feedback "+BaseActivity.getVersion());
+		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, BaseActivity.getAppTitle()+": feedback "+BaseActivity.getVersion());
 		startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
 	}
 

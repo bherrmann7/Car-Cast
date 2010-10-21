@@ -69,6 +69,11 @@ public class EnclosureHandler extends DefaultHandler {
 	}
 
 	private boolean isAudio(String url) {
+		// for http://feeds.feedburner.com/dailyaudiobible
+		// which always has the same intro at the top.		
+		if (url.endsWith("/Intro_to_DAB.mp3")){
+			return false;
+		}
 		if (url.toLowerCase().endsWith(".mp3"))
 			return true;
 		if (url.toLowerCase().endsWith(".m4a"))

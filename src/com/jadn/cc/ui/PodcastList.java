@@ -85,7 +85,7 @@ public class PodcastList extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.podcast_list);
 
-		setTitle("Car Cast: Downloaded podcasts");
+		setTitle(getAppTitle()+": Downloaded podcasts");
 
 		ListView listView = (ListView) findViewById(R.id.podcastList);
 		registerForContextMenu(listView);

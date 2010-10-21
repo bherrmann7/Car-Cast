@@ -89,11 +89,11 @@ public class CarCast extends BaseActivity {
 		startService(csIntent);
 		bindService(csIntent, this, Context.BIND_AUTO_CREATE);
 
-		setTitle("Car Cast " + getVersion());
+		setTitle(getAppTitle());
 
 		int width = getWindow().getWindowManager().getDefaultDisplay().getWidth();
 		int height = getWindow().getWindowManager().getDefaultDisplay().getHeight();
-		// how horrible... the shame. (should be phone neutral.)
+		// how horrible... the shame. (this should be phone neutral.)
 		if (width == 320 && height == 480) {
 			setContentView(R.layout.main_relative_g1);
 		} else if (width == 480 && height == 854) {
@@ -200,7 +200,7 @@ public class CarCast extends BaseActivity {
 			editor.putBoolean("showSplash", false);
 			editor.commit();
 		} else if (!lastRun.equals(releaseData[0])) {
-			new AlertDialog.Builder(CarCast.this).setTitle("Car Cast updated").setMessage(releaseData[1]).setNeutralButton("Close", null)
+			new AlertDialog.Builder(CarCast.this).setTitle(getAppTitle()+" updated").setMessage(releaseData[1]).setNeutralButton("Close", null)
 					.show();
 		}
 		saveLastRun();
@@ -241,7 +241,7 @@ public class CarCast extends BaseActivity {
 				Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 				emailIntent.setType("plain/text");
 				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "" });
-				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Car Cast: about podcast " + contentService.getCurrentTitle());
+				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getAppTitle()+": about podcast " + contentService.getCurrentTitle());
 				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, contentService.getPodcastEmailSummary());
 				startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
 			}
@@ -302,13 +302,13 @@ public class CarCast extends BaseActivity {
 			if (!android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
 
 				TextView textView = (TextView) findViewById(R.id.title);
-				textView.setText("ERROR ** Car Cast requires the sdcard ** ");
+				textView.setText("ERROR ** "+getAppTitle()+" requires the sdcard ** ");
 				return;
 			}
 			if (!Config.PodcastsRoot.exists()) {
 				if (!Config.PodcastsRoot.mkdirs()) {
 					TextView textView = (TextView) findViewById(R.id.title);
-					textView.setText("ERROR ** Car Cast cannot write to sdcard ** ");
+					textView.setText("ERROR ** "+getAppTitle()+" cannot write to sdcard ** ");
 					return;
 				}
 			}

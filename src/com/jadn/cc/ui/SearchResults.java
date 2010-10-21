@@ -103,7 +103,7 @@ public class SearchResults extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.subscription_list);
 
-		setTitle("Car Cast: subscription search results");
+		setTitle(getAppTitle()+": subscription search results");
 
 		ListView listView = (ListView) findViewById(R.id.siteList);
 

@@ -24,6 +24,7 @@ import com.jadn.cc.core.Location;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
+import com.jadn.cc.ui.BaseActivity;
 import com.jadn.cc.ui.CarCast;
 
 public class ContentService extends Service implements OnCompletionListener {
@@ -339,7 +340,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			}
 		}
 		sb.append("\n\n\n");
-		sb.append("This email sent from Car Cast.");
+		sb.append("This email sent from "+BaseActivity.getAppTitle()+".");
 		return sb.toString();
 	}
 

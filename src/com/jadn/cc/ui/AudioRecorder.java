@@ -55,7 +55,7 @@ public class AudioRecorder extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recorder);
 
-		setTitle("Car Cast: record audio note");
+		setTitle(getAppTitle()+": record audio note");
 		
 		setReadyToRecord(true);
 		

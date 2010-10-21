@@ -52,7 +52,7 @@ public class Search extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search);
 
-		setTitle("Car Cast: search for new subscriptions");
+		setTitle(getAppTitle()+": search for new subscriptions");
 
 		// ListView listView = (ListView) findViewById(R.id.siteList);
 		// registerForContextMenu(listView);
