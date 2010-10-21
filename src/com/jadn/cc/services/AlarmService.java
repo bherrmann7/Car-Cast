@@ -8,9 +8,11 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.RemoteException;
+import android.os.StatFs;
 import android.preference.PreferenceManager;
 
 /*
@@ -48,6 +50,14 @@ public class AlarmService extends Service {
         		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         		if(app_preferences.getBoolean("wifiDownload", true) && !wifi.isWifiEnabled()) return;
         		
+        		//Check SD card mounted - reject if not mounted
+        		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) return;
+
+        		//Check SD card space - reject if less than 20 MB available
+        		StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath()); 
+        		long bytesAvailable = (long)stat.getBlockSize() * (long)stat.getBlockCount(); 
+        		if (bytesAvailable < 20971520) return;
+
 	        	// Start downloading podcasts
         		ServiceConnection conn = new ServiceConnection() {
 
