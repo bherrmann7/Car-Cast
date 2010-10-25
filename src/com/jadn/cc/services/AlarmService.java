@@ -7,13 +7,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
-import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
-import android.os.Parcel;
 import android.os.RemoteException;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
 
 /*
  * Based on
@@ -32,6 +32,8 @@ public class AlarmService extends Service {
 
     	app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+		Toast.makeText(this, "Alarm Triggered", Toast.LENGTH_LONG).show();
+    	
         // Start up the thread running the service.  Note that we create a
         // separate thread because the service normally runs in the process's
         // main thread, which we don't want to block.
@@ -44,19 +46,31 @@ public class AlarmService extends Service {
      */
     Runnable task = new Runnable() {
         public void run() {
-        	
+        	        	
         	try {
         		//Deal with WIFI option
         		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        		if(app_preferences.getBoolean("wifiDownload", true) && !wifi.isWifiEnabled()) return;
+        		if(app_preferences.getBoolean("wifiDownload", true) && !wifi.isWifiEnabled()) 
+        		{
+        			Log.w("AlarmService", "Elected not to download podcasts: WIFI not enabled");
+        			return;
+        		}
         		
         		//Check SD card mounted - reject if not mounted
-        		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) return;
+        		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+        		{
+        			Log.w("AlarmService", "Elected not to download podcasts: SD card not mounted");
+        			return;
+        		}
 
         		//Check SD card space - reject if less than 20 MB available
         		StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath()); 
         		long bytesAvailable = (long)stat.getBlockSize() * (long)stat.getBlockCount(); 
-        		if (bytesAvailable < 20971520) return;
+        		if (bytesAvailable < 20971520)
+        		{
+        			Log.w("AlarmService", "Elected not to download podcasts: insufficient space available");
+        			return;
+        		}
 
 	        	// Start downloading podcasts
         		ServiceConnection conn = new ServiceConnection() {
@@ -70,7 +84,7 @@ public class AlarmService extends Service {
         				try {
 							contentService.startDownloadingNewPodCasts(maxDownloads);
 						} catch (RemoteException e) {
-							// Eat exception
+							Log.e("AlarmService", "downloading new podcasts", e);
 						}						
 					}
 
@@ -83,7 +97,7 @@ public class AlarmService extends Service {
 				getApplicationContext().bindService(csIntent, conn, BIND_AUTO_CREATE);
 
         	} catch(Throwable e) {
-				// Eat exception
+				Log.e("AlarmService", "unknown failure", e);
         	}
 
             // Done with our work...  stop the service!
@@ -91,15 +105,8 @@ public class AlarmService extends Service {
         }
     };
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-
-    private final IBinder mBinder = new Binder() {
-        @Override
-        protected boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
-            return super.onTransact(code, data, reply, flags);
-        }
-    };
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
 }

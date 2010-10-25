@@ -1,5 +1,6 @@
 package com.jadn.cc.ui;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.util.Log;
 import com.jadn.cc.R;
 
 public class Settings extends PreferenceActivity {
+		
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -24,7 +26,7 @@ public class Settings extends PreferenceActivity {
 			PackageInfo pInfo = getPackageManager().getPackageInfo(ourPackage, PackageManager.GET_META_DATA);
 			version = pInfo.versionName;
 		} catch (NameNotFoundException e) {
-			Log.e("Settings","lookging up own version", e);
+			Log.e("Settings", "looking up own version", e);
 		}
 		addPreferencesFromResource(R.xml.settings);
 		
@@ -51,5 +53,26 @@ public class Settings extends PreferenceActivity {
 			}
 		}
 
+		//Prepare to cycle the alarm host service
+		Intent serviceIntent = new Intent();
+		serviceIntent.setAction("com.jadn.cc.services.AlarmHost");
+
+		//We always want to stop
+		try {
+			stopService(serviceIntent);
+		} catch (Throwable e)
+		{
+			Log.w("Settings", "stopping AlarmHost", e);
+		}
+
+		//We might want to start
+		if(app_preferences.getBoolean("autoDownload", true)) {
+			try {
+				startService(serviceIntent);
+			} catch (Throwable e)
+			{
+				Log.e("Settings", "starting AlarmHost", e);
+			}
+		}
 	}
 }

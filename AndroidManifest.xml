@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.jadn.cc" android:versionCode="78" android:versionName="1.0.78">
-	<application android:icon="@drawable/icon3" android:label="Car Cast"
-		android:debuggable="true">
+	<application android:icon="@drawable/icon3" android:label="Car Cast" android:debuggable="true">
 		<activity android:name=".ui.CarCast" android:label="Car Cast">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -11,19 +10,30 @@
 		</activity>
 		<activity android:name=".ui.AudioRecorder"></activity>
 		<activity android:name=".ui.Downloader" android:screenOrientation="portrait"></activity>
-		<activity android:name=".ui.DownloadProgress"
-			android:screenOrientation="portrait"></activity>
+		<activity android:name=".ui.DownloadProgress" android:screenOrientation="portrait"></activity>
 		<activity android:name=".ui.SubscriptionEdit"></activity>
 		<activity android:name=".ui.Settings"></activity>
 		<activity android:name=".ui.Subscriptions"></activity>
-		<activity android:name=".ui.Search">
-		</activity>
-		<activity android:name=".ui.Splash" />
+		<activity android:name=".ui.Search"></activity>
+		<activity android:name=".ui.Splash"></activity>
 		<activity android:name=".ui.SearchResults"></activity>
 		<activity android:name=".ui.PodcastList"></activity>
 		<activity android:name=".ui.FeedbackHelp"></activity>
-		<service android:name=".services.ContentService">
+		
+		<service android:name=".services.ContentService" />
+		<service android:name=".services.AlarmService" />
+		<service android:name=".services.AlarmHost">
+			<intent-filter>
+				<action android:name="com.jadn.cc.services.AlarmHost" />
+			</intent-filter>
 		</service>
+
+		<receiver android:name=".services.AlarmReceiver">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<category android:name="android.intent.category.HOME" />
+			</intent-filter>
+		</receiver>
 		<!--
 			<receiver android:name=".services.UnpluggedListener"> <intent-filter>
 			<action android:name="android.intent.action.ACTION_HEADSET_PLUG" />
@@ -31,15 +41,16 @@
 		-->
 		 <meta-data android:value="a14ca09b777254f" android:name="ADMOB_PUBLISHER_ID" />
 	</application>
+	
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-	
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />	
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/> 
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH" />
 
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
