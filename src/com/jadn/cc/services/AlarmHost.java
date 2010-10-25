@@ -33,35 +33,23 @@ public class AlarmHost extends Service {
 		SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-		if(app_preferences.getBoolean("autoDownload", true)) {
-			//Set the alarm time
-	 		int alarmHour = Integer.parseInt(app_preferences.getString("listDownloadHour", "1"));
-	 		GregorianCalendar currentCalendar = new GregorianCalendar();
-	 		long alarmTime = new GregorianCalendar(
-	 			currentCalendar.get(Calendar.YEAR),
-	 			currentCalendar.get(Calendar.MONTH),
-	 			currentCalendar.get(Calendar.DAY_OF_MONTH),
-				alarmHour, 
-				0).getTime().getTime();
-	 		
-	 		//Add a day if the hour has passed
-	 		if (alarmTime < currentCalendar.getTime().getTime())
-	 			alarmTime = alarmTime + AlarmManager.INTERVAL_DAY;
-	 		
-			am.setRepeating(AlarmManager.RTC_WAKEUP, alarmTime, AlarmManager.INTERVAL_DAY, alarm_sender);
-			Log.i("AlarmHost", "set " + (new Date(alarmTime)));
-			
-		} else {
 
-			//The alarm host service starts on boot
-			//We don't want to stick around if auto downloads are disabled
-			
-			//Cancel the alarm (probably redundant)
-			am.cancel(alarm_sender);
-			
-			//Stop the host service
-			AlarmHost.this.stopSelf();
- 		}
+		//Set the alarm time
+ 		int alarmHour = Integer.parseInt(app_preferences.getString("listDownloadHour", "1"));
+ 		GregorianCalendar currentCalendar = new GregorianCalendar();
+ 		long alarmTime = new GregorianCalendar(
+ 				currentCalendar.get(Calendar.YEAR),
+ 				currentCalendar.get(Calendar.MONTH),
+ 				currentCalendar.get(Calendar.DAY_OF_MONTH),
+ 				alarmHour, 
+ 				0).getTime().getTime();
+ 		
+ 		//Add a day if the hour has passed
+ 		if (alarmTime < currentCalendar.getTime().getTime())
+ 			alarmTime = alarmTime + AlarmManager.INTERVAL_DAY;
+ 		
+		am.setRepeating(AlarmManager.RTC_WAKEUP, alarmTime, AlarmManager.INTERVAL_DAY, alarm_sender);
+		Log.i("AlarmHost", "set " + (new Date(alarmTime)));
 	}
 
 	@Override
