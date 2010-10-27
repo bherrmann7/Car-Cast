@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.admob.android.ads.AdManager;
 import com.google.android.googlelogin.GoogleLoginServiceHelper;
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
@@ -81,6 +82,7 @@ public class CarCast extends BaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		AdManager.setAllowUseOfLocation(true); 
 		ExceptionHandler.register(this);
 
 		super.onCreate(savedInstanceState);
