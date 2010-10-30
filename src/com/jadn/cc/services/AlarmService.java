@@ -13,7 +13,6 @@ import android.os.RemoteException;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 /*
  * Based on
@@ -31,8 +30,6 @@ public class AlarmService extends Service {
     	super.onCreate();
 
     	app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-		Toast.makeText(this, "Alarm Triggered", Toast.LENGTH_LONG).show();
     	
         // Start up the thread running the service.  Note that we create a
         // separate thread because the service normally runs in the process's

@@ -4,27 +4,16 @@
 		android:title="Auto download" 
 		android:summary="Download podcasts automatically" 
 		android:defaultValue="false" />
-	<ListPreference 
-		android:key="listDownloadHour"
-		android:title="Download hour"
-		android:entries="@array/downloadHours"
-		android:entryValues="@array/downloadHoursValues"
-		android:dialogTitle="Hour of day to download podcasts"
-		android:summary="Set hour of day on which to download podcasts"
-		android:defaultValue="1" />
+	<com.jadn.cc.ui.TimePickerPreference 
+		android:key="timeAutoDownload"
+		android:title="Download time"
+		android:dialogTitle="Time of day to download podcasts"
+		android:summary="Set time of day on which to download podcasts" />
 	<CheckBoxPreference 
 		android:key="wifiDownload"
 		android:title="Require WIFI" 
 	 	android:summary="Require WIFI for auto download"
 	 	android:defaultValue="true" />
-	<!--<ListPreference 
-		android:key="listWifi"
-		android:title="WIFI Options"
-		android:entries="@array/wifiChoices"
-		android:entryValues="@array/wifiChoicesValues"
-		android:dialogTitle="WIFI Options"
-		android:summary="Choose how to use WIFI with auto download"
-		android:defaultValue="1" />-->
 	<ListPreference 
 		android:key="listmax"
 		android:title="Max downloads"

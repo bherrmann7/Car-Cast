@@ -22,9 +22,9 @@
 		
 		<service android:name=".services.ContentService" />
 		<service android:name=".services.AlarmService" />
-		<service android:name=".services.AlarmHost">
+		<service android:name=".services.AlarmHostService">
 			<intent-filter>
-				<action android:name="com.jadn.cc.services.AlarmHost" />
+				<action android:name="com.jadn.cc.services.AlarmHostService" />
 			</intent-filter>
 		</service>
 

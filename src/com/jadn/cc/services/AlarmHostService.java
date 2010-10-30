@@ -16,14 +16,14 @@ import android.util.Log;
 /*
  *  Based on http://www.androidcompetencycenter.com/2009/06/start-service-at-boot/
  */
-public class AlarmHost extends Service {
+public class AlarmHostService extends Service {
 
 	private PendingIntent alarm_sender;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		alarm_sender = PendingIntent.getService(AlarmHost.this, 0, new Intent(AlarmHost.this, AlarmService.class), 0);
+		alarm_sender = PendingIntent.getService(AlarmHostService.this, 0, new Intent(AlarmHostService.this, AlarmService.class), 0);
 	}
 
 	@Override
@@ -35,21 +35,21 @@ public class AlarmHost extends Service {
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
 
 		//Set the alarm time
- 		int alarmHour = Integer.parseInt(app_preferences.getString("listDownloadHour", "1"));
+ 		String time = app_preferences.getString("timeAutoDownload", "2:0");
  		GregorianCalendar currentCalendar = new GregorianCalendar();
  		long alarmTime = new GregorianCalendar(
  				currentCalendar.get(Calendar.YEAR),
  				currentCalendar.get(Calendar.MONTH),
  				currentCalendar.get(Calendar.DAY_OF_MONTH),
- 				alarmHour, 
- 				0).getTime().getTime();
+ 				Integer.valueOf(time.split(":")[0]), 
+ 				Integer.valueOf(time.split(":")[1])).getTime().getTime();
  		
  		//Add a day if the hour has passed
  		if (alarmTime < currentCalendar.getTime().getTime())
  			alarmTime = alarmTime + AlarmManager.INTERVAL_DAY;
  		
 		am.setRepeating(AlarmManager.RTC_WAKEUP, alarmTime, AlarmManager.INTERVAL_DAY, alarm_sender);
-		Log.i("AlarmHost", "set " + (new Date(alarmTime)));
+		Log.i("AlarmHostService", "set " + (new Date(alarmTime)));
 	}
 
 	@Override

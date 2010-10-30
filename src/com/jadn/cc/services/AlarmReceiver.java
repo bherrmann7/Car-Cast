@@ -17,7 +17,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 		if(app_preferences.getBoolean("autoDownload", false)) {
 			Intent serviceIntent = new Intent();
-			serviceIntent.setAction("com.jadn.cc.services.AlarmHost");
+			serviceIntent.setAction("com.jadn.cc.services.AlarmHostService");
 			context.startService(serviceIntent);
 		}
 	}

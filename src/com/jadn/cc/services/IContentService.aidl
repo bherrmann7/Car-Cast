@@ -46,6 +46,4 @@ interface IContentService {
 	void startDownloadingNewPodCasts(int max);
 	String getDownloadProgress();
 	String encodedDownloadStatus();
-	//boolean getWifiWasDisabledBeforeAutoDownload();
-    //void setWifiWasDisabledBeforeAutoDownload(boolean value);
 }

@@ -55,14 +55,14 @@ public class Settings extends PreferenceActivity {
 
 		//Prepare to cycle the alarm host service
 		Intent serviceIntent = new Intent();
-		serviceIntent.setAction("com.jadn.cc.services.AlarmHost");
+		serviceIntent.setAction("com.jadn.cc.services.AlarmHostService");
 
 		//We always want to stop
 		try {
 			stopService(serviceIntent);
 		} catch (Throwable e)
 		{
-			Log.w("Settings", "stopping AlarmHost", e);
+			Log.w("Settings", "stopping AlarmHostService", e);
 		}
 
 		//We might want to start
@@ -71,7 +71,7 @@ public class Settings extends PreferenceActivity {
 				startService(serviceIntent);
 			} catch (Throwable e)
 			{
-				Log.e("Settings", "starting AlarmHost", e);
+				Log.e("Settings", "starting AlarmHostService", e);
 			}
 		}
 	}
