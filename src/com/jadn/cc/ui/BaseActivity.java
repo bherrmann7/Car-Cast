@@ -20,7 +20,7 @@ import com.jadn.cc.trace.TraceUtil;
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
 		"27-Oct-2010",
-		"Testing automatic nighty download",
+		"Added automatic nightly download feature (beta).",
 		"18-Oct-2010",
 		"Move version info into settings title.",
 			"13-Oct-2010",

@@ -66,7 +66,7 @@ public class Settings extends PreferenceActivity {
 		}
 
 		//We might want to start
-		if(app_preferences.getBoolean("autoDownload", true)) {
+		if(app_preferences.getBoolean("autoDownload", false)) {
 			try {
 				startService(serviceIntent);
 			} catch (Throwable e)

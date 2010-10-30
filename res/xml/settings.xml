@@ -3,7 +3,7 @@
 		android:key="autoDownload" 
 		android:title="Auto download" 
 		android:summary="Download podcasts automatically" 
-		android:defaultValue="true" />
+		android:defaultValue="false" />
 	<ListPreference 
 		android:key="listDownloadHour"
 		android:title="Download hour"

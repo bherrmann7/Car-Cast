@@ -15,7 +15,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 		SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-		if(app_preferences.getBoolean("autoDownload", true)) {
+		if(app_preferences.getBoolean("autoDownload", false)) {
 			Intent serviceIntent = new Intent();
 			serviceIntent.setAction("com.jadn.cc.services.AlarmHost");
 			context.startService(serviceIntent);
