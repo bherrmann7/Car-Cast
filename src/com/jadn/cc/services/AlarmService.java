@@ -1,5 +1,7 @@
 package com.jadn.cc.services;
 
+import com.jadn.cc.core.ExternalMediaStatus;
+
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -53,10 +55,10 @@ public class AlarmService extends Service {
         			return;
         		}
         		
-        		//Check SD card mounted - reject if not mounted
-        		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+        		//Check SD card - reject if not writable
+        		if (ExternalMediaStatus.getExternalMediaStatus() != ExternalMediaStatus.writeable)
         		{
-        			Log.w("AlarmService", "Elected not to download podcasts: SD card not mounted");
+        			Log.w("AlarmService", "Elected not to download podcasts: SD card not writable");
         			return;
         		}
 
