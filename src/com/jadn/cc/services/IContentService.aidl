@@ -41,6 +41,7 @@ interface IContentService {
     List<Subscription> getSubscriptions();
     boolean editSubscription(in Subscription original, in Subscription modified);
     boolean addSubscription(in Subscription toAdd);
+	void toggleSubscription(in Subscription toToggle);
 	
 	// download:
 	void startDownloadingNewPodCasts(int max);

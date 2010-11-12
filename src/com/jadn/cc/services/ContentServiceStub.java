@@ -51,6 +51,11 @@ public class ContentServiceStub extends IContentService.Stub {
 	}
 
 	@Override
+	public void toggleSubscription(Subscription toToggle) throws RemoteException {
+		contentService.toggleSubscription(toToggle);
+	}
+
+	@Override
 	public boolean editSubscription(Subscription original, Subscription modified) throws RemoteException {
 	    return contentService.editSubscription(original, modified);
 	}
@@ -190,7 +195,5 @@ public class ContentServiceStub extends IContentService.Stub {
 	public String startSearch(String search) throws RemoteException {
 		return contentService.startSearch(search);
 	}
-
-	
 
 }

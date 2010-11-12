@@ -93,19 +93,30 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
 
     private Subscription convertProperty(String url, String nameAndMore) {
         String[] split = nameAndMore.split(REGEX_DIVIDER);
-        
-        if (split.length == 3) {
-            // best case, we should have all properties:
-            try {
-                String name = split[0];
-                int maxCount = Integer.valueOf(split[1]);
-                OrderingPreference pref = OrderingPreference.valueOf(split[2]);
-                return new Subscription(name, url, maxCount, pref);
-
-            } catch (Exception ex) {
-                Log.w("CarCast", "couldn't read subscription " + url + "=" + nameAndMore);
-            } // endtry
-
+ 
+        if (split.length == 4) {
+	        // best case, we should have all properties:
+	        try {
+	            String name = split[0];
+	            int maxCount = Integer.valueOf(split[1]);
+	            OrderingPreference pref = OrderingPreference.valueOf(split[2]);
+	            boolean enabled = Boolean.valueOf(split[3]);
+	            return new Subscription(name, url, maxCount, pref, enabled);
+	
+	        } catch (Exception ex) {
+	            Log.w("CarCast", "couldn't read subscription " + url + "=" + nameAndMore);
+	        } // endtry
+        } else if (split.length == 3) {
+	        // best case, we should have all properties except enabled:
+	        try {
+	            String name = split[0];
+	            int maxCount = Integer.valueOf(split[1]);
+	            OrderingPreference pref = OrderingPreference.valueOf(split[2]);
+	            return new Subscription(name, url, maxCount, pref);
+	
+	        } catch (Exception ex) {
+	            Log.w("CarCast", "couldn't read subscription " + url + "=" + nameAndMore);
+	        } // endtry
         } else if (split.length == 1) {
             String name = split[0];
             // oops, missing extra properties:
@@ -239,6 +250,20 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
     }
 
     @Override
+    public boolean toggleSubscription(Subscription toToggle) {
+        List<Subscription> subs = getSubscriptions();
+        int idx = indexOfSubscriptionURL(subs, toToggle.url);
+        if (idx != -1) {
+        	Subscription sub = subs.get(idx);
+            sub.enabled = !sub.enabled;
+            saveSubscriptions(subs);
+            return true;
+        } // endif
+
+        return false;
+    }
+    
+    @Override
     public List<Subscription> resetToDemoSubscriptions() {
         List<Subscription> subs = new ArrayList<Subscription>();
         subs.add(new Subscription("Science Channel", "http://www.discovery.com/radio/xml/sciencechannel.xml"));
@@ -259,11 +284,11 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
             Properties outSubs = new Properties();
             
             for (Subscription sub : subscriptions) {
-                String valueStr = sub.name + CONCAT_DIVIDER + sub.maxDownloads + CONCAT_DIVIDER + sub.orderingPreference.name();
+                String valueStr = sub.name + CONCAT_DIVIDER + sub.maxDownloads + CONCAT_DIVIDER + sub.orderingPreference.name() + CONCAT_DIVIDER + sub.enabled;
                 outSubs.put(sub.url, valueStr);
             } // endforeach
             
-            outSubs.store(bos, "Carcast Subscription File v2");
+            outSubs.store(bos, "Carcast Subscription File v3");
             bos.close();
 
             // success:

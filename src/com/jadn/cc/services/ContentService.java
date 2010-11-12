@@ -210,6 +210,10 @@ public class ContentService extends Service implements OnCompletionListener {
 		subHelper.removeSubscription(sub);
 	}
 
+	public void toggleSubscription(Subscription sub) {
+		subHelper.toggleSubscription(sub);
+	}
+
 	void deleteUpTo(int upTo) {
 		if (mediaPlayer.isPlaying()) {
 			pauseNow();
@@ -683,5 +687,4 @@ public class ContentService extends Service implements OnCompletionListener {
 		mNotificationManager.notify(23, notification);
 
 	}
-
 }

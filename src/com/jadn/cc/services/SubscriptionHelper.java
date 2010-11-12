@@ -11,4 +11,5 @@ public interface SubscriptionHelper {
     public List<Subscription> getSubscriptions();
     public boolean removeSubscription(Subscription toRemove);
     public List<Subscription> resetToDemoSubscriptions();
+	boolean toggleSubscription(Subscription toToggle);
 }

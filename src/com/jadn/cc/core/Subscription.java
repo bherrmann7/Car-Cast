@@ -21,8 +21,8 @@ public class Subscription implements Parcelable, Comparable<Subscription> {
     public final int                maxDownloads;
     public final String             name;
     public final OrderingPreference orderingPreference;
-    public final boolean            enabled;
     public final String             url;
+    public boolean enabled;
 
     public Subscription(String name, String url) {
         this(name, url, -1, OrderingPreference.FIFO, true);
