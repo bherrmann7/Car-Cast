@@ -5,11 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -40,7 +46,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		startDownloads.setEnabled(idle);
 		abort.setEnabled(!idle);
 	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -49,15 +55,24 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		final Button startDownloads = (Button) findViewById(R.id.startDownloads);
 		startDownloads.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				try {
-					reset();
-					contentService.startDownloadingNewPodCasts(Config.getMax(DownloadProgress.this));
-				} catch (RemoteException re) {
-					esay(re);
-				}
 
-				findViewById(R.id.AbortDownloads).setEnabled(true);
-				startDownloads.setEnabled(false);
+				SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(DownloadProgress.this);
+        		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+				if (app_preferences.getBoolean("wifiDownload", true) && !wifi.isWifiEnabled()) {
+					new AlertDialog.Builder(DownloadProgress.this).setTitle("Warning")
+					.setMessage("WIFI is not enabled. Do you want to use your phone's data plan?  You may use up your bandwidth allocation or incur overage charges...")
+					.setNegativeButton("Yikes, no", null).setPositiveButton("Go ahead anyway", new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							doDownloads();
+						}
+					}).show();
+				} else {
+					//either WIFI is enabled or settings indicate WIFI is not required for auto download, so go ahead
+					doDownloads();
+				}
 			}
 		});
 
@@ -85,6 +100,20 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		reset();
 	}
 
+	//Do the downloads
+	private void doDownloads()
+	{
+		try {
+			reset();
+			contentService.startDownloadingNewPodCasts(Config.getMax(DownloadProgress.this));
+		} catch (RemoteException re) {
+			esay(re);
+		}
+
+		findViewById(R.id.AbortDownloads).setEnabled(true);
+		findViewById(R.id.startDownloads).setEnabled(false);
+	}
+	
 	@Override
 	protected void onPause() {
 		super.onPause();
