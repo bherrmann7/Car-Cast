@@ -34,14 +34,20 @@
               android:layout_height="wrap_content" 
               android:paddingBottom="20dip"              
               /> 
-              
+ 
+     <CheckBox android:id="@+id/enabled" 
+            android:layout_below="@+id/editsite_name" 
+            android:layout_marginTop="20px"
+    		android:layout_width="fill_parent" 
+            android:layout_height="wrap_content"
+            android:text="Enabled" />             
               
      <Button android:id="@+id/saveEditSite" 
      		android:layout_marginTop="20px"
      		android:layout_marginLeft="100px"
             android:layout_width="100px"
             android:layout_height="wrap_content" 
-            android:layout_below="@id/editsite_name"
+            android:layout_below="@id/enabled"
             android:text="Save" />
 
    

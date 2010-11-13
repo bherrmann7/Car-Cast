@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ public class SubscriptionEdit extends BaseActivity {
 	    if (currentSub != null) {
 	        ((TextView) findViewById(R.id.editsite_name)).setText(currentSub.name);
 	        ((TextView) findViewById(R.id.editsite_url)).setText(currentSub.url);
+	        ((CheckBox) findViewById(R.id.enabled)).setChecked(currentSub.enabled);
 	        // TODO: add max count, ordering here
         } // end if
 	}
@@ -57,6 +59,7 @@ public class SubscriptionEdit extends BaseActivity {
 								.getText().toString();
 						String url = ((TextView) findViewById(R.id.editsite_url))
 								.getText().toString();
+						Boolean enabled = ((CheckBox) findViewById(R.id.enabled)).isChecked();
 				        // TODO: add max count, ordering here
 						
 						// try out the url:
@@ -73,7 +76,7 @@ public class SubscriptionEdit extends BaseActivity {
 						}
 
 						try {
-						    Subscription newSub = new Subscription(name, url); // TODO add max count, ordering
+						    Subscription newSub = new Subscription(name, url, enabled); // TODO add max count, ordering
 						    if (currentSub != null) {
 						        // edit:
                                 contentService.editSubscription(currentSub, newSub);

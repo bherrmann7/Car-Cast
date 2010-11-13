@@ -107,7 +107,7 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
 	            Log.w("CarCast", "couldn't read subscription " + url + "=" + nameAndMore);
 	        } // endtry
         } else if (split.length == 3) {
-	        // best case, we should have all properties except enabled:
+	        // second best case, we have all properties except enabled:
 	        try {
 	            String name = split[0];
 	            int maxCount = Integer.valueOf(split[1]);

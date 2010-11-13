@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -35,9 +36,11 @@ import com.jadn.cc.services.DownloadHistory;
 
 public class Subscriptions extends BaseActivity {
 
-	private static final String DELETE_SUBSCRIPTION = "Delete Subscription";
-	private static final String EDIT_SUBSCRIPTION = "Edit Subscription";
-	private static final String ERASE_SUBSCRIPTIONS_S_HISTORY = "Erase Subscriptions's History";
+	private static final String DISABLE_SUBSCRIPTION = "Disable";
+	private static final String ENABLE_SUBSCRIPTION = "Enable";
+	private static final String DELETE_SUBSCRIPTION = "Delete";
+	private static final String EDIT_SUBSCRIPTION = "Edit";
+	private static final String ERASE_SUBSCRIPTIONS_S_HISTORY = "Erase History";
 
 	SimpleAdapter listAdapter;
 	ListView listView;
@@ -57,7 +60,7 @@ public class Subscriptions extends BaseActivity {
 			return;
 		}
 
-		listAdapter = new SimpleAdapter(this, subscriptions, R.layout.main_item_two_line_row, new String[] { "name", "url" }, new int[] {
+		listAdapter = new SimpleAdapter(this, subscriptions, R.layout.main_item_two_line_row, new String[] { "name", "enabled" }, new int[] {
 				R.id.text1, R.id.text2 });
 		listView.setAdapter(listAdapter);
 	}
@@ -81,7 +84,20 @@ public class Subscriptions extends BaseActivity {
 		Map<?, ?> rowData = (Map<?, ?>) listView.getAdapter().getItem(info.position);
 
 		Subscription sub = (Subscription) rowData.get("subscription");
-		if (item.getTitle().equals(DELETE_SUBSCRIPTION)) {
+		
+		if(item.getTitle().equals(DISABLE_SUBSCRIPTION) || item.getTitle().equals(ENABLE_SUBSCRIPTION))
+		{
+			try {
+				contentService.toggleSubscription(sub);
+			} catch (RemoteException re) {
+				esay(re);
+				return true;
+			}
+			reloadSubscriptions();
+			Subscriptions.this.listAdapter.notifyDataSetChanged();
+			return true;
+			
+		} else if (item.getTitle().equals(DELETE_SUBSCRIPTION)) {
 			try {
 				contentService.deleteSubscription(sub);
 			} catch (RemoteException re) {
@@ -106,6 +122,17 @@ public class Subscriptions extends BaseActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
+
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+		Map<?, ?> rowData = (Map<?, ?>) listView.getAdapter().getItem(info.position);
+		Subscription sub = (Subscription) rowData.get("subscription");
+		menu.setHeaderTitle(sub.name);
+		
+		if (sub.enabled)
+			menu.add(DISABLE_SUBSCRIPTION);
+		else
+			menu.add(ENABLE_SUBSCRIPTION);
+		
 		menu.add(EDIT_SUBSCRIPTION);
 		menu.add(DELETE_SUBSCRIPTION);
 		menu.add(ERASE_SUBSCRIPTIONS_S_HISTORY);
@@ -160,7 +187,12 @@ public class Subscriptions extends BaseActivity {
 		for (Subscription sub : sites) {
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put("name", sub.name);
-			item.put("url", ""); // URL is too geeky sub.url);
+			
+			if(sub.enabled)
+				item.put("enabled", "");
+			else
+				item.put("enabled", "(Disabled)");
+			
 			item.put("subscription", sub);
 			subscriptions.add(item);
 		}

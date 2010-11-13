@@ -28,6 +28,10 @@ public class Subscription implements Parcelable, Comparable<Subscription> {
         this(name, url, -1, OrderingPreference.FIFO, true);
     }
 
+    public Subscription(String name, String url, Boolean enabled) {
+        this(name, url, -1, OrderingPreference.FIFO, enabled);
+    }
+
     public Subscription(String name, String url, int maxDownloads, OrderingPreference orderingPreference) {
         this(name, url, maxDownloads, orderingPreference, true);
     }

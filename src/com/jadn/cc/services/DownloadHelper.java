@@ -63,7 +63,7 @@ public class DownloadHelper implements Sayer {
 			postSitesToJadn(accounts, sites);
 		}
 
-		say("Searching " + sites.size() + " subscriptions. "+sdf.format(new Date()));
+		say("\nSearching " + sites.size() + " subscriptions. "+sdf.format(new Date()));
 
 		totalSites = sites.size();
 
@@ -73,38 +73,47 @@ public class DownloadHelper implements Sayer {
 		EnclosureHandler encloseureHandler = new EnclosureHandler(max, history, this);
 
 		for (Subscription sub : sites) {
-			try {
-				say("scanning subscription/feed: " + sub.url);
-				URL url = new URL(sub.url);
-				int foundStart = encloseureHandler.metaNets.size();
-				if (sub.maxDownloads == -1) {
-					encloseureHandler.max = max;
-				} else {
-					encloseureHandler.max = sub.maxDownloads;
-				} // endif
-
-				SAXParser sp = spf.newSAXParser();
-				XMLReader xr = sp.getXMLReader();
-				xr.setContentHandler(encloseureHandler);
-				String name = sub.name;
-				encloseureHandler.setFeedName(name);
-				xr.parse(new InputSource(url.openStream()));
-
-				String message = sitesScanned + "/" + sites.size() + ": " + name + ", " + (encloseureHandler.metaNets.size() - foundStart)
-						+ " new";
-				say(message);
-				contentService.updateNotification(message);
-
-			} catch (Throwable e) {
-				/* Display any Error to the GUI. */
-				say("Error ex:" + e.getMessage());
-				Log.e("BAH", "bad", e);
+			
+			if(sub.enabled)
+			{
+				try {
+					say("\nScanning subscription/feed: " + sub.url);
+					URL url = new URL(sub.url);
+					int foundStart = encloseureHandler.metaNets.size();
+					if (sub.maxDownloads == -1) {
+						encloseureHandler.max = max;
+					} else {
+						encloseureHandler.max = sub.maxDownloads;
+					} // endif
+	
+					SAXParser sp = spf.newSAXParser();
+					XMLReader xr = sp.getXMLReader();
+					xr.setContentHandler(encloseureHandler);
+					String name = sub.name;
+					encloseureHandler.setFeedName(name);
+					xr.parse(new InputSource(url.openStream()));
+	
+					String message = sitesScanned + "/" + sites.size() + ": " + name + ", " + (encloseureHandler.metaNets.size() - foundStart)
+							+ " new";
+					say(message);
+					contentService.updateNotification(message);
+	
+				} catch (Throwable e) {
+					/* Display any Error to the GUI. */
+					say("Error ex:" + e.getMessage());
+					Log.e("BAH", "bad", e);
+				}
 			}
+			else
+			{
+				say("\nSkipping subscription/feed: " + sub.url + " because it is not enabled.");
+			}
+			
 			sitesScanned++;
 
 		} // endforeach
 
-		say("total enclosures " + encloseureHandler.metaNets.size());
+		say("\nTotal enclosures " + encloseureHandler.metaNets.size());
 
 		List<MetaNet> newPodcasts = new ArrayList<MetaNet>();
 		for (MetaNet metaNet : encloseureHandler.metaNets) {
