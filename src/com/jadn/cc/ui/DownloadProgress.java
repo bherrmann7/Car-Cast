@@ -61,8 +61,8 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 
 				if (app_preferences.getBoolean("wifiDownload", true) && !wifi.isWifiEnabled()) {
 					new AlertDialog.Builder(DownloadProgress.this).setTitle("Warning")
-					.setMessage("WIFI is not enabled. Do you want to use your phone's data plan?  You may use up your bandwidth allocation or incur overage charges...")
-					.setNegativeButton("Yikes, no", null).setPositiveButton("Go ahead anyway", new DialogInterface.OnClickListener() {
+					.setMessage("WIFI is not enabled. Do you want to use your carrier?  You may use up your bandwidth allocation or incur overage charges...")
+					.setNegativeButton("Yikes, no", null).setPositiveButton("Sure, go ahead", new DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
