@@ -1757,7 +1757,54 @@
          result="fbSourceGraphic" /><feColorMatrix
          id="feColorMatrix5845-4-6-7"
          in="fbSourceGraphic"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 " /></filter></defs><sodipodi:namedview
+         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 " /></filter><filter
+       id="filter5841-1-8-6-1"
+       inkscape:label="Invert"
+       x="0"
+       y="0"
+       width="1"
+       height="1"
+       inkscape:menu="Color"
+       inkscape:menu-tooltip="Invert colors"
+       color-interpolation-filters="sRGB"><feColorMatrix
+         id="feColorMatrix5843-7-9-3-7"
+         type="saturate"
+         values="1"
+         result="fbSourceGraphic" /><feColorMatrix
+         id="feColorMatrix5845-4-5-6-4"
+         in="fbSourceGraphic"
+         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 " /></filter><filter
+       id="filter5889-8-9-0"
+       inkscape:label="Invert"
+       x="0"
+       y="0"
+       width="1"
+       height="1"
+       inkscape:menu="Color"
+       inkscape:menu-tooltip="Invert colors"
+       color-interpolation-filters="sRGB"><feColorMatrix
+         id="feColorMatrix5891-1-4-9"
+         type="saturate"
+         values="1"
+         result="fbSourceGraphic" /><feColorMatrix
+         id="feColorMatrix5893-7-4-4"
+         in="fbSourceGraphic"
+         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 " /></filter><clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3821-0-9-9-8"><path
+         d="m 449.863,81.471 19,0 0,24 -19,0 0,-24 z"
+         id="path3823-7-1-9-8"
+         inkscape:connector-curvature="0" /></clipPath><mask
+       maskUnits="userSpaceOnUse"
+       x="0"
+       y="0"
+       width="1"
+       height="1"
+       id="mask3827-2-3-7-2"><image
+         width="1"
+         height="1"
+         xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAYCAAAAAA9/JnTAAAAAXNCSVQI5gpbmQAAAGNJREFUGJWlkLENwCAMBN8kUrrMk73YI1uGnizwFJjEmAaJbyyd32/LiJm9nij5hNMr9AgII5pmu1YBAK7nzTKh7mxi9bFHdZYd0jxa1HbQtoJxNPd3C//UpZ+mAaVNrsOhuwABNyg93BO18AAAAABJRU5ErkJggg=="
+         id="image3829-1-0-8-4" /></mask></defs><sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1"
@@ -1770,9 +1817,9 @@
      inkscape:window-height="838"
      id="namedview2987"
      showgrid="false"
-     inkscape:zoom="0.54871485"
-     inkscape:cx="976.91213"
-     inkscape:cy="455.79524"
+     inkscape:zoom="1.0974297"
+     inkscape:cx="610.46835"
+     inkscape:cy="365.63417"
      inkscape:window-x="1912"
      inkscape:window-y="410"
      inkscape:window-maximized="1"
@@ -2219,90 +2266,46 @@
              transform="matrix(1,0,0,-1,0,1)"
              xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAABHNCSVQICAgIfAhkiAAAAClJREFUSIntzTERAAAIBCC1f+e3hecABegkqQNzkYhEIpFIJBKJRH+jBQfnBDTZUrMzAAAAAElFTkSuQmCC"
              mask="url(#mask3777-2)"
-             id="image3781-9" /></g></g></g><g
-       transform="matrix(0.8,0,0,-0.8,-8.0187372,580.21201)"
-       style="display:inline"
-       id="g4435"
-       inkscape:export-filename="C:\Users\steffan\Projects\Car-Cast\res\drawable\nbdeleteall.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"><g
-         inkscape:export-ydpi="90"
-         inkscape:export-xdpi="90"
-         inkscape:export-filename="C:\Users\steffan\Pictures\carcast_png\old\nbdelete.png"
-         transform="matrix(1.25,0,0,-1.25,696.12174,540.75699)"
-         id="g4891-2-0"
-         style="display:inline;filter:url(#filter5841-1-1)"><path
-           inkscape:connector-curvature="0"
-           id="path4893-4-9"
-           style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           d="m 0,0 -1.898,-1.9 -3.173,3.173 -3.156,-3.156 -1.898,1.899 3.156,3.156 -3.182,3.182 1.899,1.898 3.181,-3.182 3.198,3.2 L 0.026,6.369 -3.172,3.172 0,0 z m -5.063,15.77 c -6.95,0 -12.583,-5.635 -12.583,-12.584 0,-6.95 5.633,-12.584 12.583,-12.584 6.951,0 12.584,5.634 12.584,12.584 0,6.949 -5.633,12.584 -12.584,12.584" /></g><g
-         inkscape:export-ydpi="90"
-         inkscape:export-xdpi="90"
-         inkscape:export-filename="C:\Users\steffan\Pictures\carcast_png\old\nbdelete.png"
-         transform="matrix(1.25,0,0,-1.25,728.92566,540.75699)"
-         id="g4891-2-0-1"
-         style="display:inline;filter:url(#filter5841-1-0-3)"><path
-           inkscape:connector-curvature="0"
-           id="path4893-4-9-2"
-           style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-           d="m 0,0 -1.898,-1.9 -3.173,3.173 -3.156,-3.156 -1.898,1.899 3.156,3.156 -3.182,3.182 1.899,1.898 3.181,-3.182 3.198,3.2 L 0.026,6.369 -3.172,3.172 0,0 z m -5.063,15.77 c -6.95,0 -12.583,-5.635 -12.583,-12.584 0,-6.95 5.633,-12.584 12.583,-12.584 6.951,0 12.584,5.634 12.584,12.584 0,6.949 -5.633,12.584 -12.584,12.584" /></g></g><g
-       transform="matrix(0.8,0,0,-0.8,-8.0187372,580.21201)"
-       style="display:inline"
-       id="g4441"
+             id="image3781-9" /></g></g></g><image
+       y="-242.35645"
+       x="498.28326"
+       id="image3627"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABHNCSVQICAgIfAhkiAAABC5JREFU SIm9l09IankUx881ffb3phklFtGUFVFQNIGBIkSFBlNhtAmCGAJdzCxaCA0zLuzPbly0iBkKjF4L VxFToMlAGv3/T2GL5EFTM02lFNlg6S2vZxbRpeu1R39e78CB6+977u/jOb9zLvcCIsKDb21tVet0 uj9EItExAFwCQOCtnpSUdKZUKhftdvt3j1nMhdVq/VEikfwHAPgeThAEGo3G36LRaCIDHh0d/YEg iHcBxrrBYPiIiATs7u5WicXi4NeAPrjNZutMoCjq15WVlW/hkXV0dEBraytUVlaCSCSCu7s7CIfD QNM0fAnz+/0iyMnJ+RT7j5aWlvCxBYNB9Hg8aDKZsLy8/M0ZZ2Rk/A1w370swel04lMWDofR6XRi XV3dW+CXAPdtzxLm5uaeBD8YTdPodDqxsbHxNeBAAgD8BACJj89ALpdDKBQCiqIgMTERhEIh55wI ggC5XA7t7e1AkiTMzs7ez+fzjIqb8YMLhUKUSCTY1taGg4OD6PP5nqyAzWZDHo/37Iw/C4713Nxc NJvNeHx8HBc+MjKCCQkJrwf39PSgxWJBk8mEWq0WSZJk6VKpFPv6+uLCHQ4HisXi14Hn5+dZmx0d HeHw8DAWFBSw4vR6PVIUxYFbrdbXgZ8ap9PTU+zu7maVU61W4/n5OSdWpVK9HBz7AIm1mZkZLC4u ZuJbWlowEAiwYtxuN3748OFl43R7ewsejwcCgQDIZDLOOMnlcmhoaICJiQm4vr4Gr9cLFxcX0NTU xMTk5+dDKBSCxcVFiGOfHycAwLy8PDSbzXFHaWFhgclKIBDg3t4eS/d6vSgUCt82TmVlZejxeDhw i8XCxGi1Wo7e2dn59jmWyWS4sbHB2jgSiaBSqUQAQD6fj+vr6yzd6XS+DFxaWopWqxXHxsZQo9Ew 69nZ2bi/v8/a3OVyMZ2u0+lYGkVRWFJS8jywQqHAk5MT5maaprGrq4vRNRoNRiIRRo9Go0zWJEni 5eUlC67X658Hnpyc5JzV2dkZpqSkIMD9+9Py8jJL7+3tffI5MDQ0xAHz4vW6WCzmrKWnp4NAIAAA AESEqakpll5UVMRcb29vs7TCwkLOfnHBLpeLs+Z2uyEYDDK/Dw8PWbpcLgc+nw8AAAcHByxNKBQC QRCcTP6BmFILBAK0WCx4c3ODFEWh3W5HqVTK6QOapplybm5uIp/PRwDA+vp6Vqn9fj+mpaUx9yYn J58Szc3Njunp6cZ4mVdUVABBELCzs8PRSJKEmpoa4PHui3Z1dQWrq6uAiJCZmQnV1dVMbCAQgLW1 NeZFoaqqagMcDkdjbMbv7f39/b8AIoLRaPz9a0FVKtVaKBQiARGBpukkg8Hw8b2harV6xefzfYOP v50QEcbHx7+vra39Mysr6y/4Qh9tqamp/yoUiuWBgYGfKYpKe2D9D+ZCc52HKeL6AAAAAElFTkSu QmCC "
+       height="24"
+       width="24"
+       transform="scale(1,-1)" /><g
+       id="g3640"
        inkscape:export-filename="C:\Users\steffan\Projects\Car-Cast\res\drawable\nbdeletedownload.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"><g
+       inkscape:export-xdpi="81.135689"
+       inkscape:export-ydpi="81.135689"
+       transform="translate(-77.271464,-223.06668)"><g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
          inkscape:export-filename="C:\Users\steffan\Pictures\carcast_png\old\nbdelete.png"
-         transform="matrix(1.25,0,0,-1.25,697.37196,491.28704)"
-         id="g4891-2-0-0"
-         style="display:inline;filter:url(#filter5841-1-8-6)"><path
+         transform="matrix(0.63575317,0,0,0.63575317,590.11263,400.40338)"
+         id="g4891-2-0-0-5"
+         style="display:inline;filter:url(#filter5841-1-8-6-1)"><path
            inkscape:connector-curvature="0"
-           id="path4893-4-9-0"
+           id="path4893-4-9-0-1"
            style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
            d="m 0,0 -1.898,-1.9 -3.173,3.173 -3.156,-3.156 -1.898,1.899 3.156,3.156 -3.182,3.182 1.899,1.898 3.181,-3.182 3.198,3.2 L 0.026,6.369 -3.172,3.172 0,0 z m -5.063,15.77 c -6.95,0 -12.583,-5.635 -12.583,-12.584 0,-6.95 5.633,-12.584 12.583,-12.584 6.951,0 12.584,5.634 12.584,12.584 0,6.949 -5.633,12.584 -12.584,12.584" /></g><g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
          inkscape:export-filename="C:\Users\steffan\Pictures\carcast_png\old\nbdownload.png"
-         transform="matrix(1.25,0,0,-1.25,146.90964,604.14306)"
-         id="g3817-7-1"
-         style="display:inline;filter:url(#filter5889-8-9)"><g
-           clip-path="url(#clipPath3821-0-9-9)"
-           id="g3819-7-8"><g
+         transform="translate(118.43407,319.12964)"
+         id="g3817-7-1-7"
+         style="display:inline;filter:url(#filter5889-8-9-0)"><g
+           clip-path="url(#clipPath3821-0-9-9-8)"
+           id="g3819-7-8-1"><g
              transform="matrix(18.999908,0,0,23.999878,449.86307,81.470749)"
-             id="g3825-1-3"><image
-               id="image3831-3-0"
-               mask="url(#mask3827-2-3-7)"
+             id="g3825-1-3-1"><image
+               id="image3831-3-0-5"
+               mask="url(#mask3827-2-3-7-2)"
                xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAYCAYAAAAYl8YPAAAABHNCSVQICAgIfAhkiAAAAFdJREFUOI1j/P///38GKgEmahk0ahh5gAWfJCMjI4YYvsinn8tITYKD15v0MQybF2HiuORwGoYvbHDJ4fUmNk0URQCyZkJJBW/SINYQGBiCSWPUMPoYBgA5yCIlxahs8AAAAABJRU5ErkJggg=="
                transform="matrix(1,0,0,-1,0,1)"
                height="1"
-               width="1" /></g></g></g></g><image
-       y="-284.63705"
-       x="533.27411"
-       id="image3627"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABHNCSVQICAgIfAhkiAAABC5JREFU
-SIm9l09IankUx881ffb3phklFtGUFVFQNIGBIkSFBlNhtAmCGAJdzCxaCA0zLuzPbly0iBkKjF4L
-VxFToMlAGv3/T2GL5EFTM02lFNlg6S2vZxbRpeu1R39e78CB6+977u/jOb9zLvcCIsKDb21tVet0
-uj9EItExAFwCQOCtnpSUdKZUKhftdvt3j1nMhdVq/VEikfwHAPgeThAEGo3G36LRaCIDHh0d/YEg
-iHcBxrrBYPiIiATs7u5WicXi4NeAPrjNZutMoCjq15WVlW/hkXV0dEBraytUVlaCSCSCu7s7CIfD
-QNM0fAnz+/0iyMnJ+RT7j5aWlvCxBYNB9Hg8aDKZsLy8/M0ZZ2Rk/A1w370swel04lMWDofR6XRi
-XV3dW+CXAPdtzxLm5uaeBD8YTdPodDqxsbHxNeBAAgD8BACJj89ALpdDKBQCiqIgMTERhEIh55wI
-ggC5XA7t7e1AkiTMzs7ez+fzjIqb8YMLhUKUSCTY1taGg4OD6PP5nqyAzWZDHo/37Iw/C4713Nxc
-NJvNeHx8HBc+MjKCCQkJrwf39PSgxWJBk8mEWq0WSZJk6VKpFPv6+uLCHQ4HisXi14Hn5+dZmx0d
-HeHw8DAWFBSw4vR6PVIUxYFbrdbXgZ8ap9PTU+zu7maVU61W4/n5OSdWpVK9HBz7AIm1mZkZLC4u
-ZuJbWlowEAiwYtxuN3748OFl43R7ewsejwcCgQDIZDLOOMnlcmhoaICJiQm4vr4Gr9cLFxcX0NTU
-xMTk5+dDKBSCxcVFiGOfHycAwLy8PDSbzXFHaWFhgclKIBDg3t4eS/d6vSgUCt82TmVlZejxeDhw
-i8XCxGi1Wo7e2dn59jmWyWS4sbHB2jgSiaBSqUQAQD6fj+vr6yzd6XS+DFxaWopWqxXHxsZQo9Ew
-69nZ2bi/v8/a3OVyMZ2u0+lYGkVRWFJS8jywQqHAk5MT5maaprGrq4vRNRoNRiIRRo9Go0zWJEni
-5eUlC67X658Hnpyc5JzV2dkZpqSkIMD9+9Py8jJL7+3tffI5MDQ0xAHz4vW6WCzmrKWnp4NAIAAA
-AESEqakpll5UVMRcb29vs7TCwkLOfnHBLpeLs+Z2uyEYDDK/Dw8PWbpcLgc+nw8AAAcHByxNKBQC
-QRCcTP6BmFILBAK0WCx4c3ODFEWh3W5HqVTK6QOapplybm5uIp/PRwDA+vp6Vqn9fj+mpaUx9yYn
-J58Szc3Njunp6cZ4mVdUVABBELCzs8PRSJKEmpoa4PHui3Z1dQWrq6uAiJCZmQnV1dVMbCAQgLW1
-NeZFoaqqagMcDkdjbMbv7f39/b8AIoLRaPz9a0FVKtVaKBQiARGBpukkg8Hw8b2harV6xefzfYOP
-v50QEcbHx7+vra39Mysr6y/4Qh9tqamp/yoUiuWBgYGfKYpKe2D9D+ZCc52HKeL6AAAAAElFTkSu
-QmCC
-"
-       height="24"
-       width="24"
-       transform="scale(1,-1)" /></g></svg>
+               width="1" /></g></g></g><path
+         inkscape:connector-curvature="0"
+         id="path3638"
+         d="m 584.28279,399.82487 -0.5793,0.57997 0.99039,0.99078 c 0.54472,0.54493 0.9904,1.00511 0.9904,1.02261 0,0.0175 -0.44945,0.48146 -0.99878,1.031 l -0.99878,0.99915 0.58828,0.58763 0.58828,0.58764 0.99825,-0.99865 c 0.54904,-0.54926 1.01276,-0.99865 1.03048,-0.99865 0.0178,0 0.48185,0.44945 1.03139,0.99878 l 0.99916,0.99878 0.58763,-0.58828 0.58763,-0.58827 -0.99866,-0.99827 c -0.54925,-0.54904 -0.99864,-1.01276 -0.99864,-1.03048 0,-0.0178 0.44572,-0.47812 0.9905,-1.0231 l 0.9905,-0.9909 -0.58775,-0.58775 -0.58776,-0.58776 -0.99089,0.99051 c -0.54499,0.54477 -1.00539,0.9905 -1.02311,0.9905 -0.0178,0 -0.47421,-0.44217 -1.01443,-0.9826 -0.54022,-0.54043 -0.9897,-0.98261 -0.99885,-0.98261 -0.009,0 -0.27733,0.26099 -0.59594,0.57997 l 0,0 z"
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.00322165;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" /></g></g></svg>
