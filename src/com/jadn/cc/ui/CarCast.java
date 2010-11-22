@@ -71,9 +71,9 @@ public class CarCast extends BaseActivity {
 		if (pausePlay == null)
 			return;
 		if (contentService.isPlaying()) {
-			pausePlay.setImageResource(R.drawable.mpause);
+			pausePlay.setImageResource(R.drawable.player_102_pause);
 		} else {
-			pausePlay.setImageResource(R.drawable.mplay);
+			pausePlay.setImageResource(R.drawable.player_102_play);
 		}
 
 		updateUI();
@@ -124,16 +124,16 @@ public class CarCast extends BaseActivity {
 		final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
 		pausePlay.setBackgroundColor(0x0);
 		pausePlay.setSoundEffectsEnabled(true);
-		pausePlay.setImageResource(R.drawable.mplay);
+		pausePlay.setImageResource(R.drawable.player_102_play);
 		pausePlay.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				try {
 					if (contentService.getCount() == 0)
 						return;
 					if (contentService.pauseOrPlay()) {
-						pausePlay.setImageResource(R.drawable.mpause);
+						pausePlay.setImageResource(R.drawable.player_102_pause);
 					} else {
-						pausePlay.setImageResource(R.drawable.mplay);
+						pausePlay.setImageResource(R.drawable.player_102_play);
 					}
 					updateUI();
 				} catch (RemoteException e) {
@@ -180,7 +180,7 @@ public class CarCast extends BaseActivity {
 						esay(e);
 					}
 
-					pausePlay.setImageResource(R.drawable.mplay);
+					pausePlay.setImageResource(R.drawable.player_102_play);
 					startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
 				}
 				return true;

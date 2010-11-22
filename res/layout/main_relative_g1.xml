@@ -11,17 +11,17 @@
 
 	<ImageButton android:id="@+id/previous"
 		android:layout_height="70dip" android:layout_width="64dip"
-		android:src="@drawable/mrewind" android:layout_alignParentLeft="true"
+		android:src="@drawable/player_65_previous" android:layout_alignParentLeft="true"
 		android:layout_alignParentBottom="true" />
 
 	<ImageButton android:id="@+id/pausePlay"
 		android:layout_height="140dip" android:layout_width="102dip"
-		android:src="@drawable/mplay"  
+		android:src="@drawable/player_102_play"  
 		android:layout_alignParentBottom="true" 
 		android:layout_centerHorizontal="true" />
 
 	<ImageButton android:id="@+id/next" android:layout_height="70dip"
-		android:layout_width="65dip" android:src="@drawable/mforward"
+		android:layout_width="65dip" android:src="@drawable/player_65_next"
 		android:layout_alignParentBottom="true"
 		android:layout_alignParentRight="true" />
 
@@ -49,11 +49,11 @@
 		android:scrollbarStyle="insideOverlay" />
 
 
-	<ImageButton android:id="@+id/rewind30" android:src="@drawable/mleftarrow"
+	<ImageButton android:id="@+id/rewind30" android:src="@drawable/player_65_bump_left"
 		android:layout_height="70dip" android:layout_width="65dip"
 		android:layout_above="@id/previous" />
 
-	<ImageButton android:id="@+id/forward30" android:src="@drawable/mrightarrow"
+	<ImageButton android:id="@+id/forward30" android:src="@drawable/player_65_bump_right"
 		android:layout_height="70dip" android:layout_width="65dip"
 		android:layout_above="@id/next" android:layout_alignParentRight="true" />
 
@@ -68,6 +68,6 @@
 		android:layout_width="fill_parent" android:layout_height="110dip"
 		android:textColor="#FFF" android:textStyle="bold" android:text=""
 		android:layout_below="@id/subscriptionName" android:layout_above="@id/progress"
-		android:background="@drawable/carcastbg" />
+		android:background="@drawable/background_319" />
 
 </RelativeLayout>
