@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:id="@+id/search" android:title="Search" android:icon="@drawable/nbsearch" />
-<item android:id="@+id/addSubscription" android:title="Add" android:icon="@drawable/nbadd" />
-<item android:id="@+id/deleteAllSubscriptions" android:title="Delete All" android:icon="@drawable/nbdeleteall" />
-<item android:id="@+id/resetToDemoSubscriptions" android:title="Reset to Demos" android:icon="@drawable/nbreset" />
+<item android:id="@+id/search" android:title="Search" android:icon="@drawable/menu_48_search" />
+<item android:id="@+id/addSubscription" android:title="Add" android:icon="@drawable/menu_48_add" />
+<item android:id="@+id/deleteAllSubscriptions" android:title="Delete All" android:icon="@drawable/menu_48_delete" />
+<item android:id="@+id/resetToDemoSubscriptions" android:title="Reset to Demos" android:icon="@drawable/menu_48_reset" />
 </menu>

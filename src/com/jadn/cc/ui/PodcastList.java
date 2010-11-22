@@ -136,7 +136,7 @@ public class PodcastList extends BaseActivity {
 
 			// Ask the user if they want to really delete all
 			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete All?").setMessage(
-					"Do you really want to Delete all Downloaded Podcasts?").setPositiveButton("Confirm Delete All",
+					"Do you really want to delete all downloaded podcasts?").setPositiveButton("Confirm Delete All",
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
