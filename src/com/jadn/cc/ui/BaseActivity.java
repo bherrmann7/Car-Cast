@@ -19,6 +19,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
+		"15-Nov-2010", "enable/disable on subscriptions, warning when downloading without wifi, new icons on menus. ALL BY -> steffanfay@gmail.com <- send him thanks!!!", 
 		"27-Oct-2010",
 		"Added automatic nightly download feature (beta).",
 		"18-Oct-2010",
