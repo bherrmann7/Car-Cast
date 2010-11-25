@@ -1,4 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:id="@+id/emailResults" android:title="Email Download Results"></item>
+<item android:id="@+id/emailResults" android:title="Email Download Results" android:icon="@drawable/menu_48_email" ></item>
 
 </menu>
