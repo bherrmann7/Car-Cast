@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -163,7 +164,10 @@ public class Subscriptions extends BaseActivity {
 				return true;
 			}
 			if (item.getItemId() == R.id.search) {
-				startActivityForResult(new Intent(this, Search.class), Integer.MAX_VALUE);
+				// Server Move BOBH
+				new AlertDialog.Builder(this).setTitle("Searching is offline").setMessage("Sorry the Car Cast search server is being physically moved.  Service should resume before 15-Dec-2011.").setNeutralButton("Close", null)
+				.show();
+				//startActivityForResult(new Intent(this, Search.class), Integer.MAX_VALUE);
 				return true;
 			}
 		} catch (RemoteException e) {
