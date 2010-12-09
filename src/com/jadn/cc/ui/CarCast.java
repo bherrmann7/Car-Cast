@@ -3,8 +3,10 @@ package com.jadn.cc.ui;
 import java.util.Arrays;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,7 +37,8 @@ public class CarCast extends BaseActivity {
 	Updater updater;
 	private SharedPreferences app_preferences;
 	int bgcolor;
-
+	ImageButton pausePlay = null;
+	
 	// Need handler for callbacks to the UI thread
 	final Handler handler = new Handler();
 
@@ -67,22 +70,27 @@ public class CarCast extends BaseActivity {
 
 	@Override
 	void onContentService() throws RemoteException {
-		final ImageButton pausePlay = (ImageButton) findViewById(R.id.pausePlay);
-		if (pausePlay == null)
+		updatePausePlay();
+		updateUI();
+	}
+	
+	void updatePausePlay() throws RemoteException {
+		if (contentService == null){
 			return;
+		}
+		if (pausePlay == null){
+			pausePlay = (ImageButton) findViewById(R.id.pausePlay);
+		}
 		if (contentService.isPlaying()) {
 			pausePlay.setImageResource(R.drawable.player_102_pause);
 		} else {
 			pausePlay.setImageResource(R.drawable.player_102_play);
 		}
-
-		updateUI();
 	}
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		AdManager.setAllowUseOfLocation(true); 
 		ExceptionHandler.register(this);
 
 		super.onCreate(savedInstanceState);
@@ -90,7 +98,26 @@ public class CarCast extends BaseActivity {
 		Intent csIntent = new Intent(getApplicationContext(), ContentService.class);
 		startService(csIntent);
 		bindService(csIntent, this, Context.BIND_AUTO_CREATE);
-
+		
+		registerReceiver(new BroadcastReceiver(){
+			@Override
+			public void onReceive(Context context, Intent intent){
+				if (intent != null && intent.getExtras().getInt("state") == 0){
+						try {
+							if (contentService.isPlaying()){
+								contentService.pause();
+								contentService.bump(-2);
+								updatePausePlay();
+								updateUI();
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				}
+			}
+		}, new IntentFilter("android.intent.action.HEADSET_PLUG"));
+		
 		setTitle(getAppTitle());
 
 		int width = getWindow().getWindowManager().getDefaultDisplay().getWidth();
@@ -211,6 +238,7 @@ public class CarCast extends BaseActivity {
 		if (accounts == null) {
 			GoogleLoginServiceHelper.getAccount(this, 123, true);
 		}
+		
 	}
 
 	@Override
