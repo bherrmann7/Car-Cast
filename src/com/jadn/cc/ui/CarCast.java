@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -116,7 +117,7 @@ public class CarCast extends BaseActivity {
 						}
 				}
 			}
-		}, new IntentFilter("android.intent.action.HEADSET_PLUG"));
+		}, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 		
 		setTitle(getAppTitle());
 
