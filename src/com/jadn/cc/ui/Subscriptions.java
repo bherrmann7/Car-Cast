@@ -164,10 +164,7 @@ public class Subscriptions extends BaseActivity {
 				return true;
 			}
 			if (item.getItemId() == R.id.search) {
-				// Server Move BOBH
-				new AlertDialog.Builder(this).setTitle("Searching is offline").setMessage("Sorry the Car Cast search server is being physically moved.  Service should resume before 15-Dec-2011.").setNeutralButton("Close", null)
-				.show();
-				//startActivityForResult(new Intent(this, Search.class), Integer.MAX_VALUE);
+				startActivityForResult(new Intent(this, Search.class), Integer.MAX_VALUE);
 				return true;
 			}
 		} catch (RemoteException e) {

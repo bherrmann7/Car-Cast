@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.jadn.cc" android:versionCode="82" android:versionName="1.0.82">
+	package="com.jadn.cc" android:versionCode="83" android:versionName="1.0.83">
 	<application android:icon="@drawable/icon3" android:label="Car Cast" android:debuggable="true">
 		<activity android:name=".ui.CarCast" android:label="Car Cast">
 			<intent-filter>
