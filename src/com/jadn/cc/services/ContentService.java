@@ -621,9 +621,7 @@ public class ContentService extends Service implements OnCompletionListener {
 								"none");
 						boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
 								"canCollectData", true);
-						// Nov 24th, Server is moving 
-						canCollectData = false;
-						//
+
 						downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
 					} finally {
 						ContentService.this.setForeground(false);

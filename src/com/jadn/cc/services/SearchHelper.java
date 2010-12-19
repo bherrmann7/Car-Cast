@@ -8,9 +8,7 @@ import java.net.URLEncoder;
 import com.jadn.cc.trace.TraceUtil;
 
 public class SearchHelper extends Thread {
-
 	boolean done;
-
 	String results = "";
 	String search;
 

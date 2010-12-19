@@ -19,7 +19,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
-		"14-Nov-2010", "Turned off Podcast search - I'm moving and the server will be in a box.\n  Hopefully all back on by 15-DEC-2011", 
+		"17-Dec-2010", "Podcast search and stat collection are back on.", 
+		"24-Nov-2010", "Turned off Podcast search - I'm moving and the server will be in a box.\n  Hopefully all back on by 15-DEC-2011", 
 		"15-Nov-2010", "enable/disable on subscriptions, warning when downloading without wifi, new icons on menus. ALL BY -> steffanfay@gmail.com <- send him thanks!!!", 
 		"27-Oct-2010",
 		"Added automatic nightly download feature (beta).",

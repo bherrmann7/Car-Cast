@@ -34,7 +34,7 @@ public class DownloadHelper implements Sayer {
 	public String currentSubscription = " ";
 	public String currentTitle = " ";
 	DownloadHistory history = DownloadHistory.getInstance();
-	int max;	
+	int max;
 	StringBuilder newText = new StringBuilder();
 	int podcastsCurrentBytes;
 	int podcastsDownloaded;
@@ -49,12 +49,12 @@ public class DownloadHelper implements Sayer {
 	public DownloadHelper(int max) {
 		this.max = max;
 	}
-	
+
 	SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd hh:mma");
 
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
-		
-		say("Starting find/download new podcasts. CarCast ver "+BaseActivity.getVersion());
+
+		say("Starting find/download new podcasts. CarCast ver " + BaseActivity.getVersion());
 		say("Problems? please use Menu / Email Download Report - THANKS!");
 
 		List<Subscription> sites = contentService.getSubscriptions();
@@ -63,7 +63,7 @@ public class DownloadHelper implements Sayer {
 			postSitesToJadn(accounts, sites);
 		}
 
-		say("\nSearching " + sites.size() + " subscriptions. "+sdf.format(new Date()));
+		say("\nSearching " + sites.size() + " subscriptions. " + sdf.format(new Date()));
 
 		totalSites = sites.size();
 
@@ -73,9 +73,8 @@ public class DownloadHelper implements Sayer {
 		EnclosureHandler encloseureHandler = new EnclosureHandler(max, history, this);
 
 		for (Subscription sub : sites) {
-			
-			if(sub.enabled)
-			{
+
+			if (sub.enabled) {
 				try {
 					say("\nScanning subscription/feed: " + sub.url);
 					URL url = new URL(sub.url);
@@ -85,30 +84,28 @@ public class DownloadHelper implements Sayer {
 					} else {
 						encloseureHandler.max = sub.maxDownloads;
 					} // endif
-	
+
 					SAXParser sp = spf.newSAXParser();
 					XMLReader xr = sp.getXMLReader();
 					xr.setContentHandler(encloseureHandler);
 					String name = sub.name;
 					encloseureHandler.setFeedName(name);
 					xr.parse(new InputSource(url.openStream()));
-	
-					String message = sitesScanned + "/" + sites.size() + ": " + name + ", " + (encloseureHandler.metaNets.size() - foundStart)
-							+ " new";
+
+					String message = sitesScanned + "/" + sites.size() + ": " + name + ", "
+							+ (encloseureHandler.metaNets.size() - foundStart) + " new";
 					say(message);
 					contentService.updateNotification(message);
-	
+
 				} catch (Throwable e) {
 					/* Display any Error to the GUI. */
 					say("Error ex:" + e.getMessage());
 					Log.e("BAH", "bad", e);
 				}
-			}
-			else
-			{
+			} else {
 				say("\nSkipping subscription/feed: " + sub.url + " because it is not enabled.");
 			}
-			
+
 			sitesScanned++;
 
 		} // endforeach
@@ -157,27 +154,30 @@ public class DownloadHelper implements Sayer {
 					currentSubscription = newPodcasts.get(i).getSubscription();
 					currentTitle = newPodcasts.get(i).getTitle();
 					File tempFile = new File(Config.PodcastsRoot, "tempFile");
-					say("Subscription: "+currentSubscription);
-					say("Title: "+currentTitle);
-					say("enclosure url: "+new URL(newPodcasts.get(i).getUrl()));
+					say("Subscription: " + currentSubscription);
+					say("Title: " + currentTitle);
+					say("enclosure url: " + new URL(newPodcasts.get(i).getUrl()));
 					InputStream is = getInputStream(new URL(newPodcasts.get(i).getUrl()));
 					FileOutputStream fos = new FileOutputStream(tempFile);
 					byte[] buf = new byte[16383];
 					int amt = 0;
-					int expectedSizeKilo = newPodcasts.get(i).getSize()/1024;
+					int expectedSizeKilo = newPodcasts.get(i).getSize() / 1024;
 					String preDownload = sb.toString();
 					int totalForThisPodcast = 0;
-					say(String.format("%dk/%dk 0",totalForThisPodcast/1024,expectedSizeKilo)+"%\n");
+					say(String.format("%dk/%dk 0", totalForThisPodcast / 1024, expectedSizeKilo) + "%\n");
 					while ((amt = is.read(buf)) > 0) {
 						fos.write(buf, 0, amt);
 						podcastsCurrentBytes += amt;
 						totalForThisPodcast += amt;
-						sb = new StringBuilder(preDownload+String.format("%dk/%dk  %d",totalForThisPodcast/1024,expectedSizeKilo, (int)((totalForThisPodcast/10.24)/expectedSizeKilo))+"%\n");
+						sb = new StringBuilder(preDownload
+								+ String.format("%dk/%dk  %d", totalForThisPodcast / 1024, expectedSizeKilo,
+										(int) ((totalForThisPodcast / 10.24) / expectedSizeKilo)) + "%\n");
 					}
+					say("download finished.");
 					fos.close();
 					is.close();
 					// add before rename, so if rename fails, we remember
-					// that we tried this file and skip it next time.					
+					// that we tried this file and skip it next time.
 					history.add(newPodcasts.get(i));
 
 					tempFile.renameTo(castFile);
@@ -189,7 +189,7 @@ public class DownloadHelper implements Sayer {
 						podcastsTotalBytes -= newPodcasts.get(i).getSize();
 						// add in correct value
 						podcastsTotalBytes += totalForThisPodcast;
-						
+
 					}
 					say("-");
 				}
@@ -197,9 +197,9 @@ public class DownloadHelper implements Sayer {
 				say("Problem downloading " + newPodcasts.get(i).getUrlShortName() + " e:" + e);
 			}
 		}
-		say("Finished. Downloaded " + got + " new podcasts. "+sdf.format(new Date()));
+		say("Finished. Downloaded " + got + " new podcasts. " + sdf.format(new Date()));
 
-		contentService.doDownloadCompletedNotification(got); 
+		contentService.doDownloadCompletedNotification(got);
 		idle = true;
 	}
 
@@ -240,7 +240,7 @@ public class DownloadHelper implements Sayer {
 			}
 			// println "next: "+url
 		}
-		throw new IOException(BaseActivity.getAppTitle()+" redirect limit reached");
+		throw new IOException(BaseActivity.getAppTitle() + " redirect limit reached");
 	}
 
 	public String getStatus() {
@@ -250,54 +250,62 @@ public class DownloadHelper implements Sayer {
 				+ (podcastsTotalBytes / 1024) + "k";
 	}
 
-	
 	/**
-	 *  CarCast sends your list of subscriptions to jadn.com so that the list can be used to make the populate search the search
-	 *  engine.  This information is collected only if the checkbox is set in the settings  
+	 * CarCast sends your list of subscriptions to jadn.com so that the list can be used to make the populate search the
+	 * search engine. This information is collected only if the checkbox is set in the settings
 	 */
-	private void postSitesToJadn(String accounts, List<Subscription> sites) {
+	private void postSitesToJadn(final String accounts, final List<Subscription> sites) {
 
-		try {
-			// Construct data
-			StringBuilder data = new StringBuilder();
-			boolean first = true;
-			for (Subscription sub : sites) {
-				if (first)
-					first = false;
-				else
-					data.append('|');
-				data.append(sub.url);
+		// Do this in the background so user doesn't wait for data collection... they hate that. :)
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					// Construct data
+					StringBuilder data = new StringBuilder();
+					boolean first = true;
+					for (Subscription sub : sites) {
+						if (first)
+							first = false;
+						else
+							data.append('|');
+						data.append(sub.url);
+					}
+
+					// Send data
+					URL url = new URL("http://jadn.com/carcast/collectSites");
+					// URL url = new
+					// URL("http://192.168.0.128:9090/carcast/collectSites");
+					URLConnection conn = url.openConnection();
+					conn.setDoOutput(true);
+					OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+					wr.write("appVersion=" + URLEncoder.encode(BaseActivity.getVersion(), "UTF-8"));
+					wr.write('&');
+					wr.write("accounts=" + URLEncoder.encode(accounts, "UTF-8"));
+					wr.write('&');
+					wr.write("sites=" + URLEncoder.encode(data.toString(), "UTF-8"));
+					wr.flush();
+
+					// Get the response
+					BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+					// String line = null;
+					while ((rd.readLine()) != null) {
+						// Process line...
+						// Log.d("carcast",line);
+					}
+					wr.close();
+					rd.close();
+				} catch (Exception e) {
+					Log.e("carcast", "updateSite", e);
+
+				}
+
 			}
-
-			// Send data
-			URL url = new URL("http://jadn.com/carcast/collectSites");
-			// URL url = new
-			// URL("http://192.168.0.128:9090/carcast/collectSites");
-			URLConnection conn = url.openConnection();
-			conn.setDoOutput(true);
-			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-			wr.write("appVersion=" + URLEncoder.encode(BaseActivity.getVersion(), "UTF-8"));
-			wr.write('&');
-			wr.write("accounts=" + URLEncoder.encode(accounts, "UTF-8"));
-			wr.write('&');
-			wr.write("sites=" + URLEncoder.encode(data.toString(), "UTF-8"));
-			wr.flush();
-
-			// Get the response
-			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			// String line = null;
-			while ((rd.readLine()) != null) {
-				// Process line...
-				// Log.d("carcast",line);
-			}
-			wr.close();
-			rd.close();
-		} catch (Exception e) {
-			Log.e("carcast", "updateSite", e);
-
-		}
+		}).start();
 
 	}
+
 	@Override
 	public void say(String text) {
 		sb.append(text);
