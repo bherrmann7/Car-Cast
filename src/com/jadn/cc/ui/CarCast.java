@@ -211,6 +211,8 @@ public class CarCast extends BaseActivity {
 		if (accounts == null) {
 			GoogleLoginServiceHelper.getAccount(this, 123, true);
 		}
+		
+		Recording.updateNotification(this);
 	}
 
 	@Override

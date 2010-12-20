@@ -5,16 +5,6 @@ android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android"
 >
-<TextView
-android:id="@+id/audioRecorderScreenName"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="Audio Note Recorder"
-android:textSize="30dp"
-android:layout_x="15px"
-android:layout_y="04px"
->
-</TextView>
 <Button
 android:id="@+id/audioRecorderRecordButton"
 android:layout_width="wrap_content"
@@ -23,7 +13,7 @@ android:layout_marginTop="10px"
 android:text="Record New Note"
 android:gravity="center"
 android:layout_x="90px"
-android:layout_y="51px"
+android:layout_y="5px"
 android:visibility="invisible"
 >
 </Button>
@@ -35,13 +25,14 @@ android:layout_marginTop="10px"
 android:text=" Cancel "
 android:gravity="center"
 android:layout_x="5px"
-android:layout_y="51px"
+android:layout_y="5px"
 />
 <ProgressBar android:id="@+id/audioRecorderBusy" android:indeterminate="true" android:indeterminateOnly="true" 
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:layout_x="135px"
-android:layout_y="51px"/>
+android:layout_y="5px"
+></ProgressBar>
 <Button
 android:id="@+id/audioRecorderSaveButton"
 android:layout_width="110px"
@@ -50,7 +41,7 @@ android:layout_marginTop="10px"
 android:text="  Save  "
 android:gravity="center"
 android:layout_x="205px"
-android:layout_y="51px"
+android:layout_y="5px"
 />
 <ListView
 android:background="#444"
@@ -58,7 +49,7 @@ android:id="@+id/audioRecorderListing"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 android:layout_x="0px"
-android:layout_y="120px"
+android:layout_y="55px"
 >
 </ListView>
 </AbsoluteLayout>

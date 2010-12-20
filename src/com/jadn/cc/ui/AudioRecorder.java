@@ -44,7 +44,7 @@ public class AudioRecorder extends BaseActivity {
 		}
 		if (item.getTitle().equals("Delete")) {
 			Recording recording = Recording.getRecordings().get(info.position);
-			recording.delete();
+			recording.delete(this);
 			showRecordings();
 		}
 		return true;
@@ -55,7 +55,7 @@ public class AudioRecorder extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recorder);
 
-		setTitle(getAppTitle()+": record audio note");
+		setTitle(getAppTitle()+": Audio Note Recorder");
 		
 		setReadyToRecord(true);
 		
@@ -78,7 +78,7 @@ public class AudioRecorder extends BaseActivity {
 		fb(R.id.audioRecorderSaveButton).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				Recording.save();
+				Recording.save(AudioRecorder.this);
 
 				// transition back to ready
 				setReadyToRecord(true);

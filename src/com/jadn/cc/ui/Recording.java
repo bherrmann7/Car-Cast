@@ -6,11 +6,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
+import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
 
 public class Recording {
@@ -34,7 +40,7 @@ public class Recording {
 
 	public static void deleteAll() {
 		for (File file : recordDir.listFiles()) {
-			if(file.getName().endsWith(".3gp"))
+			if (file.getName().endsWith(".3gp"))
 				file.delete();
 		}
 	}
@@ -47,6 +53,7 @@ public class Recording {
 		}
 		return list;
 	}
+
 	public static void record() {
 		recordFile = new File(recordDir, System.currentTimeMillis() + ".tmp");
 		recorder = new MediaRecorder();
@@ -60,8 +67,8 @@ public class Recording {
 		}
 		recorder.start();
 	}
-	
-	public static void save() {
+
+	public static void save(Activity activity) {
 		recorder.stop();
 		recorder = null;
 		try {
@@ -73,26 +80,55 @@ public class Recording {
 				duration = duration / 1000;
 			mediaPlayer.release();
 
-			File newFile = new File(recordDir, recordFile.getName().replaceAll(
-					"\\.tmp$", "-" + duration + ".3gp"));
+			File newFile = new File(recordDir, recordFile.getName().replaceAll("\\.tmp$", "-" + duration + ".3gp"));
 			recordFile.renameTo(newFile);
+
+			updateNotification(activity);
 		} catch (Exception e) {
 			Log.e("carcast", "Recording.save", e);
 		}
+
 	}
+
 	File file;
+
+	public static void updateNotification(Activity activity) {
+		NotificationManager mNotificationManager = (NotificationManager) activity.getSystemService(Activity.NOTIFICATION_SERVICE);
+
+		mNotificationManager.cancel(24);
+
+		int r = getRecordings().size();
+		if (r != 0) {
+
+			Notification notification = new Notification(R.drawable.idea, "Audio Recordings ", System.currentTimeMillis());
+
+			PendingIntent contentIntent = PendingIntent.getActivity(activity, 0, new Intent(activity, AudioRecorder.class), 0);
+
+			notification.setLatestEventInfo(activity.getBaseContext(), "Audio Recordings", "You have " + r + " recording"
+					+ (r == 1 ? "." : "s."), contentIntent);
+			//notification.flags = Notification.FLAG_AUTO_CANCEL;
+
+			mNotificationManager.notify(24, notification);
+		}
+
+	}
 
 	public Recording(File file) {
 		this.file = file;
 	}
 
-	public void delete() {
+	public void delete(Activity activity) {
 		file.delete();
+
+		if (getRecordings().size() == 0) {
+			NotificationManager mNotificationManager = (NotificationManager) activity.getSystemService(Activity.NOTIFICATION_SERVICE);
+
+			mNotificationManager.cancel(24);
+		}
 	}
 
 	public String getDurationString() {
-		int millis = Integer.parseInt(file.getName().substring(
-				file.getName().indexOf('-') + 1, file.getName().indexOf('.')));
+		int millis = Integer.parseInt(file.getName().substring(file.getName().indexOf('-') + 1, file.getName().indexOf('.')));
 		int min = millis / 60;
 		int sec = millis - (60 * min);
 		if (sec <= 9) {
@@ -102,19 +138,19 @@ public class Recording {
 	}
 
 	public String getTimeString() {
-		long millis = Long.parseLong(file.getName().substring(0,
-				file.getName().indexOf('-')));
+		long millis = Long.parseLong(file.getName().substring(0, file.getName().indexOf('-')));
 		return sdf.format(new Date(millis));
 	}
 
 	public void play() {
 		try {
 			final MediaPlayer mediaPlayer = new MediaPlayer();
-			mediaPlayer.setOnCompletionListener(new OnCompletionListener(){
+			mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 				@Override
 				public void onCompletion(MediaPlayer mp) {
 					mediaPlayer.release();
-				}});
+				}
+			});
 			mediaPlayer.setDataSource(file.toString());
 			mediaPlayer.prepare();
 			mediaPlayer.start();
