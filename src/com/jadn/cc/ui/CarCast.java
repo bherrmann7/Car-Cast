@@ -371,6 +371,7 @@ public class CarCast extends BaseActivity {
 
 			ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
 			progressBar.setProgress(contentService.currentProgress());
+			updatePausePlay();
 
 		} catch (Throwable e) {
 			Log.e("cc", "", e);
