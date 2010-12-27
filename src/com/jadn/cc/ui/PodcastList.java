@@ -30,7 +30,7 @@ import com.jadn.cc.services.MetaHolder;
 public class PodcastList extends BaseActivity {
 
 	SimpleAdapter podcastsAdapter;
-	ArrayList<HashMap<String, String>> list;
+	ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -106,7 +106,7 @@ public class PodcastList extends BaseActivity {
 							contentService.pause();
 						contentService.play(position);
 					}
-					podcastsAdapter.notifyDataSetChanged();
+					showPodcasts();
 				} catch (RemoteException e) {
 					// humm.
 				}
@@ -168,7 +168,7 @@ public class PodcastList extends BaseActivity {
 		ListView listView = (ListView) findViewById(R.id.podcastList);
 
 		MetaHolder metaHolder = new MetaHolder();
-		list = new ArrayList<HashMap<String, String>>();
+		list.clear();
 
 		for (int i = 0; i < metaHolder.getSize(); i++) {
 			MetaFile metaFile = metaHolder.get(i);
