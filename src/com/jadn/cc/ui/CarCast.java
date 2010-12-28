@@ -102,7 +102,7 @@ public class CarCast extends BaseActivity {
 		registerReceiver(new BroadcastReceiver(){
 			@Override
 			public void onReceive(Context context, Intent intent){
-				if (intent != null && intent.getExtras().getInt("state") == 0){
+				if (intent != null ) { // && intent.getExtras().getInt("state") == 0){
 						try {
 							if (contentService.isPlaying()){
 								contentService.pause();
