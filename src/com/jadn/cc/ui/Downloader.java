@@ -65,7 +65,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 		
 		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 		emailIntent.setType("plain/text");
-		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "carcast-devs@jadn.com" });
+		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "carcast-devs@googlegroups.com" });
 		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Issue on download...");
 		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, tv.getText());
 		startActivity(Intent.createChooser(emailIntent, "Email about podcast downloading"));
