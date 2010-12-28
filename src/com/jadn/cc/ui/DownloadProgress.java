@@ -59,8 +59,12 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 				SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(DownloadProgress.this);
         		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
-				if (app_preferences.getBoolean("wifiDownload", true) && !wifi.isWifiEnabled()) {
-					new AlertDialog.Builder(DownloadProgress.this).setTitle("WIFI is not enabled.").setIcon(android.R.drawable.ic_dialog_alert)
+				if (app_preferences.getBoolean("wifiDownload", true) && (!wifi.isWifiEnabled() || wifi.getConnectionInfo().getIpAddress() == 0)) {
+					
+					String title =  "WIFI is not enabled.";
+					if (wifi.getConnectionInfo().getIpAddress() == 0) title = "WIFI is not connected.";
+					
+					new AlertDialog.Builder(DownloadProgress.this).setTitle(title).setIcon(android.R.drawable.ic_dialog_alert)
 					.setMessage("Do you want to use your carrier?  You may use up your data plan's bandwidth allocation or incur overage charges...")
 					.setNegativeButton("Yikes, no", null).setPositiveButton("Sure, go ahead", new DialogInterface.OnClickListener() {
 						

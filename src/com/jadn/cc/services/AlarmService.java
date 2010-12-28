@@ -49,10 +49,19 @@ public class AlarmService extends Service {
         	try {
         		//Deal with WIFI option
         		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        		if(app_preferences.getBoolean("wifiDownload", true) && !wifi.isWifiEnabled()) 
+        		if(app_preferences.getBoolean("wifiDownload", true)) 
         		{
-        			Log.w("AlarmService", "Elected not to download podcasts: WIFI not enabled");
-        			return;
+        			if (!wifi.isWifiEnabled())
+        			{
+	        			Log.w("AlarmService", "Elected not to download podcasts: WIFI not enabled");
+	        			return;
+        			}
+        			
+        			if (wifi.getConnectionInfo().getIpAddress() == 0)
+        			{
+	        			Log.w("AlarmService", "Elected not to download podcasts: no WIFI connection");
+	        			return;
+        			}
         		}
         		
         		//Check SD card - reject if not writable
@@ -97,10 +106,10 @@ public class AlarmService extends Service {
 
         	} catch(Throwable e) {
 				Log.e("AlarmService", "unknown failure", e);
+        	} finally {
+                // Done with our work...  stop the service!
+                AlarmService.this.stopSelf();
         	}
-
-            // Done with our work...  stop the service!
-            AlarmService.this.stopSelf();
         }
     };
 
