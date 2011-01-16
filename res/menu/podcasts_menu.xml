@@ -1,4 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 <item android:id="@+id/deleteAllPodcasts" android:title="Delete All Podcasts" android:icon="@drawable/menu_48_delete" />
 <item android:id="@+id/eraseDownloadHistory" android:title="Erase Download History" android:icon="@drawable/menu_48_clear_cancel" />
+<item android:id="@+id/deleteListenedTo" android:title="Delete Listened To" android:icon="@drawable/menu_48_delete"></item>
 </menu>

@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import com.jadn.cc.trace.TraceUtil;
+
+import android.media.MediaPlayer;
 import android.util.Log;
 
 /**
@@ -31,12 +34,31 @@ public class MetaFile {
 			properties.setProperty("title", file.getName());
 			properties.setProperty("feedName", "unknown feed");
 			properties.setProperty("currentPos", "0");
+			computeDuration();
 		}
+	}
+
+	public void computeDuration() {
+		// ask media player
+		MediaPlayer mediaPlayer = new MediaPlayer();
+		try {
+			mediaPlayer.setDataSource(file.toString());
+			mediaPlayer.prepare();
+			setDuration(mediaPlayer.getDuration());			
+		} catch (Exception e) {
+			TraceUtil.report(new RuntimeException("on file " + file, e));
+			setDuration(0);
+		} finally {
+			mediaPlayer.reset();
+			mediaPlayer.release();
+		}
+		
 	}
 
 	public MetaFile(MetaNet metaNet, File castFile) {
 		file = castFile;
 		properties = metaNet.properties;
+		computeDuration();
 	}
 
 	public void delete() {

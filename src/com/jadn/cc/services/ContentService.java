@@ -108,18 +108,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (dur != -1)
 			return dur;
 		if (mediaMode == MediaMode.UnInitialized) {
-			// ask media player
-			try {
-				mediaPlayer.reset();
-				mediaPlayer.setDataSource(currentFile().toString());
-				mediaPlayer.prepare();
-				cm().setDuration(mediaPlayer.getDuration());
-			} catch (Exception e) {
-				TraceUtil.report(new RuntimeException("on file " + currentFile().toString(), e));
-				cm().setDuration(0);
-			}
-		} else {
-			cm().setDuration(mediaPlayer.getDuration());
+			cm().computeDuration();
+			return cm().getDuration();
 		}
 		return cm().getDuration();
 	}
@@ -423,7 +413,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		cm().setCurrentPos(-1);
+		cm().setCurrentPos(mp.getCurrentPosition());		
 		cm().save();
 		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("autoPlayNext", true)) {
 			next(true);

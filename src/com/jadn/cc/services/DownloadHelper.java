@@ -182,6 +182,7 @@ public class DownloadHelper implements Sayer {
 
 					tempFile.renameTo(castFile);
 					new MetaFile(newPodcasts.get(i), castFile).save();
+					
 					got++;
 					if (totalForThisPodcast != newPodcasts.get(i).getSize()) {
 						say("Note: reported size in rss did not match download.");

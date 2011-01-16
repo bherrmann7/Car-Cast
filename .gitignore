@@ -9,3 +9,5 @@ build.gradle
 build.properties
 local.properties
 default.properties
+.settings
+

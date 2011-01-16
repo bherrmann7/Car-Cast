@@ -47,7 +47,8 @@ public class PodcastList extends BaseActivity {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
 		if (item.getTitle().equals("Delete")) {
 			try {
 				contentService.deletePodcast(info.position);
@@ -85,7 +86,7 @@ public class PodcastList extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.podcast_list);
 
-		setTitle(getAppTitle()+": Downloaded podcasts");
+		setTitle(getAppTitle() + ": Downloaded podcasts");
 
 		ListView listView = (ListView) findViewById(R.id.podcastList);
 		registerForContextMenu(listView);
@@ -93,12 +94,14 @@ public class PodcastList extends BaseActivity {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View arg1,
+					int position, long arg3) {
 				MetaHolder metaHolder = new MetaHolder();
 				try {
 					MetaFile mfile = metaHolder.get(position);
 
-					if (mfile.getTitle().equals(contentService.getCurrentTitle())) {
+					if (mfile.getTitle().equals(
+							contentService.getCurrentTitle())) {
 						contentService.pauseOrPlay();
 					} else {
 						// This saves our position
@@ -115,7 +118,8 @@ public class PodcastList extends BaseActivity {
 	}
 
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.add("Play");
 		menu.add("Delete");
@@ -132,32 +136,62 @@ public class PodcastList extends BaseActivity {
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
-		if (item.getItemId() == R.id.deleteAllPodcasts) {
+		if (item.getItemId() == R.id.deleteListenedTo) {
+			String currTitle = "";
+			try {
+				currTitle = contentService.getCurrentTitle();
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
+			MetaHolder metaHolder = new MetaHolder();
+			for (int i = metaHolder.getSize() - 1; i >= 0; i--) {
+				if (currTitle.equals(metaHolder.get(i).getTitle())) {
+					continue;
+				}
+				if (metaHolder.get(i).getCurrentPos() > metaHolder.get(i)
+						.getDuration() * .9) {
+					try {
+						contentService.deletePodcast(i);
+						list.remove(i);
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			podcastsAdapter.notifyDataSetChanged();
+
+		} else if (item.getItemId() == R.id.deleteAllPodcasts) {
 
 			// Ask the user if they want to really delete all
-			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete All?").setMessage(
-					"Do you really want to delete all downloaded podcasts?").setPositiveButton("Confirm Delete All",
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							try {
-								contentService.purgeAll();
-								list.clear();
-								podcastsAdapter.notifyDataSetChanged();
-								finish();
-							} catch (RemoteException e) {
-								esay(e);
-							}
+			new AlertDialog.Builder(this)
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setTitle("Delete All?")
+					.setMessage(
+							"Do you really want to delete all downloaded podcasts?")
+					.setPositiveButton("Confirm Delete All",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									try {
+										contentService.purgeAll();
+										list.clear();
+										podcastsAdapter.notifyDataSetChanged();
+										finish();
+									} catch (RemoteException e) {
+										esay(e);
+									}
 
-						}
+								}
 
-					}).setNegativeButton("Cancel", null).show();
+							}).setNegativeButton("Cancel", null).show();
 
 			return true;
 		}
 		if (item.getItemId() == R.id.eraseDownloadHistory) {
 			int historyDeleted = DownloadHistory.getInstance().eraseHistory();
-			Util.toast(this, "Erased " + historyDeleted + " podcast from dowload history.");
+			Util.toast(this, "Erased " + historyDeleted
+					+ " podcast from dowload history.");
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
@@ -174,7 +208,8 @@ public class PodcastList extends BaseActivity {
 			MetaFile metaFile = metaHolder.get(i);
 			HashMap<String, String> item = new HashMap<String, String>();
 			try {
-				if (contentService.getCurrentTitle().equals(metaFile.getTitle())) {
+				if (contentService.getCurrentTitle()
+						.equals(metaFile.getTitle())) {
 					if (contentService.isPlaying()) {
 						item.put("line1", "> " + metaFile.getFeedName());
 					} else {
@@ -187,7 +222,9 @@ public class PodcastList extends BaseActivity {
 				esay(e);
 				item.put("line1", metaFile.getFeedName());
 			}
-			String time = ContentService.getTimeString(metaFile.getCurrentPos()) + "-"
+			String time = ContentService
+					.getTimeString(metaFile.getCurrentPos())
+					+ "-"
 					+ ContentService.getTimeString(metaFile.getDuration());
 			if (metaFile.getCurrentPos() == 0 && metaFile.getDuration() == -1) {
 				time = "";
@@ -198,13 +235,15 @@ public class PodcastList extends BaseActivity {
 
 		}
 
-		// When doing a delete before, we rebuild the list, but the adapter is ok.
+		// When doing a delete before, we rebuild the list, but the adapter is
+		// ok.
 		if (podcastsAdapter == null) {
 			podcastsAdapter = new SimpleAdapter(this, list,
 			// R.layout.main_item_two_line_row, new String[] { "line1",
 					// "line2" }, new int[] { R.id.text1, R.id.text2 });
-					R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine, R.id.amountHeard,
-							R.id.secondLine });
+					R.layout.podcast_items, new String[] { "line1",
+							"xx:xx-xx:xx", "line2" }, new int[] {
+							R.id.firstLine, R.id.amountHeard, R.id.secondLine });
 
 			listView.setAdapter(podcastsAdapter);
 		} else {
