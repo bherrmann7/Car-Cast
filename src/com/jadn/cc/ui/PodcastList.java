@@ -145,10 +145,14 @@ public class PodcastList extends BaseActivity {
 			}
 			MetaHolder metaHolder = new MetaHolder();
 			for (int i = metaHolder.getSize() - 1; i >= 0; i--) {
-				if (currTitle.equals(metaHolder.get(i).getTitle())) {
+				MetaFile metaFile = metaHolder.get(i);
+				if (currTitle.equals(metaFile.getTitle())) {
 					continue;
 				}
-				if (metaHolder.get(i).getCurrentPos() > metaHolder.get(i)
+				if (metaFile.getDuration()==0){
+					continue;
+				}
+				if (metaFile.getCurrentPos() > metaHolder.get(i)
 						.getDuration() * .9) {
 					try {
 						contentService.deletePodcast(i);
