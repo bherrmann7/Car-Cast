@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent" 
-                android:layout_height="wrap_content"
-                android:padding="10px" >
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<ScrollView android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
     <TextView android:id="@+id/label" 
               android:layout_width="fill_parent" 
@@ -12,27 +17,24 @@
     <EditText android:id="@+id/editsite_url" 
               android:layout_width="fill_parent" 
               android:layout_height="wrap_content" 
-              android:layout_below="@id/label" android:text="http://"/>
+              android:text="http://"/>
   
 
     <Button android:id="@+id/testEditSite" 
     		android:layout_width="wrap_content" 
             android:layout_height="wrap_content"
-            android:layout_below="@id/editsite_url"
-            android:layout_alignParentRight="true"            
-            android:text="Test" />
+            android:text="Test" android:singleLine="true" />
 
     <TextView android:id="@+id/label2" 
               android:layout_width="fill_parent" 
-              android:layout_below="@id/testEditSite" 
               android:layout_height="wrap_content" 
               android:text="Site Name:" />
 
     <EditText android:id="@+id/editsite_name" 
-              android:layout_below="@id/label2" 
               android:layout_width="fill_parent" 
               android:layout_height="wrap_content" 
-              android:paddingBottom="20dip"              
+              android:paddingBottom="20dip"  
+              android:singleLine="true"
               /> 
  
      <CheckBox android:id="@+id/enabled" 
@@ -49,8 +51,7 @@
             android:layout_height="wrap_content" 
             android:layout_below="@id/enabled"
             android:text="Save" />
-
-   
-              
             
-</RelativeLayout>
+</LinearLayout>
+</ScrollView>
+</LinearLayout>

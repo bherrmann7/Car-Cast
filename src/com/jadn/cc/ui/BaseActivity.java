@@ -19,6 +19,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
+		"28-Jan-2011", "Fix layout for: Audio Recorder, Subscription Add", 
 		"15-Jan-2011", "Added menu item to podcasts screen - delete listened to.", 
 		"27-Dec-2010", "Head phone unplug pauses player, wifi alarm fix, feedback goes to group.", 
 		"17-Dec-2010", "Podcast search and stat collection are back on.", 

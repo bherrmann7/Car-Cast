@@ -12,7 +12,8 @@ import android.media.MediaPlayer;
 import android.util.Log;
 
 /**
- * Meta information about a podcast. From rss metadata (hopefully someday from id3tags as well.)
+ * Meta information about a podcast. From rss metadata (hopefully someday from
+ * id3tags as well.)
  */
 public class MetaFile {
 
@@ -35,6 +36,7 @@ public class MetaFile {
 			properties.setProperty("feedName", "unknown feed");
 			properties.setProperty("currentPos", "0");
 			computeDuration();
+			save();
 		}
 	}
 
@@ -44,7 +46,7 @@ public class MetaFile {
 		try {
 			mediaPlayer.setDataSource(file.toString());
 			mediaPlayer.prepare();
-			setDuration(mediaPlayer.getDuration());			
+			setDuration(mediaPlayer.getDuration());
 		} catch (Exception e) {
 			TraceUtil.report(new RuntimeException("on file " + file, e));
 			setDuration(0);
@@ -52,7 +54,7 @@ public class MetaFile {
 			mediaPlayer.reset();
 			mediaPlayer.release();
 		}
-		
+
 	}
 
 	public MetaFile(MetaNet metaNet, File castFile) {
@@ -109,13 +111,20 @@ public class MetaFile {
 	}
 
 	public void save() {
-		FileOutputStream fos;
+		FileOutputStream fos = null;
 		try {
 			fos = new FileOutputStream(getMetaPropertiesFile());
 			properties.save(fos, "");
 			fos.close();
-		} catch (IOException e) {
-			Log.e("", "", e);
+		} catch (Throwable e) {
+			Log.e("MetaFile", "saving meta data", e);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException io) {
+				}
+			}
 		}
 
 	}

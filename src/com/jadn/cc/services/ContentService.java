@@ -39,19 +39,20 @@ public class ContentService extends Service implements OnCompletionListener {
 	MetaHolder metaHolder;
 	SearchHelper searchHelper;
 	File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
-	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
+	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile,
+			legacyFile);
 	boolean wasPausedByPhoneCall;
 	boolean idle = false;
-	
-	/*private boolean _wifiWasDisabledBeforeAutoDownload = false;
-	
-    public boolean getWifiWasDisabledBeforeAutoDownload() {
-        return _wifiWasDisabledBeforeAutoDownload;
-    }
 
-    public void setWifiWasDisabledBeforeAutoDownload(boolean value) {
-        _wifiWasDisabledBeforeAutoDownload = value;
-    }*/
+	/*
+	 * private boolean _wifiWasDisabledBeforeAutoDownload = false;
+	 * 
+	 * public boolean getWifiWasDisabledBeforeAutoDownload() { return
+	 * _wifiWasDisabledBeforeAutoDownload; }
+	 * 
+	 * public void setWifiWasDisabledBeforeAutoDownload(boolean value) {
+	 * _wifiWasDisabledBeforeAutoDownload = value; }
+	 */
 
 	enum MediaMode {
 		Paused, Playing, UnInitialized
@@ -132,7 +133,8 @@ public class ContentService extends Service implements OnCompletionListener {
 				return 0;
 			return currentPostion() * 100 / duration;
 		}
-		return mediaPlayer.getCurrentPosition() * 100 / mediaPlayer.getDuration();
+		return mediaPlayer.getCurrentPosition() * 100
+				/ mediaPlayer.getDuration();
 	}
 
 	public CharSequence currentSummary() {
@@ -236,17 +238,20 @@ public class ContentService extends Service implements OnCompletionListener {
 			e.printStackTrace();
 		}
 
-		Notification notification = new Notification(R.drawable.icon2, "Download complete", System.currentTimeMillis());
+		Notification notification = new Notification(R.drawable.icon2,
+				"Download complete", System.currentTimeMillis());
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, CarCast.class), 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				new Intent(this, CarCast.class), 0);
 
-		notification.setLatestEventInfo(getBaseContext(), "Downloads Finished", "Downloaded " + got + " podcasts.", contentIntent);
+		notification.setLatestEventInfo(getBaseContext(), "Downloads Finished",
+				"Downloaded " + got + " podcasts.", contentIntent);
 		notification.flags = Notification.FLAG_AUTO_CANCEL;
 
 		mNotificationManager.notify(22, notification);
 
 		// clear so next user request will start new download
-		//downloadHelper = null;
+		// downloadHelper = null;
 
 		metaHolder = new MetaHolder();
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
@@ -262,9 +267,14 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (downloadHelper == null) {
 			return "";
 		}
-		String status = (downloadHelper.idle ? "idle":"busy")+","+downloadHelper.sitesScanned + "," + downloadHelper.totalSites + "," + downloadHelper.podcastsDownloaded + ","
-				+ downloadHelper.totalPodcasts + "," + downloadHelper.podcastsCurrentBytes + "," + downloadHelper.podcastsTotalBytes + ","
-				+ downloadHelper.currentSubscription + "," + downloadHelper.currentTitle;
+		String status = (downloadHelper.idle ? "idle" : "busy") + ","
+				+ downloadHelper.sitesScanned + "," + downloadHelper.totalSites
+				+ "," + downloadHelper.podcastsDownloaded + ","
+				+ downloadHelper.totalPodcasts + ","
+				+ downloadHelper.podcastsCurrentBytes + ","
+				+ downloadHelper.podcastsTotalBytes + ","
+				+ downloadHelper.currentSubscription + ","
+				+ downloadHelper.currentTitle;
 		return status;
 	}
 
@@ -277,7 +287,8 @@ public class ContentService extends Service implements OnCompletionListener {
 
 		mediaPlayer.setDataSource(currentFile().toString());
 		mediaPlayer.prepare();
-		mediaPlayer.seekTo(metaHolder.get(currentPodcastInPlayer).getCurrentPos());
+		mediaPlayer.seekTo(metaHolder.get(currentPodcastInPlayer)
+				.getCurrentPos());
 		return true;
 	}
 
@@ -334,7 +345,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			}
 		}
 		sb.append("\n\n\n");
-		sb.append("This email sent from "+BaseActivity.getAppTitle()+".");
+		sb.append("This email sent from " + BaseActivity.getAppTitle() + ".");
 		return sb.toString();
 	}
 
@@ -363,7 +374,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (mediaMode == MediaMode.UnInitialized) {
 			if (currentDuration() == 0)
 				return;
-			metaHolder.get(currentPodcastInPlayer).setCurrentPos((int) (d * currentDuration()));
+			metaHolder.get(currentPodcastInPlayer).setCurrentPos(
+					(int) (d * currentDuration()));
 			mediaPlayer.reset();
 			try {
 				mediaPlayer.setDataSource(currentFile().toString());
@@ -413,9 +425,10 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		cm().setCurrentPos(mp.getCurrentPosition());		
+		cm().setCurrentPos(mp.getCurrentPosition());
 		cm().save();
-		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("autoPlayNext", true)) {
+		if (PreferenceManager.getDefaultSharedPreferences(
+				getApplicationContext()).getBoolean("autoPlayNext", true)) {
 			next(true);
 		}
 	}
@@ -430,21 +443,24 @@ public class ContentService extends Service implements OnCompletionListener {
 			public void onCallStateChanged(int state, String incomingNumber) {
 				super.onCallStateChanged(state, incomingNumber);
 
-				if (state == TelephonyManager.CALL_STATE_OFFHOOK || state == TelephonyManager.CALL_STATE_RINGING) {
+				if (state == TelephonyManager.CALL_STATE_OFFHOOK
+						|| state == TelephonyManager.CALL_STATE_RINGING) {
 					if (mediaPlayer.isPlaying()) {
 						pauseNow();
 						wasPausedByPhoneCall = true;
 					}
 				}
 
-				if (state == TelephonyManager.CALL_STATE_IDLE && wasPausedByPhoneCall) {
+				if (state == TelephonyManager.CALL_STATE_IDLE
+						&& wasPausedByPhoneCall) {
 					wasPausedByPhoneCall = false;
 					pauseOrPlay();
 				}
 			}
 		};
 
-		final TelephonyManager telMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+		final TelephonyManager telMgr = (TelephonyManager) this
+				.getSystemService(Context.TELEPHONY_SERVICE);
 		telMgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
 		Config.PodcastsRoot.mkdirs();
@@ -562,7 +578,8 @@ public class ContentService extends Service implements OnCompletionListener {
 	public void saveState() {
 		try {
 			final File stateFile = new File(Config.PodcastsRoot, "state.dat");
-			location = Location.save(stateFile, currentTitle(), mediaPlayer.getCurrentPosition(), mediaPlayer.getDuration());
+			location = Location.save(stateFile, currentTitle(), mediaPlayer
+					.getCurrentPosition(), mediaPlayer.getDuration());
 		} catch (Throwable e) {
 			// bummer.
 		}
@@ -584,8 +601,9 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	void startDownloadingNewPodCasts(final int max) {
 
-		if (downloadHelper == null || downloadHelper.idle ) {
-			// cause display to reflect that we are getting ready to do a download
+		if (downloadHelper == null || downloadHelper.idle) {
+			// cause display to reflect that we are getting ready to do a
+			// download
 			downloadHelper = null;
 
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
@@ -598,21 +616,28 @@ public class ContentService extends Service implements OnCompletionListener {
 				public void run() {
 					// Lets not the phone go to sleep while doing downloads....
 					PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-					PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK , "ContentService download thread");
+					PowerManager.WakeLock wl = pm.newWakeLock(
+							PowerManager.PARTIAL_WAKE_LOCK,
+							"ContentService download thread");
 
 					try {
 						// The intent here is keep the phone from shutting down
 						// during a download.
-						ContentService.this.setForeground(true);					
+						ContentService.this.setForeground(true);
 						wl.acquire();
-	
-						downloadHelper = new DownloadHelper(max);
-						String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
-								"none");
-						boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
-								"canCollectData", true);
 
-						downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
+						downloadHelper = new DownloadHelper(max);
+						String accounts = PreferenceManager
+								.getDefaultSharedPreferences(
+										getApplicationContext()).getString(
+										"accounts", "none");
+						boolean canCollectData = PreferenceManager
+								.getDefaultSharedPreferences(
+										getApplicationContext()).getBoolean(
+										"canCollectData", true);
+
+						downloadHelper.downloadNewPodCasts(ContentService.this,
+								accounts, canCollectData);
 					} finally {
 						ContentService.this.setForeground(false);
 						wl.release();
@@ -636,7 +661,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		searchHelper.start();
 		return "";
 	}
-	
+
 	private void tryToRestoreLocation() {
 		try {
 			if (location == null) {
@@ -668,11 +693,14 @@ public class ContentService extends Service implements OnCompletionListener {
 	void updateNotification(String update) {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
 
-		Notification notification = new Notification(R.drawable.iconbusy, "Downloading started", System.currentTimeMillis());
+		Notification notification = new Notification(R.drawable.iconbusy,
+				"Downloading started", System.currentTimeMillis());
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, CarCast.class), 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				new Intent(this, CarCast.class), 0);
 
-		notification.setLatestEventInfo(getBaseContext(), "Downloading Started", update, contentIntent);
+		notification.setLatestEventInfo(getBaseContext(),
+				"Downloading Started", update, contentIntent);
 		notification.flags = Notification.FLAG_ONGOING_EVENT;
 
 		mNotificationManager.notify(23, notification);
