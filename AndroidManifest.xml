@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.jadn.cc" android:versionCode="93" android:versionName="1.0.93">
+	package="com.jadn.cc" android:versionCode="95" android:versionName="1.0.95">
 	<application android:icon="@drawable/icon3" android:label="Car Cast" android:debuggable="true">
 		<activity android:name=".ui.CarCast" android:label="Car Cast">
 			<intent-filter>
@@ -8,6 +8,18 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		<activity android:name="com.admob.android.ads.AdMobActivity" 
+                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
+                  android:configChanges="orientation|keyboard|keyboardHidden" 
+                  /> 
+                  
+<receiver android:name="com.admob.android.ads.analytics.InstallReceiver"
+android:exported="true">
+<intent-filter>
+   <action android:name="com.android.vending.INSTALL_REFERRER" />
+</intent-filter>
+</receiver>
+                  
 		<activity android:name=".ui.AudioRecorder"></activity>
 		<activity android:name=".ui.Downloader" android:screenOrientation="portrait"></activity>
 		<activity android:name=".ui.DownloadProgress" android:screenOrientation="portrait"></activity>

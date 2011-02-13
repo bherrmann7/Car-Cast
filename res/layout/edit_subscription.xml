@@ -4,54 +4,49 @@
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
 	<ScrollView android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			android:orientation="vertical" android:layout_width="fill_parent"
+			android:layout_height="fill_parent">
 
-    <TextView android:id="@+id/label" 
-              android:layout_width="fill_parent" 
-              android:layout_height="wrap_content" 
-              android:text="Podcast Site URL:" />
+			<TextView android:id="@+id/label" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Podcast Site URL:" />
 
-    <EditText android:id="@+id/editsite_url" 
-              android:layout_width="fill_parent" 
-              android:layout_height="wrap_content" 
-              android:text="http://"/>
-  
+			<EditText android:id="@+id/editsite_url"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:text="http://" />
 
-    <Button android:id="@+id/testEditSite" 
-    		android:layout_width="wrap_content" 
-            android:layout_height="wrap_content"
-            android:text="Test" android:singleLine="true" />
 
-    <TextView android:id="@+id/label2" 
-              android:layout_width="fill_parent" 
-              android:layout_height="wrap_content" 
-              android:text="Site Name:" />
+			<Button android:id="@+id/testEditSite" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:text="Test"
+				android:singleLine="true" />
 
-    <EditText android:id="@+id/editsite_name" 
-              android:layout_width="fill_parent" 
-              android:layout_height="wrap_content" 
-              android:paddingBottom="20dip"  
-              android:singleLine="true"
-              /> 
- 
-     <CheckBox android:id="@+id/enabled" 
-            android:layout_below="@+id/editsite_name" 
-            android:layout_marginTop="20px"
-    		android:layout_width="fill_parent" 
-            android:layout_height="wrap_content"
-            android:text="Enabled" />             
-              
-     <Button android:id="@+id/saveEditSite" 
-     		android:layout_marginTop="20px"
-     		android:layout_marginLeft="100px"
-            android:layout_width="100px"
-            android:layout_height="wrap_content" 
-            android:layout_below="@id/enabled"
-            android:text="Save" />
-            
-</LinearLayout>
-</ScrollView>
+			<TextView android:id="@+id/label2" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Site Name:" />
+
+			<EditText android:id="@+id/editsite_name"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:paddingBottom="20dip" android:singleLine="true" />
+
+			<CheckBox android:id="@+id/enabled" android:layout_below="@+id/editsite_name"
+				android:layout_marginTop="20px" android:layout_width="fill_parent"
+				android:checked="true" android:layout_height="wrap_content"
+				android:text="Enabled" />
+<!--
+			<CheckBox android:id="@+id/fifoLifo" android:layout_below="@+id/fifolifo_name"
+				android:layout_marginTop="20px" android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="Newest first (vs oldest first for audiobooks)"
+				android:checked="true" />
+
+			<Spinner android:id="@+id/subMax" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:prompt="@string/maxChoices" />
+-->
+
+			<Button android:id="@+id/saveEditSite"
+				android:layout_marginTop="20px" android:layout_marginLeft="100px"
+				android:layout_width="100px" android:layout_height="wrap_content"
+				android:layout_below="@id/enabled" android:text="Save" />
+
+		</LinearLayout>
+	</ScrollView>
 </LinearLayout>

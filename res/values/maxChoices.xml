@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="maxChoices">Max downloads?</string>
+	<string-array name="maxChoice_array">
+		<item>Use Global Max Setting</item>
+		<item>2</item>
+		<item>4</item>
+		<item>8</item>
+		<item>16</item>
+		<item>All</item>
+	</string-array>
+</resources>

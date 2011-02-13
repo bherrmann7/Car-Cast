@@ -155,8 +155,9 @@ public class AudioRecorder extends BaseActivity {
 
 		for (Recording recording: recordings){
 			HashMap<String, String> item = new HashMap<String, String>();
-            item.put("line1", recording.getTimeString());
-			item.put("line2", recording.getDurationString());
+            item.put("line1", "");
+			item.put("line2", recording.getTimeString());
+			item.put("amountHeard", recording.getDurationString());
 			list.add(item);
 
 		}
@@ -165,8 +166,8 @@ public class AudioRecorder extends BaseActivity {
 */
 	SimpleAdapter notes = new SimpleAdapter(this,
 				list,
-				R.layout.podcast_items, new String[] { "line1", "line2" },
-				new int[] { R.id.firstLine, R.id.secondLine });
+				R.layout.podcast_items, new String[] { "line1", "line2", "amountHeard" },
+				new int[] { R.id.firstLine, R.id.secondLine, R.id.amountHeard });
 		
 		listView.setAdapter(notes);
 		

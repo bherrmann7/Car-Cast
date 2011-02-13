@@ -165,7 +165,7 @@ public class DownloadHelper implements Sayer {
 					String preDownload = sb.toString();
 					int totalForThisPodcast = 0;
 					say(String.format("%dk/%dk 0", totalForThisPodcast / 1024, expectedSizeKilo) + "%\n");
-					while ((amt = is.read(buf)) > 0) {
+					while ((amt = is.read(buf)) >= 0) {
 						fos.write(buf, 0, amt);
 						podcastsCurrentBytes += amt;
 						totalForThisPodcast += amt;
