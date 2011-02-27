@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AbsoluteLayout
 android:id="@+id/widget0"
+android:background="#000"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -44,12 +45,13 @@ android:layout_x="205dip"
 android:layout_y="5dip"
 />
 <ListView
-android:background="#444"
 android:id="@+id/audioRecorderListing"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 android:layout_x="0dip"
 android:layout_y="55dip"
+android:dividerHeight="5dip"
+
 >
 </ListView>
 </AbsoluteLayout>

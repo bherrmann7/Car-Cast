@@ -1,5 +1,10 @@
 package com.jadn.cc.ui;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,32 +17,32 @@ import android.widget.TextView;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.Sayer;
+import com.jadn.cc.trace.TraceData;
 
-/** 
+/**
  * Lets the user observe download details in all their command line glory.
  * 
  * @author bob
- *
+ * 
  */
 public class Downloader extends BaseActivity implements Sayer, Runnable {
 
 	final Handler handler = new Handler() {
 		@Override
-        public void handleMessage(Message m) {
+		public void handleMessage(Message m) {
 			tv.append(m.getData().getCharSequence("text"));
 		}
 	};
 
 	TextView tv;
-	
+
 	Updater updater;
-	
+
 	@Override
 	void onContentService() throws RemoteException {
 	}
-	
-	//PowerManager.WakeLock wl; 
 
+	// PowerManager.WakeLock wl;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -46,15 +51,16 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 		setContentView(R.layout.download);
 
 		tv = (TextView) findViewById(R.id.textconsole);
-		
+
 		// If you are running the debug screen, then do not go to sleep
-//		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-//		wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-//		wl.acquire();			
+		// PowerManager pm = (PowerManager)
+		// getSystemService(Context.POWER_SERVICE);
+		// wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
+		// wl.acquire();
 	}
 
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.downloads_menu, menu);
 		return true;
@@ -62,26 +68,52 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		
+
 		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 		emailIntent.setType("plain/text");
-		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "carcast-devs@googlegroups.com" });
-		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Issue on download...");
-		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, tv.getText());
-		startActivity(Intent.createChooser(emailIntent, "Email about podcast downloading"));
+		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
+				new String[] { "carcast-devs@googlegroups.com" });
+		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+				"Issue on download...");
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("\nBasic Info\n");
+		nv(sb, "package_name", TraceData.APP_PACKAGE);
+		nv(sb, "package_version", TraceData.APP_VERSION);
+		nv(sb, "phone_model", TraceData.PHONE_MODEL);
+		nv(sb, "android_version", TraceData.ANDROID_VERSION);
+		sb.append("\nCar Cast Download output\n====================\n");
+		sb.append(tv.getText());
+		sb.append("\nLog snapshot\n============\n");
+		fetchLog(sb);
+
+		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, sb.toString());
+
+		startActivity(Intent.createChooser(emailIntent,
+				"Email about podcast downloading"));
 
 		return true;
 	}
-	
+
+	private void nv(StringBuilder sb, String name, String value) {
+		int start = sb.length();
+		sb.append(name);
+		while (sb.length()<start+15)
+			sb.append(' ');
+		sb.append(':');
+		sb.append(value);
+		sb.append('\n');					
+	}
+
 	@Override
 	protected void onPause() {
 		super.onPause();
 
 		// stop display thread
 		updater.allDone();
-		
-		// *** This was causing a force quit 
-		//wl.release();
+
+		// *** This was causing a force quit
+		// wl.release();
 	}
 
 	@Override
@@ -94,7 +126,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 	public void run() {
 		try {
 			String text = contentService.getDownloadProgress();
-			if(text.length()!=0)
+			if (text.length() != 0)
 				tv.setText(text);
 			else {
 				tv.setText("\n\n\nNo download has run or is running.");
@@ -112,4 +144,37 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 		handler.sendMessage(message);
 	}
 
+	void fetchLog(StringBuilder log) {
+		BufferedReader reader = null;
+		try {
+			Process process = Runtime.getRuntime().exec(
+					new String[] { "logcat", "-d" });
+			reader = new BufferedReader(new InputStreamReader(process
+					.getInputStream()));
+			String line;
+			LinkedList<String> lines = new LinkedList<String>();
+			while ((line = reader.readLine()) != null) {
+				// life's too short to ever look at these again.
+				if(line.startsWith("D/dalvikvm(")&& line.indexOf("GC freed")!=-1)
+					continue;
+				lines.add(line);
+				if(lines.size()>600){
+					lines.remove(0);
+				}
+			}
+			for (String aline : lines) {
+				log.append(aline);
+				log.append('\n');
+			}
+			System.out.println("Captured "+lines+" lines.");
+		} catch (IOException e) {
+			log.append("Problem running logcat: " + e.getMessage());
+		} finally {
+			if (reader != null)
+				try {
+					reader.close();
+				} catch (IOException e) {
+				}
+		}
+	}
 }

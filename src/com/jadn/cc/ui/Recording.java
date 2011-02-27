@@ -47,6 +47,10 @@ public class Recording {
 
 	public static List<Recording> getRecordings() {
 		List<Recording> list = new ArrayList<Recording>();
+		// If you have no flash card this might happen
+		if(recordDir.listFiles()==null){
+			return list;
+		}
 		for (File file : recordDir.listFiles()) {
 			if (file.getName().endsWith(".3gp"))
 				list.add(new Recording(file));

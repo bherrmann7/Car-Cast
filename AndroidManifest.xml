@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.jadn.cc" android:versionCode="95" android:versionName="1.0.95">
-	<application android:icon="@drawable/icon3" android:label="Car Cast" android:debuggable="true">
+	package="com.jadn.cc" android:versionCode="100" android:versionName="1.0.100">
+	<application android:icon="@drawable/ccp_launcher" android:label="Car Cast" android:debuggable="true">
 		<activity android:name=".ui.CarCast" android:label="Car Cast">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -62,6 +62,7 @@ android:exported="true">
 	<uses-permission android:name="android.permission.READ_PHONE_STATE" />	
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+	<uses-permission android:name="android.permission.READ_LOGS"/>
 	<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH" />
 
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />

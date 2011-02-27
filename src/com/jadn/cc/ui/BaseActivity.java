@@ -19,7 +19,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
-		"13-Feb-2011", "Hopefully fix issues with partial downloads.  Slight UI changes to Audio Recorder.", 
+		"26-Feb-2011", "Try and make landscape mode more usable.", 
+		"19-Feb-2011", "Updated icon, Thanks to Peter Herrmann.  More space between buttons on player.", 
 		"28-Jan-2011", "Fix layout for: Audio Recorder, Subscription Add", 
 		"15-Jan-2011", "Added menu item to podcasts screen - delete listened to.", 
 		"27-Dec-2010", "Head phone unplug pauses player, wifi alarm fix, feedback goes to group.", 

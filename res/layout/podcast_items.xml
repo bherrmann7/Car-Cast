@@ -1,8 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="45dip"
+    android:layout_height="wrap_content"
+    android:paddingBottom="5dip"
+    android:paddingTop="5dip"
     >
-
     <TextView
         android:textSize="14dp"
         android:id="@+id/firstLine"
@@ -12,7 +13,7 @@
         android:ellipsize="marquee"
         android:layout_alignParentTop="true"
         android:gravity="left"
-        android:text="My Application" />
+        android:text="" />
     <TextView
         android:textSize="14dp"
         android:id="@+id/amountHeard"
@@ -32,6 +33,6 @@
         android:layout_alignParentLeft="true"
         android:singleLine="true"
         android:ellipsize="marquee"  
-        android:text="Simple application that shows how to use RelativeLayout" /> 
+        android:text="" /> 
         
 </RelativeLayout>
