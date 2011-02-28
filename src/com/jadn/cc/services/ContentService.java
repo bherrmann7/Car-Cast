@@ -625,13 +625,7 @@ public class ContentService extends Service implements OnCompletionListener {
 								PowerManager.PARTIAL_WAKE_LOCK,
 								"ContentService download thread");
 
-						// If we have wifi now, lets hold on to it.
 						WifiManager.WifiLock wifiLock = null;
-						WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-						if (wifi.isWifiEnabled()) {
-							wifiLock = wifi.createWifiLock("CarCast");
-							Log.i("CarCast", "Locked Wifi.");
-						}
 
 						try {
 							// The intent here is keep the phone from shutting
@@ -639,6 +633,15 @@ public class ContentService extends Service implements OnCompletionListener {
 							// during a download.
 							ContentService.this.setForeground(true);
 							wl.acquire();
+							
+							// If we have wifi now, lets hold on to it.
+							WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+							if (wifi.isWifiEnabled()) {
+								wifiLock = wifi.createWifiLock("CarCast");
+								if (wifiLock!=null)
+									wifiLock.acquire();
+								Log.i("CarCast", "Locked Wifi.");
+							}
 
 							downloadHelper = new DownloadHelper(max);
 							String accounts = PreferenceManager
@@ -655,12 +658,20 @@ public class ContentService extends Service implements OnCompletionListener {
 									canCollectData);
 						} finally {
 							if (wifiLock != null) {
-								wifiLock.release();
-								Log.i("CarCast", "released Wifi.");
+								try {
+									wifiLock.release();
+									Log.i("CarCast", "released Wifi.");
+								} catch (Throwable t) {
+									Log.i("CarCast",
+											"Yikes, issue releasing Wifi.");
+								}
 							}
+
 							ContentService.this.setForeground(false);
 							wl.release();
 						}
+					} catch(Throwable t){
+						Log.i("CarCast","Unpleasentness during download: "+t.getMessage());
 					} finally {
 						Log.i("CarCast", "finished download thread.");
 					}
