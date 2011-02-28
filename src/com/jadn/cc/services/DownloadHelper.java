@@ -22,6 +22,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.widget.TextView;
 

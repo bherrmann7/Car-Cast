@@ -19,6 +19,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
+		"27-Feb-2011", "Added code to keep wifi on, if it is on when downloading starts.", 
 		"26-Feb-2011", "Try and make landscape mode more usable.", 
 		"19-Feb-2011", "Updated icon, Thanks to Peter Herrmann.  More space between buttons on player.", 
 		"28-Jan-2011", "Fix layout for: Audio Recorder, Subscription Add", 

@@ -12,11 +12,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
@@ -614,33 +616,53 @@ public class ContentService extends Service implements OnCompletionListener {
 			new Thread() {
 				@Override
 				public void run() {
-					// Lets not the phone go to sleep while doing downloads....
-					PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-					PowerManager.WakeLock wl = pm.newWakeLock(
-							PowerManager.PARTIAL_WAKE_LOCK,
-							"ContentService download thread");
-
 					try {
-						// The intent here is keep the phone from shutting down
-						// during a download.
-						ContentService.this.setForeground(true);
-						wl.acquire();
+						Log.i("CarCast", "starting download thread.");
+						// Lets not the phone go to sleep while doing
+						// downloads....
+						PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+						PowerManager.WakeLock wl = pm.newWakeLock(
+								PowerManager.PARTIAL_WAKE_LOCK,
+								"ContentService download thread");
 
-						downloadHelper = new DownloadHelper(max);
-						String accounts = PreferenceManager
-								.getDefaultSharedPreferences(
-										getApplicationContext()).getString(
-										"accounts", "none");
-						boolean canCollectData = PreferenceManager
-								.getDefaultSharedPreferences(
-										getApplicationContext()).getBoolean(
-										"canCollectData", true);
+						// If we have wifi now, lets hold on to it.
+						WifiManager.WifiLock wifiLock = null;
+						WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+						if (wifi.isWifiEnabled()) {
+							wifiLock = wifi.createWifiLock("CarCast");
+							Log.i("CarCast", "Locked Wifi.");
+						}
 
-						downloadHelper.downloadNewPodCasts(ContentService.this,
-								accounts, canCollectData);
+						try {
+							// The intent here is keep the phone from shutting
+							// down
+							// during a download.
+							ContentService.this.setForeground(true);
+							wl.acquire();
+
+							downloadHelper = new DownloadHelper(max);
+							String accounts = PreferenceManager
+									.getDefaultSharedPreferences(
+											getApplicationContext()).getString(
+											"accounts", "none");
+							boolean canCollectData = PreferenceManager
+									.getDefaultSharedPreferences(
+											getApplicationContext())
+									.getBoolean("canCollectData", true);
+
+							downloadHelper.downloadNewPodCasts(
+									ContentService.this, accounts,
+									canCollectData);
+						} finally {
+							if (wifiLock != null) {
+								wifiLock.release();
+								Log.i("CarCast", "released Wifi.");
+							}
+							ContentService.this.setForeground(false);
+							wl.release();
+						}
 					} finally {
-						ContentService.this.setForeground(false);
-						wl.release();
+						Log.i("CarCast", "finished download thread.");
 					}
 				}
 			}.start();
