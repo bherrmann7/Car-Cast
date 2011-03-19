@@ -1,37 +1,30 @@
 package com.jadn.cc.ui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
-
 import com.jadn.cc.R;
+import com.jadn.cc.core.CarCastApplication;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class AudioRecorder extends BaseActivity {
-	
+
 	private Button fb(int id) {
-		return (Button)findViewById(id);		
-	}
-	
-	@Override
-	void onContentService() throws RemoteException {
-		// TODO Auto-generated method stub		
+		return (Button)findViewById(id);
 	}
 
 	@Override
@@ -40,7 +33,7 @@ public class AudioRecorder extends BaseActivity {
 				.getMenuInfo();
 		if (item.getTitle().equals("Play")) {
 			Recording recording = Recording.getRecordings().get(info.position);
-			recording.play();		
+			recording.play();
 		}
 		if (item.getTitle().equals("Delete")) {
 			Recording recording = Recording.getRecordings().get(info.position);
@@ -49,16 +42,16 @@ public class AudioRecorder extends BaseActivity {
 		}
 		return true;
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recorder);
 
-		setTitle(getAppTitle()+": Audio Note Recorder");
-		
+		setTitle(CarCastApplication.getAppTitle()+": Audio Note Recorder");
+
 		setReadyToRecord(true);
-		
+
 		fb(R.id.audioRecorderRecordButton).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -74,7 +67,7 @@ public class AudioRecorder extends BaseActivity {
 				// transition back to ready
 				setReadyToRecord(true);
 			}});
-		
+
 		fb(R.id.audioRecorderSaveButton).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -84,9 +77,9 @@ public class AudioRecorder extends BaseActivity {
 				setReadyToRecord(true);
 				showRecordings();
 			}});
-		
+
 		ListView listView = (ListView) findViewById(R.id.audioRecorderListing);
-		
+
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -95,9 +88,9 @@ public class AudioRecorder extends BaseActivity {
 				Recording.getRecordings().get(position).play();
 			}
 		});
-		
+
 		registerForContextMenu(listView);
-		
+
 		showRecordings();
 
 	}
@@ -130,7 +123,7 @@ public class AudioRecorder extends BaseActivity {
 		return super.onMenuItemSelected(featureId, item);
 	}
 
-	
+
 	private void setReadyToRecord(boolean ready) {
 		if (ready) {
 			fb(R.id.audioRecorderRecordButton).setVisibility(View.VISIBLE);
@@ -143,8 +136,8 @@ public class AudioRecorder extends BaseActivity {
 			fb(R.id.audioRecorderSaveButton).setVisibility(View.VISIBLE);
 			((ProgressBar)findViewById(R.id.audioRecorderBusy)).setVisibility(View.VISIBLE);
 		}
-		
-		
+
+
 	}
 
 	private void showRecordings() {
@@ -168,11 +161,11 @@ public class AudioRecorder extends BaseActivity {
 				list,
 				R.layout.podcast_items, new String[] { "line1", "line2", "amountHeard" },
 				new int[] { R.id.firstLine, R.id.secondLine, R.id.amountHeard });
-		
+
 		listView.setAdapter(notes);
-		
+
 	}
 
-	
+
 
 }

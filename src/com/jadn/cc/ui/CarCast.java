@@ -1,7 +1,5 @@
 package com.jadn.cc.ui;
 
-import java.util.Arrays;
-
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,7 +9,6 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -24,12 +21,13 @@ import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.google.android.googlelogin.GoogleLoginServiceHelper;
 import com.jadn.cc.R;
+import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
-import com.jadn.cc.services.ContentService;
+import com.jadn.cc.core.MediaMode;
 import com.jadn.cc.trace.ExceptionHandler;
+import java.util.Arrays;
 
 public class CarCast extends BaseActivity {
 	final static String tag = CarCast.class.getSimpleName();
@@ -44,10 +42,11 @@ public class CarCast extends BaseActivity {
 
 	// Create runnable for posting
 	final Runnable mUpdateResults = new Runnable() {
-		public void run() {
+		@Override public void run() {
 			updateUI();
 		}
 	};
+    private BroadcastReceiver broadcastReceiver;
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -70,12 +69,12 @@ public class CarCast extends BaseActivity {
 	}
 
 	@Override
-	void onContentService() throws RemoteException {
+	protected void onContentService() {
 		updatePausePlay();
 		updateUI();
 	}
 
-	void updatePausePlay() throws RemoteException {
+	void updatePausePlay() {
 		if (contentService == null) {
 			return;
 		}
@@ -96,33 +95,24 @@ public class CarCast extends BaseActivity {
 
 		super.onCreate(savedInstanceState);
 
-		Intent csIntent = new Intent(getApplicationContext(),
-				ContentService.class);
-		startService(csIntent);
-		bindService(csIntent, this, Context.BIND_AUTO_CREATE);
-
-		registerReceiver(new BroadcastReceiver() {
+		broadcastReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if (intent != null) { // && intent.getExtras().getInt("state")
 										// == 0){
-					try {
-						if (contentService.isPlaying()) {
-							contentService.pause();
-							contentService.bump(-2);
-							updatePausePlay();
-							updateUI();
-						}
-					} catch (RemoteException e) {
-						e.printStackTrace();
+					if (contentService.isPlaying()) {
+						contentService.pauseNow();
+						contentService.bump(-2);
+						updatePausePlay();
+						updateUI();
 					}
 				}
 			}
-		}, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+		};
 
-		setTitle(getAppTitle());
+		setTitle(CarCastApplication.getAppTitle());
 
-		setContentView(R.layout.player);		
+		setContentView(R.layout.player);
 
 		ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
 		progressBar.setProgress(0);
@@ -130,11 +120,7 @@ public class CarCast extends BaseActivity {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				try {
-					contentService.moveTo(event.getX() / v.getWidth());
-				} catch (RemoteException e) {
-					esay(e);
-				}
+				contentService.moveTo(event.getX() / v.getWidth());
 				updateUI();
 				return true;
 			}
@@ -145,19 +131,15 @@ public class CarCast extends BaseActivity {
 		pausePlay.setSoundEffectsEnabled(true);
 		pausePlay.setImageResource(R.drawable.player_102_play);
 		pausePlay.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				try {
-					if (contentService.getCount() == 0)
-						return;
-					if (contentService.pauseOrPlay()) {
-						pausePlay.setImageResource(R.drawable.player_102_pause);
-					} else {
-						pausePlay.setImageResource(R.drawable.player_102_play);
-					}
-					updateUI();
-				} catch (RemoteException e) {
-					esay(e);
+			@Override public void onClick(View v) {
+				if (contentService.getCount() == 0)
+					return;
+				if (contentService.pauseOrPlay()) {
+					pausePlay.setImageResource(R.drawable.player_102_pause);
+				} else {
+					pausePlay.setImageResource(R.drawable.player_102_play);
 				}
+				updateUI();
 			}
 		});
 
@@ -195,10 +177,10 @@ public class CarCast extends BaseActivity {
 						&& (event.getY()) > (v.getHeight() * 0.5)) {
 					try {
 						if (contentService.isPlaying()) {
-							contentService.pause();
+							contentService.pauseNow();
 						}
 					} catch (Exception e) {
-						esay(e);
+						CarCastApplication.esay(e);
 					}
 
 					pausePlay.setImageResource(R.drawable.player_102_play);
@@ -208,7 +190,7 @@ public class CarCast extends BaseActivity {
 				return true;
 			}
 		});
-		
+
 		app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if (!app_preferences.contains("listmax")) {
@@ -223,9 +205,9 @@ public class CarCast extends BaseActivity {
 			SharedPreferences.Editor editor = app_preferences.edit();
 			editor.putBoolean("showSplash", false);
 			editor.commit();
-		} else if (!lastRun.equals(releaseData[0])) {
+		} else if (!lastRun.equals(CarCastApplication.releaseData[0])) {
 			new AlertDialog.Builder(CarCast.this).setTitle(
-					getAppTitle() + " updated").setMessage(releaseData[1])
+					CarCastApplication.getAppTitle() + " updated").setMessage(CarCastApplication.releaseData[1])
 					.setNeutralButton("Close", null).show();
 		}
 		saveLastRun();
@@ -246,6 +228,15 @@ public class CarCast extends BaseActivity {
 		return true;
 	}
 
+	@Override public void finish() {
+	    Log.i("CarCast", "Finishing CC; contentService is "+contentService);
+	    if (contentService != null
+	            && contentService.isIdle()) {
+            getCarCastApplication().stopContentService();
+        }
+	    super.finish();
+	}
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -253,55 +244,51 @@ public class CarCast extends BaseActivity {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		try {
-			if (item.getItemId() == R.id.purgeAll) {
-				contentService.purgeAll();
-				return true;
-			}
-			if (item.getItemId() == R.id.downloadNewPodcasts) {
+		if (item.getItemId() == R.id.purgeAll) {
+			contentService.purgeAll();
+			return true;
+		}
+		if (item.getItemId() == R.id.downloadNewPodcasts) {
 
-				startActivityForResult(
-						new Intent(this, DownloadProgress.class), 0);
+			startActivityForResult(
+					new Intent(this, DownloadProgress.class), 0);
 
-				return true;
-			}
-			if (item.getItemId() == R.id.email) {
-				Intent emailIntent = new Intent(
-						android.content.Intent.ACTION_SEND);
-				emailIntent.setType("plain/text");
-				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
-						new String[] { "" });
-				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-						getAppTitle() + ": about podcast "
-								+ contentService.getCurrentTitle());
-				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-						contentService.getPodcastEmailSummary());
-				startActivity(Intent.createChooser(emailIntent,
-						"Email about podcast"));
-			}
-			if (item.getItemId() == R.id.feedback) {
-				startActivityForResult(new Intent(this, FeedbackHelp.class), 0);
-				return true;
-			}
-			if (item.getItemId() == R.id.settings) {
-				startActivity(new Intent(this, Settings.class));
-				return true;
-			}
-			if (item.getItemId() == R.id.menuSiteList) {
-				startActivityForResult(new Intent(this, Subscriptions.class), 0);
-				return true;
-			}
-			// if (item.getItemId() == R.id.delete) {
-			// startActivityForResult(new Intent(this, Delete.class), 0);
-			// return true;
-			// }
-			if (item.getItemId() == R.id.listPodcasts) {
-				// startActivityForResult(new Intent(this, Search.class), 0);
-				startActivityForResult(new Intent(this, PodcastList.class), 0);
-				return true;
-			}
-		} catch (RemoteException re) {
-			esay(re);
+			return true;
+		}
+		if (item.getItemId() == R.id.email) {
+			Intent emailIntent = new Intent(
+					android.content.Intent.ACTION_SEND);
+			emailIntent.setType("plain/text");
+			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
+					new String[] { "" });
+			emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+					CarCastApplication.getAppTitle() + ": about podcast "
+							+ contentService.currentTitle());
+			emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+					contentService.getPodcastEmailSummary());
+			startActivity(Intent.createChooser(emailIntent,
+					"Email about podcast"));
+		}
+		if (item.getItemId() == R.id.feedback) {
+			startActivityForResult(new Intent(this, FeedbackHelp.class), 0);
+			return true;
+		}
+		if (item.getItemId() == R.id.settings) {
+			startActivity(new Intent(this, Settings.class));
+			return true;
+		}
+		if (item.getItemId() == R.id.menuSiteList) {
+			startActivityForResult(new Intent(this, Subscriptions.class), 0);
+			return true;
+		}
+		// if (item.getItemId() == R.id.delete) {
+		// startActivityForResult(new Intent(this, Delete.class), 0);
+		// return true;
+		// }
+		if (item.getItemId() == R.id.listPodcasts) {
+			// startActivityForResult(new Intent(this, Search.class), 0);
+			startActivityForResult(new Intent(this, PodcastList.class), 0);
+			return true;
 		}
 		return false;
 	}
@@ -311,6 +298,8 @@ public class CarCast extends BaseActivity {
 		super.onPause();
 
 		updater.allDone();
+		unregisterReceiver(broadcastReceiver);
+
 	}
 
 	@Override
@@ -318,11 +307,12 @@ public class CarCast extends BaseActivity {
 		super.onResume();
 
 		updater = new Updater(handler, mUpdateResults);
+        registerReceiver(broadcastReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 	}
 
 	private void saveLastRun() {
 		SharedPreferences.Editor editor = app_preferences.edit();
-		editor.putString("lastRun", releaseData[0]);
+		editor.putString("lastRun", CarCastApplication.releaseData[0]);
 		if (!app_preferences.contains("listmax")) {
 			editor.putString("listmax", "2");
 		}
@@ -337,14 +327,14 @@ public class CarCast extends BaseActivity {
 					android.os.Environment.MEDIA_MOUNTED)) {
 
 				TextView textView = (TextView) findViewById(R.id.title);
-				textView.setText("ERROR ** " + getAppTitle()
+				textView.setText("ERROR ** " + CarCastApplication.getAppTitle()
 						+ " requires the sdcard ** ");
 				return;
 			}
 			if (!Config.PodcastsRoot.exists()) {
 				if (!Config.PodcastsRoot.mkdirs()) {
 					TextView textView = (TextView) findViewById(R.id.title);
-					textView.setText("ERROR ** " + getAppTitle()
+					textView.setText("ERROR ** " + CarCastApplication.getAppTitle()
 							+ " cannot write to sdcard ** ");
 					return;
 				}
@@ -354,10 +344,10 @@ public class CarCast extends BaseActivity {
 			textView.setText(contentService.getCurrentSubscriptionName());
 
 			textView = (TextView) findViewById(R.id.title);
-			textView.setText(contentService.getCurrentTitle());
+			textView.setText(contentService.currentTitle());
 
 			textView = (TextView) findViewById(R.id.location);
-			if (MediaMode.valueOf(contentService.getMediaMode()) == MediaMode.Paused) {
+			if (contentService.getMediaMode() == MediaMode.Paused) {
 				if (toggleOnPause == true) {
 					toggleOnPause = false;
 					textView.setText("");
@@ -383,6 +373,6 @@ public class CarCast extends BaseActivity {
 			Log.e("cc", "", e);
 		}
 	}
-	
+
 
 }

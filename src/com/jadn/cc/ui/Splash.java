@@ -1,4 +1,6 @@
-package com.jadn.cc.ui; import android.app.Activity;
+package com.jadn.cc.ui; import com.jadn.cc.core.CarCastApplication;
+
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,7 +15,7 @@ public class Splash extends Activity {
           super.onCreate(icicle);
           setContentView(R.layout.splash);
           
-          setTitle(BaseActivity.getAppTitle()+"");
+          setTitle(CarCastApplication.getAppTitle()+"");
           
           ImageView imageView = (ImageView)findViewById(R.id.splashscreen);
           imageView.setOnClickListener(new OnClickListener(){

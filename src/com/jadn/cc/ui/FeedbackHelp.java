@@ -1,5 +1,7 @@
 package com.jadn.cc.ui;
 
+import com.jadn.cc.core.CarCastApplication;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -37,7 +39,7 @@ public class FeedbackHelp extends Activity {
 		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 		emailIntent.setType("plain/text");
 		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "carcast-devs@googlegroups.com" });
-		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, BaseActivity.getAppTitle()+": feedback "+BaseActivity.getVersion());
+		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, CarCastApplication.getAppTitle()+": feedback "+CarCastApplication.getVersion());
 		startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
 	}
 

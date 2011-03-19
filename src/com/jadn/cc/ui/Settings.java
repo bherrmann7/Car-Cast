@@ -1,5 +1,7 @@
 package com.jadn.cc.ui;
 
+import com.jadn.cc.core.CarCastApplication;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -30,7 +32,7 @@ public class Settings extends PreferenceActivity {
 		}
 		addPreferencesFromResource(R.xml.settings);
 		
-		setTitle(BaseActivity.getAppTitle()+": "+BaseActivity.getVersion()+" / "+version);
+		setTitle(CarCastApplication.getAppTitle()+": "+CarCastApplication.getVersion()+" / "+version);
 	}
 
 	@Override
