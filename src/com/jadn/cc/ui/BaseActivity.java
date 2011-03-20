@@ -19,6 +19,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public abstract class BaseActivity extends Activity implements ServiceConnection {
 	public final static String[] releaseData = new String[] {
+		"5-March-2011", "Update Target version to make work on Nook Honey", 
 		"28-Feb-2011", "Added code to keep wifi on, if it is on when downloading starts. (Round II)", 
 		"26-Feb-2011", "Try and make landscape mode more usable.", 
 		"19-Feb-2011", "Updated icon, Thanks to Peter Herrmann.  More space between buttons on player.", 
