@@ -25,7 +25,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.googlelogin.GoogleLoginServiceHelper;
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.services.ContentService;
@@ -52,19 +51,6 @@ public class CarCast extends BaseActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-
-		// Google responding to a name request
-		if (requestCode == 123) {
-			for (String key : data.getExtras().keySet()) {
-				if (key.equals("accounts")) {
-					String accounts = Arrays.toString(data.getExtras()
-							.getStringArray(key));
-					SharedPreferences.Editor editor = app_preferences.edit();
-					editor.putString("accounts", accounts);
-					editor.commit();
-				}
-			}
-		}
 
 		updateUI();
 	}
@@ -229,11 +215,6 @@ public class CarCast extends BaseActivity {
 					.setNeutralButton("Close", null).show();
 		}
 		saveLastRun();
-
-		String accounts = app_preferences.getString("accounts", null);
-		if (accounts == null) {
-			GoogleLoginServiceHelper.getAccount(this, 123, true);
-		}
 
 		Recording.updateNotification(this);
 	}
