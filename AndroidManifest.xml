@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.jadn.cc" android:versionCode="106" android:versionName="1.0.106">
-	<application android:icon="@drawable/ccp_launcher" android:label="Car Cast" android:debuggable="true">
+	<application android:icon="@drawable/ccp_launcher"
+		android:label="Car Cast" android:debuggable="true"
+		android:name="com.jadn.cc.core.CarCastApplication">
 		<activity android:name=".ui.CarCast" android:label="Car Cast">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name="com.admob.android.ads.AdMobActivity" 
-                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 
-                  android:configChanges="orientation|keyboard|keyboardHidden" 
-                  /> 
-                  
-<receiver android:name="com.admob.android.ads.analytics.InstallReceiver"
-android:exported="true">
-<intent-filter>
-   <action android:name="com.android.vending.INSTALL_REFERRER" />
-</intent-filter>
-</receiver>
-                  
+		<activity android:name="com.admob.android.ads.AdMobActivity"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+			android:configChanges="orientation|keyboard|keyboardHidden" />
+
+		<receiver android:name="com.admob.android.ads.analytics.InstallReceiver"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="com.android.vending.INSTALL_REFERRER" />
+			</intent-filter>
+		</receiver>
+
 		<activity android:name=".ui.AudioRecorder"></activity>
-		<activity android:name=".ui.Downloader" android:screenOrientation="portrait"></activity>
-		<activity android:name=".ui.DownloadProgress" android:screenOrientation="portrait"></activity>
+		<activity android:name=".ui.Downloader"
+			android:screenOrientation="portrait"></activity>
+		<activity android:name=".ui.DownloadProgress"
+			android:screenOrientation="portrait"></activity>
 		<activity android:name=".ui.SubscriptionEdit"></activity>
 		<activity android:name=".ui.Settings"></activity>
 		<activity android:name=".ui.Subscriptions"></activity>
@@ -31,7 +34,7 @@ android:exported="true">
 		<activity android:name=".ui.SearchResults"></activity>
 		<activity android:name=".ui.PodcastList"></activity>
 		<activity android:name=".ui.FeedbackHelp"></activity>
-		
+
 		<service android:name=".services.ContentService" />
 		<service android:name=".services.AlarmService" />
 		<service android:name=".services.AlarmHostService">
@@ -51,27 +54,26 @@ android:exported="true">
 			<action android:name="android.intent.action.ACTION_HEADSET_PLUG" />
 			</intent-filter> </receiver>
 		-->
-		 <meta-data android:value="a14ca09b777254f" android:name="ADMOB_PUBLISHER_ID" />
+		<meta-data android:value="a14ca09b777254f" android:name="ADMOB_PUBLISHER_ID" />
 	</application>
-	
+
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.READ_PHONE_STATE" />	
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-	<uses-permission android:name="android.permission.READ_LOGS"/>
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	<uses-permission android:name="android.permission.READ_LOGS" />
 
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
 
-	<meta-data android:name="ADMOB_ALLOW_LOCATION_FOR_ADS" android:value="true" />
-	
-	<supports-screens
-        android:smallScreens="true"
-        android:normalScreens="true"
-        android:largeScreens="true"               
-        android:anyDensity="true" />
-        
+	<meta-data android:name="ADMOB_ALLOW_LOCATION_FOR_ADS"
+		android:value="true" />
+
+	<supports-screens android:smallScreens="true"
+		android:normalScreens="true" android:largeScreens="true"
+		android:anyDensity="true" />
+
 </manifest> 

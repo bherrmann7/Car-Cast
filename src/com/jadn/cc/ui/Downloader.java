@@ -1,29 +1,27 @@
 package com.jadn.cc.ui;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.TextView;
+import com.jadn.cc.R;
+import com.jadn.cc.core.CarCastApplication;
+import com.jadn.cc.core.Sayer;
+import com.jadn.cc.trace.TraceData;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.RemoteException;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.TextView;
-
-import com.jadn.cc.R;
-import com.jadn.cc.core.Sayer;
-import com.jadn.cc.trace.TraceData;
-
 /**
  * Lets the user observe download details in all their command line glory.
- * 
+ *
  * @author bob
- * 
+ *
  */
 public class Downloader extends BaseActivity implements Sayer, Runnable {
 
@@ -37,10 +35,6 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 	TextView tv;
 
 	Updater updater;
-
-	@Override
-	void onContentService() throws RemoteException {
-	}
 
 	// PowerManager.WakeLock wl;
 
@@ -102,7 +96,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 			sb.append(' ');
 		sb.append(':');
 		sb.append(value);
-		sb.append('\n');					
+		sb.append('\n');
 	}
 
 	@Override
@@ -123,7 +117,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 	}
 
 	// Called once a second in the UI thread to update the screen.
-	public void run() {
+	@Override public void run() {
 		try {
 			String text = contentService.getDownloadProgress();
 			if (text.length() != 0)
@@ -132,11 +126,11 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 				tv.setText("\n\n\nNo download has run or is running.");
 			}
 		} catch (Exception e) {
-			esay(e);
+			CarCastApplication.esay(e);
 		}
 	}
 
-	public void say(String text) {
+	@Override public void say(String text) {
 		Message message = Message.obtain();
 		Bundle bundle = new Bundle();
 		bundle.putCharSequence("text", text + "\n");

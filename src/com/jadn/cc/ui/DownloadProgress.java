@@ -1,9 +1,5 @@
 package com.jadn.cc.ui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -14,16 +10,18 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.jadn.cc.R;
+import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class DownloadProgress extends BaseActivity implements Runnable {
 
@@ -31,7 +29,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 	Updater updater;
 
 	@Override
-	void onContentService() throws RemoteException {
+	protected void onContentService() {
 		String status = contentService.encodedDownloadStatus();
 		boolean idle = false;
 		if (status.equals("")) {
@@ -46,7 +44,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		startDownloads.setEnabled(idle);
 		abort.setEnabled(!idle);
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,20 +52,20 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 
 		final Button startDownloads = (Button) findViewById(R.id.startDownloads);
 		startDownloads.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
+			@Override public void onClick(View v) {
 
 				SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(DownloadProgress.this);
         		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
 				if (app_preferences.getBoolean("wifiDownload", true) && (!wifi.isWifiEnabled() || wifi.getConnectionInfo().getIpAddress() == 0)) {
-					
+
 					String title =  "WIFI is not enabled.";
 					if (wifi.getConnectionInfo().getIpAddress() == 0) title = "WIFI is not connected.";
-					
+
 					new AlertDialog.Builder(DownloadProgress.this).setTitle(title).setIcon(android.R.drawable.ic_dialog_alert)
 					.setMessage("Do you want to use your carrier?  You may use up your data plan's bandwidth allocation or incur overage charges...")
 					.setNegativeButton("Yikes, no", null).setPositiveButton("Sure, go ahead", new DialogInterface.OnClickListener() {
-						
+
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							doDownloads();
@@ -82,7 +80,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 
 		final Button abort = (Button) findViewById(R.id.AbortDownloads);
 		abort.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
+			@Override public void onClick(View v) {
 				NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
 				mNotificationManager.cancel(22);
 				mNotificationManager.cancel(23);
@@ -93,7 +91,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 
 		final Button downloadDetails = (Button) findViewById(R.id.downloadDetails);
 		downloadDetails.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
+			@Override public void onClick(View v) {
 				startActivity(new Intent(DownloadProgress.this, Downloader.class));
 
 			}
@@ -107,17 +105,13 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 	//Do the downloads
 	private void doDownloads()
 	{
-		try {
-			reset();
-			contentService.startDownloadingNewPodCasts(Config.getMax(DownloadProgress.this));
-		} catch (RemoteException re) {
-			esay(re);
-		}
+		reset();
+		contentService.startDownloadingNewPodCasts(Config.getMax(DownloadProgress.this));
 
 		findViewById(R.id.AbortDownloads).setEnabled(true);
 		findViewById(R.id.startDownloads).setEnabled(false);
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -157,7 +151,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 	}
 
 	// Called once a second in the UI thread to update the screen.
-	public void run() {
+	@Override public void run() {
 		String downloadStatus = null;
 		try {
 			downloadStatus = contentService.encodedDownloadStatus();
@@ -173,7 +167,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 				findViewById(R.id.AbortDownloads).setEnabled(true);
 			}
 		} catch (Exception e) {
-			esay(new RuntimeException("downloadStatus was: " + downloadStatus, e));
+			CarCastApplication.esay(new RuntimeException("downloadStatus was: " + downloadStatus, e));
 		}
 	}
 

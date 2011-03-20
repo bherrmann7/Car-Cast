@@ -1,13 +1,4 @@
-package com.jadn.cc.ui; import java.net.URL;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-
-import android.os.Bundle;
-import android.os.RemoteException;
+package com.jadn.cc.ui; import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,7 +6,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.ExternalMediaStatus;
@@ -24,13 +14,18 @@ import com.jadn.cc.core.Subscription;
 import com.jadn.cc.core.Util;
 import com.jadn.cc.services.DownloadHistory;
 import com.jadn.cc.services.EnclosureHandler;
+import java.net.URL;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 public class SubscriptionEdit extends BaseActivity {
 
 	Subscription currentSub;
 
 	@Override
-	void onContentService() throws RemoteException {
+	protected void onContentService() {
 	    if (currentSub != null) {
 	        ((TextView) findViewById(R.id.editsite_name)).setText(currentSub.name);
 	        ((TextView) findViewById(R.id.editsite_url)).setText(currentSub.url);
@@ -45,7 +40,7 @@ public class SubscriptionEdit extends BaseActivity {
 		setContentView(R.layout.edit_subscription);
 
 		currentSub = null;
-		
+
 		if (getIntent().getExtras() != null) {
             currentSub = (Subscription) getIntent().getExtras().get("subscription");
 		}
@@ -61,10 +56,10 @@ public class SubscriptionEdit extends BaseActivity {
 								.getText().toString();
 						Boolean enabled = ((CheckBox) findViewById(R.id.enabled)).isChecked();
 				        // TODO: add max count, ordering here
-						
+
 						// try out the url:
 						if (!Util.isValidURL(url)) {
-                            Util.toast(SubscriptionEdit.this, "URL to site is malformed."); 
+                            Util.toast(SubscriptionEdit.this, "URL to site is malformed.");
                             return;
                         } // endif
 
@@ -75,21 +70,16 @@ public class SubscriptionEdit extends BaseActivity {
 							return;
 						}
 
-						try {
-						    Subscription newSub = new Subscription(name, url, enabled); // TODO add max count, ordering
-						    if (currentSub != null) {
-						        // edit:
-                                contentService.editSubscription(currentSub, newSub);
+					    Subscription newSub = new Subscription(name, url, enabled); // TODO add max count, ordering
+					    if (currentSub != null) {
+					        // edit:
+                            contentService.editSubscription(currentSub, newSub);
 
-						    } else {
-						        // add:
-                                contentService.addSubscription(newSub);
-                            } // endif
+					    } else {
+					        // add:
+                            contentService.addSubscription(newSub);
+                        } // endif
 
-						} catch (RemoteException e) {
-							esay(e);
-						}
-											
 						SubscriptionEdit.this.setResult(RESULT_OK);
 						SubscriptionEdit.this.finish();
 					}
@@ -128,7 +118,7 @@ public class SubscriptionEdit extends BaseActivity {
 
 							Util.toast(SubscriptionEdit.this, "Feed is OK.  Would download "
 									+ encloseureHandler.metaNets.size() + " podcasts.");
-						} catch (Exception e) {		
+						} catch (Exception e) {
 							Log.e("editSite", "testURL", e);
 							Util.toast(SubscriptionEdit.this, "Problem accessing feed. "+e.toString());
 						}

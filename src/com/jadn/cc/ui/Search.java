@@ -1,16 +1,15 @@
 package com.jadn.cc.ui; import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.RemoteException;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
-
+import android.widget.Toast;
 import com.jadn.cc.R;
+import com.jadn.cc.core.CarCastApplication;
 
 public class Search extends BaseActivity {
 
@@ -19,24 +18,20 @@ public class Search extends BaseActivity {
 
 	// Create runnable for posting
 	final Runnable mUpdateResults = new Runnable() {
-		public void run() {
-			try {
-				if (contentService.startSearch("-status-").equals("done")) {
-					updater.allDone();
-					if (contentService.startSearch("-results-").equals("")) {
-						Toast.makeText(getApplicationContext(),
-								"No Results Found.", Toast.LENGTH_LONG).show();
-						TextView searchText = (TextView) findViewById(R.id.searchText);
-						Button searchButton = (Button) findViewById(R.id.searchButton);
-						searchButton.setEnabled(true);
-						searchText.setEnabled(true);
-					} else {
-						startActivity(new Intent(Search.this,
-								SearchResults.class));
-					}
+		@Override public void run() {
+			if (contentService.startSearch("-status-").equals("done")) {
+				updater.allDone();
+				if (contentService.startSearch("-results-").equals("")) {
+					Toast.makeText(getApplicationContext(),
+							"No Results Found.", Toast.LENGTH_LONG).show();
+					TextView searchText = (TextView) findViewById(R.id.searchText);
+					Button searchButton = (Button) findViewById(R.id.searchButton);
+					searchButton.setEnabled(true);
+					searchText.setEnabled(true);
+				} else {
+					startActivity(new Intent(Search.this,
+							SearchResults.class));
 				}
-			} catch (RemoteException e) {
-				esay(e);
 			}
 		}
 	};
@@ -44,15 +39,11 @@ public class Search extends BaseActivity {
 	Updater updater;
 
 	@Override
-	void onContentService() throws RemoteException {
-	}
-
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search);
 
-		setTitle(getAppTitle()+": search for new subscriptions");
+		setTitle(CarCastApplication.getAppTitle()+": search for new subscriptions");
 
 		// ListView listView = (ListView) findViewById(R.id.siteList);
 		// registerForContextMenu(listView);
@@ -66,26 +57,18 @@ public class Search extends BaseActivity {
 					KeyEvent event) {
 				searchButton.setEnabled(false);
 				searchText.setEnabled(false);
-				try {
-					contentService.startSearch(searchText.getText().toString());
-					updater = new Updater(handler, mUpdateResults);
-				} catch (RemoteException e) {
-					esay(e);
-				}
+				contentService.startSearch(searchText.getText().toString());
+				updater = new Updater(handler, mUpdateResults);
 				return true;
 			}});
-		
+
 		searchButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				searchButton.setEnabled(false);
 				searchText.setEnabled(false);
-				try {
-					contentService.startSearch(searchText.getText().toString());
-					updater = new Updater(handler, mUpdateResults);
-				} catch (RemoteException e) {
-					esay(e);
-				}
+				contentService.startSearch(searchText.getText().toString());
+				updater = new Updater(handler, mUpdateResults);
 			}
 		});
 
