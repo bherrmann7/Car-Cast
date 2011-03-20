@@ -47,7 +47,7 @@ public class PodcastList extends BaseActivity {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		if (item.getTitle().equals("Delete")) {
 			try {
@@ -60,14 +60,28 @@ public class PodcastList extends BaseActivity {
 			return false;
 		}
 		if (item.getTitle().equals("Delete All Before")) {
-			try {
-				contentService.setCurrentPaused(info.position);
-				contentService.purgeToCurrent();
-				showPodcasts();
-			} catch (RemoteException e) {
-				// humm.
-			}
-			return false;
+			// Ask the user if they want to really delete all
+			new AlertDialog.Builder(this).setIcon(
+					android.R.drawable.ic_dialog_alert)
+					.setMessage("Delete podcasts before?")
+					.setPositiveButton("Delete",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									try {
+										contentService
+												.setCurrentPaused(info.position);
+										contentService.purgeToCurrent();
+										showPodcasts();
+										finish();
+									} catch (RemoteException e) {
+										esay(e);
+									}
+								}
+
+							}).setNegativeButton("Cancel", null).show();
+			return true;
 		}
 		if (item.getTitle().equals("Play")) {
 			try {
@@ -150,11 +164,11 @@ public class PodcastList extends BaseActivity {
 					continue;
 				}
 				// if either are 1/2 baked, move on...
-				if (metaFile.getDuration()<=0 || metaFile.getCurrentPos()<=0 ){ 
+				if (metaFile.getDuration() <= 0
+						|| metaFile.getCurrentPos() <= 0) {
 					continue;
 				}
-				if (metaFile.getCurrentPos() > metaHolder.get(i)
-						.getDuration() * .9) {
+				if (metaFile.getCurrentPos() > metaHolder.get(i).getDuration() * .9) {
 					try {
 						contentService.deletePodcast(i);
 						list.remove(i);
