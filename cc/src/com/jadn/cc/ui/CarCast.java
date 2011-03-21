@@ -21,12 +21,12 @@ import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.MediaMode;
 import com.jadn.cc.trace.ExceptionHandler;
-import java.util.Arrays;
 
 public class CarCast extends BaseActivity {
 	final static String tag = CarCast.class.getSimpleName();
