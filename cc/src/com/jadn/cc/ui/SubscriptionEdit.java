@@ -1,4 +1,9 @@
-package com.jadn.cc.ui; import android.os.Bundle;
+package com.jadn.cc.ui;
+
+import android.app.ProgressDialog;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -6,32 +11,33 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.ExternalMediaStatus;
 import com.jadn.cc.core.Sayer;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.core.Util;
+import com.jadn.cc.services.DownloadHelper;
 import com.jadn.cc.services.DownloadHistory;
 import com.jadn.cc.services.EnclosureHandler;
-import java.net.URL;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
-public class SubscriptionEdit extends BaseActivity {
+public class SubscriptionEdit extends BaseActivity implements Runnable {
 
 	Subscription currentSub;
+	ProgressDialog dialog;
 
 	@Override
 	protected void onContentService() {
-	    if (currentSub != null) {
-	        ((TextView) findViewById(R.id.editsite_name)).setText(currentSub.name);
-	        ((TextView) findViewById(R.id.editsite_url)).setText(currentSub.url);
-	        ((CheckBox) findViewById(R.id.enabled)).setChecked(currentSub.enabled);
-	        // TODO: add max count, ordering here
-        } // end if
+		if (currentSub != null) {
+			((TextView) findViewById(R.id.editsite_name))
+					.setText(currentSub.name);
+			((TextView) findViewById(R.id.editsite_url))
+					.setText(currentSub.url);
+			((CheckBox) findViewById(R.id.enabled))
+					.setChecked(currentSub.enabled);
+			// TODO: add max count, ordering here
+		} // end if
 	}
 
 	@Override
@@ -42,7 +48,8 @@ public class SubscriptionEdit extends BaseActivity {
 		currentSub = null;
 
 		if (getIntent().getExtras() != null) {
-            currentSub = (Subscription) getIntent().getExtras().get("subscription");
+			currentSub = (Subscription) getIntent().getExtras().get(
+					"subscription");
 		}
 
 		((Button) findViewById(R.id.saveEditSite))
@@ -54,31 +61,37 @@ public class SubscriptionEdit extends BaseActivity {
 								.getText().toString();
 						String url = ((TextView) findViewById(R.id.editsite_url))
 								.getText().toString();
-						Boolean enabled = ((CheckBox) findViewById(R.id.enabled)).isChecked();
-				        // TODO: add max count, ordering here
+						Boolean enabled = ((CheckBox) findViewById(R.id.enabled))
+								.isChecked();
+						// TODO: add max count, ordering here
 
 						// try out the url:
 						if (!Util.isValidURL(url)) {
-                            Util.toast(SubscriptionEdit.this, "URL to site is malformed.");
-                            return;
-                        } // endif
+							Util.toast(SubscriptionEdit.this,
+									"URL to site is malformed.");
+							return;
+						} // endif
 
-						ExternalMediaStatus status = ExternalMediaStatus.getExternalMediaStatus();
+						ExternalMediaStatus status = ExternalMediaStatus
+								.getExternalMediaStatus();
 						if (status != ExternalMediaStatus.writeable) {
 							// unable to access sdcard
-							Toast.makeText(getApplicationContext(),"Unable to add subscription to sdcard", Toast.LENGTH_LONG);
+							Toast.makeText(getApplicationContext(),
+									"Unable to add subscription to sdcard",
+									Toast.LENGTH_LONG);
 							return;
 						}
 
-					    Subscription newSub = new Subscription(name, url, enabled); // TODO add max count, ordering
-					    if (currentSub != null) {
-					        // edit:
-                            contentService.editSubscription(currentSub, newSub);
+						Subscription newSub = new Subscription(name, url,
+								enabled); // TODO add max count, ordering
+						if (currentSub != null) {
+							// edit:
+							contentService.editSubscription(currentSub, newSub);
 
-					    } else {
-					        // add:
-                            contentService.addSubscription(newSub);
-                        } // endif
+						} else {
+							// add:
+							contentService.addSubscription(newSub);
+						} // endif
 
 						SubscriptionEdit.this.setResult(RESULT_OK);
 						SubscriptionEdit.this.finish();
@@ -91,59 +104,64 @@ public class SubscriptionEdit extends BaseActivity {
 
 					@Override
 					public void onClick(View v) {
-
-						// String name = ((TextView)
-						// findViewById(R.id.editsite_name))
-						// .getText().toString();
-						String url = ((TextView) findViewById(R.id.editsite_url))
-								.getText().toString();
-
-						SAXParserFactory spf = SAXParserFactory.newInstance();
 						DownloadHistory history = DownloadHistory.getInstance();
-						EnclosureHandler encloseureHandler = new EnclosureHandler(
-								Config.getMax(SubscriptionEdit.this), history,
-								new Sayer() {
-									@Override
-									public void say(String text) {
-										Util.toast(SubscriptionEdit.this, text);
-									}
-								});
-						try {
-							SAXParser sp = spf.newSAXParser();
-							XMLReader xr = sp.getXMLReader();
-							xr.setContentHandler(encloseureHandler);
-							xr
-									.parse(new InputSource(new URL(url)
-											.openStream()));
+						encloseureHandler = new EnclosureHandler(Config
+								.getMax(SubscriptionEdit.this), history);
 
-							Util.toast(SubscriptionEdit.this, "Feed is OK.  Would download "
-									+ encloseureHandler.metaNets.size() + " podcasts.");
-						} catch (Exception e) {
-							Log.e("editSite", "testURL", e);
-							Util.toast(SubscriptionEdit.this, "Problem accessing feed. "+e.toString());
-						}
+						dialog = ProgressDialog.show(
+								SubscriptionEdit.this, "Testing Subscription",
+								"Testing Subscription URL.\nPlease wait...",
+								true);
+						dialog.show();
 
-						TextView nameTV = ((TextView) findViewById(R.id.editsite_name));
-						// .getText().toString();
+						new Thread(SubscriptionEdit.this).start();
 
-						if (encloseureHandler.title.length() != 0
-								&& nameTV.getText().length() == 0) {
-							nameTV.setText(encloseureHandler.getTitle());
-						}
 					}
 
 				});
-
-//		((Button) findViewById(R.id.cancelEditSite))
-//				.setOnClickListener(new OnClickListener() {
-//
-//					@Override
-//					public void onClick(View v) {
-//						setResult(RESULT_CANCELED);
-//						finish();
-//					}
-//
-//				});
 	}
+
+	EnclosureHandler encloseureHandler;
+
+	@Override
+	public void run() {
+		testException = null;
+		try {
+			Util.downloadPodcast(getURL(), encloseureHandler);
+		} catch (Exception e) {
+			testException = e;
+		}
+
+		handler.sendEmptyMessage(0);
+	}
+
+	private String getURL() {
+		return ((TextView) findViewById(R.id.editsite_url)).getText()
+				.toString();
+	}
+
+	Exception testException;
+
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			dialog.dismiss();
+			if (testException != null) {
+				Log.e("editSite", "testURL " + getURL(), testException);
+				Util.toast(SubscriptionEdit.this, "Problem accessing feed. "
+						+ testException.toString());
+				return;
+			}
+			Util.toast(SubscriptionEdit.this, "Feed is OK.  Would download "
+					+ encloseureHandler.metaNets.size() + " podcasts.");
+
+			TextView nameTV = ((TextView) findViewById(R.id.editsite_name));
+			if (encloseureHandler.title.length() != 0
+					&& nameTV.getText().length() == 0) {
+				nameTV.setText(encloseureHandler.getTitle());
+			}
+
+		}
+	};
 
 }
