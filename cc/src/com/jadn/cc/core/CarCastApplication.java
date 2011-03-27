@@ -16,6 +16,7 @@ import java.util.List;
 
 public class CarCastApplication extends Application {
     public final static String[] releaseData = new String[] {
+    "27-Mar-2011", "Fixed Spanish/Latin Subscriptions.  Made subscription 'Test' show working message.",
     "28-Feb-2011", "Added code to keep wifi on, if it is on when downloading starts. (Round II)",
     "26-Feb-2011", "Try and make landscape mode more usable.",
     "19-Feb-2011", "Updated icon, Thanks to Peter Herrmann.  More space between buttons on player.",
