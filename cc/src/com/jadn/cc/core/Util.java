@@ -1,6 +1,7 @@
 package com.jadn.cc.core;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -8,10 +9,11 @@ import java.net.URLConnection;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.jadn.cc.services.EnclosureHandler;
-
 import android.app.Activity;
 import android.widget.Toast;
+
+import com.jadn.cc.services.EnclosureHandler;
+import org.xml.sax.InputSource;
 
 public class Util {
 
@@ -46,8 +48,20 @@ public class Util {
 		SAXParser sp = saxParserFactory.newSAXParser();
 		URLConnection connection = new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "http://jadn.com/carcast");
-		InputStream iis = connection.getInputStream();
-		sp.parse(iis, encloseureHandler);
+		String charset = getCharset(connection.getContentType());
+		InputSource is = new InputSource(connection.getInputStream());
+		is.setEncoding(charset);
+		sp.parse(is, encloseureHandler);
+	}
+
+	private static final String CHARSET = "charset=";
+	
+	public static String getCharset(String contentType) {
+		int dex=-1;
+		if(contentType!=null && (dex=contentType.indexOf(CHARSET)) !=-1 ){
+			return contentType.substring(dex+CHARSET.length());
+		}
+		return "UTF-8";
 	}
 
 }
