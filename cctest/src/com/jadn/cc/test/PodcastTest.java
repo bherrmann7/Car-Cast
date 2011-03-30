@@ -67,6 +67,60 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 				.toString());
 	}
 
+	public void testChurchPodcast1() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0,
+				"cstonechurch.sermon.net/rss/client/cstonechurch/type/audio");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		// assertTrue(solo.searchText("Feed is OK"));
+
+		assertTrue("" != solo.getEditText(1).getText().toString());
+		
+		solo.clickOnText("Save");
+
+	}
+
+	public void testChurchPodcast2() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0,
+				"www.sermon.net/rss/cstonechurch/main_channel");
+		// solo.enterText(0, "jadn.com/podcast.xml");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		// assertTrue(solo.searchText("Feed is OK"));
+
+		assertTrue("" != solo.getEditText(1).getText().toString());
+		
+		solo.clickOnText("Save");
+
+	}
+	
+	public void testNPRPodcast2() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0,
+				"www.npr.org/rss/podcast.php?id=35");
+		// solo.enterText(0, "jadn.com/podcast.xml");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		// assertTrue(solo.searchText("Feed is OK"));
+
+		assertTrue("" != solo.getEditText(1).getText().toString());
+		
+		solo.clickOnText("Save");
+
+	}
+	
+
 	// http://rss.sciam.com/sciam/60secsciencepodcast
 	public void testStockPodcasts() throws Exception {
 
@@ -91,7 +145,12 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 	}
 
 	String[] mySetPodcasts = {
+			// User reported issues
+			 "http://cstonechurch.sermon.net/rss/client/cstonechurch/type/audio",
+			"http://www.sermon.net/rss/cstonechurch/main_channel",
 			"http://feeds.feedburner.com/lincolnbereanchurchpodcast",
+			
+			// App "Stock" examples.
 			"http://rss.sciam.com/sciam/60-second-psych",
 			"http://www.cringely.com/feed/podcast/",
 			//"http://audio.commonwealthclub.org/audio/podcast/weekly.xml",

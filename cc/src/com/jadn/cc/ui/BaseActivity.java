@@ -1,11 +1,13 @@
 package com.jadn.cc.ui;
 
+import java.util.List;
+
 import android.app.Activity;
+
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.ContentServiceListener;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.services.ContentService;
-import java.util.List;
 
 
 public abstract class BaseActivity extends Activity implements ContentServiceListener {

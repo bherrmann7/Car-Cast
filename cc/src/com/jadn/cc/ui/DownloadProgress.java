@@ -1,5 +1,9 @@
 package com.jadn.cc.ui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -16,12 +20,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class DownloadProgress extends BaseActivity implements Runnable {
 

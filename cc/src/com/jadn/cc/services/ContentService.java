@@ -1,5 +1,8 @@
 package com.jadn.cc.services;
 
+import java.io.File;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,6 +20,7 @@ import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
@@ -26,8 +30,6 @@ import com.jadn.cc.core.Subscription;
 import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
-import java.io.File;
-import java.util.List;
 
 public class ContentService extends Service implements OnCompletionListener {
     /**
@@ -160,7 +162,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public String currentTitle() {
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
-			if (downloadHelper != null) {
+			if (downloadHelper != null && !downloadHelper.idle ) {
 				return "\nDownloading podcasts\n" + downloadHelper.getStatus();
 			}
 			return "No podcasts loaded.\nUse 'Menu' and 'Download Podcasts'";

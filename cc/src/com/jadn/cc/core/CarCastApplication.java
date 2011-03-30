@@ -1,5 +1,8 @@
 package com.jadn.cc.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,11 +11,10 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.jadn.cc.services.ContentService;
 import com.jadn.cc.services.ContentService.LocalBinder;
 import com.jadn.cc.trace.TraceUtil;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CarCastApplication extends Application {
     public final static String[] releaseData = new String[] {
@@ -210,7 +212,7 @@ public class CarCastApplication extends Application {
 
     public void stopContentService() {
         Log.i("CarCast", "requesting stop; contentService is "+contentService);
-        unbindService(contentServiceConnection);
+        //BOBH unbindService(contentServiceConnection);
         stopService(serviceIntent);
     }
 }

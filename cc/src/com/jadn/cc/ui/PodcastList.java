@@ -1,20 +1,24 @@
 package com.jadn.cc.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
+
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Util;
@@ -22,8 +26,6 @@ import com.jadn.cc.services.ContentService;
 import com.jadn.cc.services.DownloadHistory;
 import com.jadn.cc.services.MetaFile;
 import com.jadn.cc.services.MetaHolder;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class PodcastList extends BaseActivity {
 
@@ -177,11 +179,23 @@ public class PodcastList extends BaseActivity {
 
 			return true;
 		}
-		if (item.getItemId() == R.id.eraseDownloadHistory) {
-			int historyDeleted = DownloadHistory.getInstance().eraseHistory();
-			Util.toast(this, "Erased " + historyDeleted
-					+ " podcast from dowload history.");
-			return true;
+		if (item.getItemId() == R.id.eraseDownloadHistory) {			
+			new AlertDialog.Builder(this).setIcon(
+					android.R.drawable.ic_dialog_alert)
+					.setMessage("Erase Download History?")
+					.setPositiveButton("Erase",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+										int historyDeleted = DownloadHistory.getInstance().eraseHistory();
+										Util.toast(PodcastList.this, "Erased " + historyDeleted
+												+ " podcast from dowload history.");										
+								}
+
+							}).setNegativeButton("Cancel", null).show();
+
+			
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}

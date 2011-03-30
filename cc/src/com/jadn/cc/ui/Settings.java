@@ -1,7 +1,5 @@
 package com.jadn.cc.ui;
 
-import com.jadn.cc.core.CarCastApplication;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -13,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.jadn.cc.R;
+import com.jadn.cc.core.CarCastApplication;
 
 public class Settings extends PreferenceActivity {
 		

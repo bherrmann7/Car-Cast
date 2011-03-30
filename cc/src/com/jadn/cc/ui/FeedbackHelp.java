@@ -1,7 +1,5 @@
 package com.jadn.cc.ui;
 
-import com.jadn.cc.core.CarCastApplication;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.jadn.cc.R;
+import com.jadn.cc.core.CarCastApplication;
 
 public class FeedbackHelp extends Activity {
 

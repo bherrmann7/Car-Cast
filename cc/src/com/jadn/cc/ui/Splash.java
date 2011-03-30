@@ -1,12 +1,11 @@
-package com.jadn.cc.ui; import com.jadn.cc.core.CarCastApplication;
-
-import android.app.Activity;
+package com.jadn.cc.ui; import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
 import com.jadn.cc.R;
+import com.jadn.cc.core.CarCastApplication;
 
 public class Splash extends Activity {
 	

@@ -6,10 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import com.jadn.cc.trace.TraceUtil;
-
 import android.media.MediaPlayer;
 import android.util.Log;
+
+import com.jadn.cc.trace.TraceUtil;
 
 /**
  * Meta information about a podcast. From rss metadata (hopefully someday from

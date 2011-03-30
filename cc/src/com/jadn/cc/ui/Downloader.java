@@ -1,5 +1,10 @@
 package com.jadn.cc.ui;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,14 +13,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Sayer;
 import com.jadn.cc.trace.TraceData;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
 
 /**
  * Lets the user observe download details in all their command line glory.
@@ -142,7 +144,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 		BufferedReader reader = null;
 		try {
 			Process process = Runtime.getRuntime().exec(
-					new String[] { "logcat", "-d" });
+					new String[] { "logcat", "-v", "time", "-d" });
 			reader = new BufferedReader(new InputStreamReader(process
 					.getInputStream()));
 			String line;

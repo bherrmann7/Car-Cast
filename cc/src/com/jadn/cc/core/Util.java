@@ -1,7 +1,5 @@
 package com.jadn.cc.core;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -9,11 +7,12 @@ import java.net.URLConnection;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.InputSource;
+
 import android.app.Activity;
 import android.widget.Toast;
 
 import com.jadn.cc.services.EnclosureHandler;
-import org.xml.sax.InputSource;
 
 public class Util {
 
