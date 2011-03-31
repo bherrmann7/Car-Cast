@@ -1,12 +1,8 @@
 package com.jadn.cc.ui;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -21,7 +17,6 @@ import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
@@ -45,12 +40,17 @@ public class CarCast extends BaseActivity {
 			updateUI();
 		}
 	};
-    private BroadcastReceiver broadcastReceiver;
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
+		updateUI();
+	}
+
+	@Override
+	public void playStateUpdated(boolean playing) {
+		updatePausePlay();
 		updateUI();
 	}
 
@@ -80,21 +80,6 @@ public class CarCast extends BaseActivity {
 		ExceptionHandler.register(this);
 
 		super.onCreate(savedInstanceState);
-
-		broadcastReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				if (intent != null) { // && intent.getExtras().getInt("state")
-										// == 0){
-					if (contentService.isPlaying()) {
-						contentService.pauseNow();
-						contentService.bump(-2);
-						updatePausePlay();
-						updateUI();
-					}
-				}
-			}
-		};
 
 		setTitle(CarCastApplication.getAppTitle());
 
@@ -279,8 +264,6 @@ public class CarCast extends BaseActivity {
 		super.onPause();
 
 		updater.allDone();
-		unregisterReceiver(broadcastReceiver);
-
 	}
 
 	@Override
@@ -288,7 +271,6 @@ public class CarCast extends BaseActivity {
 		super.onResume();
 
 		updater = new Updater(handler, mUpdateResults);
-        registerReceiver(broadcastReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 	}
 
 	private void saveLastRun() {
@@ -354,6 +336,4 @@ public class CarCast extends BaseActivity {
 			Log.e("cc", "", e);
 		}
 	}
-
-
 }

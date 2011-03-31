@@ -1,8 +1,5 @@
 package com.jadn.cc.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,7 +8,6 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.jadn.cc.services.ContentService;
 import com.jadn.cc.services.ContentService.LocalBinder;
 import com.jadn.cc.trace.TraceUtil;
@@ -191,7 +187,7 @@ public class CarCastApplication extends Application {
 
 	private Intent serviceIntent;
 	private ContentService contentService;
-	private List<ContentServiceListener> listeners = new ArrayList<ContentServiceListener>();
+	private ContentServiceListener contentServiceListener;
 
 	@Override
 	public void onCreate() {
@@ -206,7 +202,7 @@ public class CarCastApplication extends Application {
 					+ "; binder is " + iservice);
 			if (name.getClassName().equals(ContentService.class.getName())) {
 				contentService = ((LocalBinder) iservice).getService();
-				fireContentServiceChanged();
+				contentServiceListener.onContentServiceChanged(contentService);
 			}
 		}
 
@@ -215,18 +211,13 @@ public class CarCastApplication extends Application {
 			Log.i("CarCast", "onServiceDisconnected; CN is " + name);
 			if (name.getClassName().equals(ContentService.class.getName())) {
 				contentService = null;
-				fireContentServiceChanged();
+				contentServiceListener.onContentServiceChanged(contentService);
 			}
 		}
 	};
 
-	private void fireContentServiceChanged() {
-		for (ContentServiceListener listener : listeners) {
-			listener.onContentServiceChanged(contentService);
-		}
-	}
-
-	public void addContentServiceListener(ContentServiceListener listener) {
+	public void setContentServiceListener(ContentServiceListener listener) {
+		this.contentServiceListener = listener;
 		// make sure the service is running (may have been shut down by stopping
 		// CarCast previously). Note that after the service has been stopped, we
 		// need to bind to it again.
@@ -235,13 +226,8 @@ public class CarCastApplication extends Application {
 		bindService(serviceIntent, contentServiceConnection,
 				Context.BIND_AUTO_CREATE);
 
-		listeners.add(listener);
 		// notify immediately if we have a contentService:
 		listener.onContentServiceChanged(contentService);
-	}
-
-	public void removeContentServiceListner(ContentServiceListener listener) {
-		listeners.remove(listener);
 	}
 
 	public static String getVersion() {
@@ -272,8 +258,7 @@ public class CarCastApplication extends Application {
 	}
 
 	public void stopContentService() {
-		Log
-				.i("CarCast", "requesting stop; contentService is "
+		Log.i("CarCast", "requesting stop; contentService is "
 						+ contentService);
 		// BOBH unbindService(contentServiceConnection);
 		stopService(serviceIntent);
