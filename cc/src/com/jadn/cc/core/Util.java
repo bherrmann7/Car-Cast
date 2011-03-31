@@ -1,5 +1,7 @@
 package com.jadn.cc.core;
 
+import java.io.DataInputStream;
+import java.io.PushbackInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -10,6 +12,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.jadn.cc.services.EnclosureHandler;
@@ -48,8 +51,28 @@ public class Util {
 		URLConnection connection = new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "http://jadn.com/carcast");
 		String charset = getCharset(connection.getContentType());
-		InputSource is = new InputSource(connection.getInputStream());
+		
+		PushbackInputStream pis = new PushbackInputStream(connection.getInputStream(),100);
+		/*
+		StringBuilder xmlHeader = new StringBuilder();	
+		for(int i=0;i<100;i++){
+			int b = pis.read();
+			if(b==-1 || b==10 || b==13){
+				break;
+			}
+			xmlHeader.append((char)b);				
+		}
+		*/
+		String xmlHeader = new DataInputStream(pis).readLine();
+		if(xmlHeader.toString().toLowerCase().indexOf("windows-1252")!=-1){
+			charset = "ISO-8859-1";
+		}
+		pis.unread('\n');
+		pis.unread(xmlHeader.toString().getBytes());
+				
+		InputSource is = new InputSource(pis);
 		is.setEncoding(charset);
+		
 		sp.parse(is, encloseureHandler);
 	}
 

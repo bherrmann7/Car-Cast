@@ -48,6 +48,19 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 				.toString());
 	}
 
+	// Windows encoding
+	public void testSubscriptionEncodedWindows() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0, "www.gomaespuma.com/podcast.asp");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		assertEquals("Podcast con orejas", solo.getEditText(1).getText()
+				.toString());
+	}
+
 	// Spanish Podcast
 	// 
 	public void testSpanishPodcast() throws Exception {
@@ -79,7 +92,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		// assertTrue(solo.searchText("Feed is OK"));
 
 		assertTrue("" != solo.getEditText(1).getText().toString());
-		
+
 		solo.clickOnText("Save");
 
 	}
@@ -89,37 +102,34 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Add");
-		solo.enterText(0,
-				"www.sermon.net/rss/cstonechurch/main_channel");
+		solo.enterText(0, "www.sermon.net/rss/cstonechurch/main_channel");
 		// solo.enterText(0, "jadn.com/podcast.xml");
 		solo.clickOnButton("Test");
 		solo.waitForDialogToClose(20000);
 		// assertTrue(solo.searchText("Feed is OK"));
 
 		assertTrue("" != solo.getEditText(1).getText().toString());
-		
+
 		solo.clickOnText("Save");
 
 	}
-	
+
 	public void testNPRPodcast2() throws Exception {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Add");
-		solo.enterText(0,
-				"www.npr.org/rss/podcast.php?id=35");
+		solo.enterText(0, "www.npr.org/rss/podcast.php?id=35");
 		// solo.enterText(0, "jadn.com/podcast.xml");
 		solo.clickOnButton("Test");
 		solo.waitForDialogToClose(20000);
 		// assertTrue(solo.searchText("Feed is OK"));
 
 		assertTrue("" != solo.getEditText(1).getText().toString());
-		
+
 		solo.clickOnText("Save");
 
 	}
-	
 
 	// http://rss.sciam.com/sciam/60secsciencepodcast
 	public void testStockPodcasts() throws Exception {
@@ -128,7 +138,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Subscriptions");
 
 		for (String podcast : mySetPodcasts) {
-			Log.i("PodcastTest", "Testing "+podcast);
+			Log.i("PodcastTest", "Testing " + podcast);
 			solo.sendKey(Solo.MENU);
 			solo.clickOnText("Add");
 			solo.enterText(0, podcast.substring("http://".length()));
@@ -146,14 +156,14 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 
 	String[] mySetPodcasts = {
 			// User reported issues
-			 "http://cstonechurch.sermon.net/rss/client/cstonechurch/type/audio",
+			"http://cstonechurch.sermon.net/rss/client/cstonechurch/type/audio",
 			"http://www.sermon.net/rss/cstonechurch/main_channel",
 			"http://feeds.feedburner.com/lincolnbereanchurchpodcast",
-			
+
 			// App "Stock" examples.
 			"http://rss.sciam.com/sciam/60-second-psych",
 			"http://www.cringely.com/feed/podcast/",
-			//"http://audio.commonwealthclub.org/audio/podcast/weekly.xml",
+			// "http://audio.commonwealthclub.org/audio/podcast/weekly.xml",
 			"http://nytimes.com/services/xml/rss/nyt/podcasts/techtalk.xml",
 			"http://www.leoville.tv/podcasts/ww.xml",
 			"http://feeds.feedburner.com/tedtalks_audio",
