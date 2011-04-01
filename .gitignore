@@ -8,7 +8,6 @@ cc/Car-Cast.iml
 cc/build.gradle
 cc/build.properties
 cc/local.properties
-cc/default.properties
 cc/.classpath
 cc/.project
 cc/.settings
