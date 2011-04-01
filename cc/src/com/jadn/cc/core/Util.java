@@ -52,8 +52,9 @@ public class Util {
 		connection.setRequestProperty("User-Agent", "http://jadn.com/carcast");
 		String charset = getCharset(connection.getContentType());
 		
-		PushbackInputStream pis = new PushbackInputStream(connection.getInputStream(),100);
+		PushbackInputStream pis = new PushbackInputStream(connection.getInputStream(),1024);
 		/*
+		 * Might be smarter to look for the ending '>' and not rely on a CR/LF
 		StringBuilder xmlHeader = new StringBuilder();	
 		for(int i=0;i<100;i++){
 			int b = pis.read();
