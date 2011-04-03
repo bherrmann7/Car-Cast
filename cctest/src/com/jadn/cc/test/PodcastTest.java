@@ -151,20 +151,20 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
 
 		for (String podcast : mySetPodcasts) {
 			Log.i("PodcastTest", "Testing " + podcast);
-			solo.sendKey(Solo.MENU);
-			solo.clickOnText("Add");
-			solo.enterText(0, podcast.substring("http://".length()));
+			solo.clearEditText(0);
+			solo.enterText(0, podcast);
 			// solo.enterText(0, "jadn.com/podcast.xml");
 			solo.clickOnButton("Test");
 			solo.waitForDialogToClose(50000);
 			// assertTrue(solo.searchText("Feed is OK"));
 
 			assertFalse("Unable to read feed title: "+podcast, solo.getEditText(1).getText().toString().length()==0);
-			solo.goBack();
-			solo.goBack();
+			solo.clearEditText(1);
 		}
 		// assertTrue(solo.getEditText(1).getText().toString().trim().length()!=0);
 	}

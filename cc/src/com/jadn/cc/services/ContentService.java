@@ -1,8 +1,5 @@
 package com.jadn.cc.services;
 
-import java.io.File;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -10,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.wifi.WifiManager;
@@ -20,7 +18,6 @@ import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
@@ -30,6 +27,8 @@ import com.jadn.cc.core.Subscription;
 import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
+import java.io.File;
+import java.util.List;
 
 public class ContentService extends Service implements OnCompletionListener {
     /**
@@ -57,6 +56,10 @@ public class ContentService extends Service implements OnCompletionListener {
 	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile,
 			legacyFile);
 	boolean wasPausedByPhoneCall;
+
+	private PlayStatusListener playStatusListener;
+
+	private HeadsetReceiver headsetReceiver;
 
 	/*
 	 * private boolean _wifiWasDisabledBeforeAutoDownload = false;
@@ -487,9 +490,27 @@ public class ContentService extends Service implements OnCompletionListener {
 		currentPodcastInPlayer = 0;
 
 		restoreState();
+
+		// Due to some crazy quirks in Android, this cannot be done in the
+		// manifest and must be done manually like this.  See
+		// http://groups.google.com/group/android-developers/browse_thread/thread/6d0dda99b4f42c8f/d7de082acdb0da25
+		headsetReceiver = new HeadsetReceiver(this);
+		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+	}
+
+	public void headsetStatusChanged(boolean headsetPresent) {
+		Log.i("CarCast", "ContentService got intent that headset prsent is " + headsetPresent);
+		if (!headsetPresent && isPlaying()) {
+			pauseNow();
+			bump(-2);
+			if (playStatusListener != null) {
+				playStatusListener.playStateUpdated(false);
+			}
+		}
 	}
 
 	@Override public void onDestroy() {
+		unregisterReceiver(headsetReceiver);
         super.onDestroy();
         Log.i("CarCast", "ContentService destroyed");
 //        Toast.makeText(getApplication(), "Service Destroyed", 1000).show();
@@ -779,4 +800,8 @@ public class ContentService extends Service implements OnCompletionListener {
     public void purgeToCurrent() {
         deleteUpTo(currentPodcastInPlayer);
     }
+
+	public void setPlayStatusListener(PlayStatusListener playStatusListener) {
+		this.playStatusListener = playStatusListener;
+	}
 }
