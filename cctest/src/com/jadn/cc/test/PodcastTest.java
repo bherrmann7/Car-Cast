@@ -3,6 +3,9 @@ package com.jadn.cc.test;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 
+import com.jadn.cc.core.Util;
+import com.jadn.cc.services.DownloadHistory;
+import com.jadn.cc.services.EnclosureHandler;
 import com.jadn.cc.ui.CarCast;
 import com.jayway.android.robotium.solo.Solo;
 
@@ -56,8 +59,20 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Add");
 		solo.enterText(0, "www.gomaespuma.com/podcast.asp");
 		solo.clickOnButton("Test");
-		solo.waitForDialogToClose(20000);
+		solo.waitForDialogToClose(100*20000);
 		assertEquals("Podcast con orejas", solo.getEditText(1).getText()
+				.toString());
+	}
+
+	public void testUTFFast() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0, "www.cbc.ca/podcasting/includes/quirks.xml");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		assertEquals("Quirks & Quarks Segmented Show from CBC Radio", solo.getEditText(1).getText()
 				.toString());
 	}
 
@@ -147,7 +162,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 			solo.waitForDialogToClose(50000);
 			// assertTrue(solo.searchText("Feed is OK"));
 
-			assertTrue("" != solo.getEditText(1).getText().toString());
+			assertFalse("Unable to read feed title: "+podcast, solo.getEditText(1).getText().toString().length()==0);
 			solo.goBack();
 			solo.goBack();
 		}
@@ -155,6 +170,10 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 	}
 
 	String[] mySetPodcasts = {
+			// no new line on first line
+			"http://www.cringely.com/feed/podcast/",
+			"http://www.cbc.ca/podcasting/includes/quirks.xml",
+
 			// User reported issues
 			"http://cstonechurch.sermon.net/rss/client/cstonechurch/type/audio",
 			"http://www.sermon.net/rss/cstonechurch/main_channel",
@@ -162,12 +181,10 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 
 			// App "Stock" examples.
 			"http://rss.sciam.com/sciam/60-second-psych",
-			"http://www.cringely.com/feed/podcast/",
 			// "http://audio.commonwealthclub.org/audio/podcast/weekly.xml",
 			"http://nytimes.com/services/xml/rss/nyt/podcasts/techtalk.xml",
 			"http://www.leoville.tv/podcasts/ww.xml",
 			"http://feeds.feedburner.com/tedtalks_audio",
-			"http://www.cbc.ca/podcasting/includes/quirks.xml",
 			"http://hansamann.podspot.de/rss",
 			"http://jbosscommunityasylum.libsyn.com/rss",
 			"http://feeds.feedburner.com/cnet/androidatlasmp3?tag=contentBody%3bpodcastMain",
@@ -179,7 +196,8 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 			"http://tempoposse.herod.net/feed.rss",
 			"http://www.thenakedscientists.com/naked_scientists_enhanced_podcast.xml",
 			"http://revision3.com/rofl/feed/mp3",
-			"Http://Thisweekin.com/thisweekin-android",
+			//"Http://Thisweekin.com/thisweekin-android",
+			"http://feeds.feedburner.com/ThisWeekInAndroidaudioOnly",
 			"http://www.discovery.com/radio/xml/sciencechannel.xml",
 			"Http://Steelecreek.libsyn.com/rss",
 			"http://feeds.feedburner.com/Ruby5",
@@ -190,4 +208,17 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 			"http://buzzoutloudpodcast.cnet.com",
 			"http://feeds.feedburner.com/Radioandroid?format=xml" };
 
+	public void testJustUtilMethod() throws Exception {
+		for (String podcast : mySetPodcasts) {
+			EnclosureHandler enclosureHandler = new EnclosureHandler(2, DownloadHistory.getInstance());
+			try {
+				Util.downloadPodcast(podcast,enclosureHandler);
+			} catch (Throwable t){
+				fail("on "+podcast+" msg: "+t.getMessage());
+			}
+			assertFalse("No title found, probably cant parse", enclosureHandler.getTitle().equals(""));
+		}
+	}
+
+		
 }

@@ -18,6 +18,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
+			"01-Apr-2011",
+			"Another fix to podcast character encodings",
 			"30-Mar-2011",
 			"Fix podcasts encodeded in Windows-1252 (I hate non UTF8 character encoding.)",
 			"27-Mar-2011",
@@ -120,73 +122,30 @@ public class CarCastApplication extends Application {
 			"Simple Video Support (seems odd for commuting, but people have asked.) "
 					+ "If a video (.mp4) is in the feed, it will be saved to the camera directory for playback with camera application.",
 			"13-Sep-2009", //
-			"rc5",
-			"Fix crash when choosing 'Search Again' on search results - sheesh.",
-			"12-Sep-2009", //
-			"rc4",
-			"Clicking on podcast title switches to Audio Recorder",
-			"07-Sep-2009", //
-			"rc3",
-			"Trippled size of podcast database for searches",
-			"05-Sep-2009", //
-			"rc2",
-			"Treat .m4a like .mp3\nThanks to Daniel Browne!!",
-			"03-Sep-2009", //
-			"beta rc1",
-			"fix subscription longpress",
-			"01-Sep-2009", //
-			"adc2",
-			"package rename",
-			"31-Aug-2009", //
-			"beta 08.31",
-			"added splash checkbox to settings",
-			"31-Aug-2009", //
-			"beta 08.30",
-			"Added subscription search",
-			"30-Aug-2009", //
-			"beta 08.28b",
-			"Email Podcast for first podcast fixed",
-			"28-Aug-2009", //
-			"beta 08.28",
-			"SplashScreen added/fix no podcasts bug",
-			"28-Aug-2009", //
-			"beta 08.26",
-			"Changed download default to 2 podcasts per subscription (instead of 5)",
-			"25-Aug-2009", //
-			"beta 08.25",
-			"on first run, use sample subscriptions",
-			"25-Aug-2009", //
-			"beta 08.24",
-			"focus on bug fixes",
-			"24-Aug-2009", //
-			"oswald5",
-			"ready for market?",
-			"22-Aug-2009", //
-			"nanobots2",
-			"added delete page",
-			"21-Aug-2009", //
-			"monkey2",
-			"add podcast list",
-			"18-Aug-2009", //
-			"llama, llama Red Pajama",
-			"Bow to Ed",
-			"17-Aug-2009", //
-			"klondike",
-			"remove extranous features",
-			"14-Aug-2009", //
-			"Jumping Jackrabbit",
-			"rework package structure",
-			"11-Aug-2009", //
-			"Himalayas",
-			"Uses actual service class for handing media content.",
-			"06-Aug-2009", //
-			"ice cream 4",
-			"pings home every 15.  Immediately on wifi connect.", //
+			"rc5", "Fix crash when choosing 'Search Again' on search results - sheesh.", "12-Sep-2009", //
+			"rc4", "Clicking on podcast title switches to Audio Recorder", "07-Sep-2009", //
+			"rc3", "Trippled size of podcast database for searches", "05-Sep-2009", //
+			"rc2", "Treat .m4a like .mp3\nThanks to Daniel Browne!!", "03-Sep-2009", //
+			"beta rc1", "fix subscription longpress", "01-Sep-2009", //
+			"adc2", "package rename", "31-Aug-2009", //
+			"beta 08.31", "added splash checkbox to settings", "31-Aug-2009", //
+			"beta 08.30", "Added subscription search", "30-Aug-2009", //
+			"beta 08.28b", "Email Podcast for first podcast fixed", "28-Aug-2009", //
+			"beta 08.28", "SplashScreen added/fix no podcasts bug", "28-Aug-2009", //
+			"beta 08.26", "Changed download default to 2 podcasts per subscription (instead of 5)", "25-Aug-2009", //
+			"beta 08.25", "on first run, use sample subscriptions", "25-Aug-2009", //
+			"beta 08.24", "focus on bug fixes", "24-Aug-2009", //
+			"oswald5", "ready for market?", "22-Aug-2009", //
+			"nanobots2", "added delete page", "21-Aug-2009", //
+			"monkey2", "add podcast list", "18-Aug-2009", //
+			"llama, llama Red Pajama", "Bow to Ed", "17-Aug-2009", //
+			"klondike", "remove extranous features", "14-Aug-2009", //
+			"Jumping Jackrabbit", "rework package structure", "11-Aug-2009", //
+			"Himalayas", "Uses actual service class for handing media content.", "06-Aug-2009", //
+			"ice cream 4", "pings home every 15.  Immediately on wifi connect.", //
 			"29-July-2009", //
-			"hummus", "After phone call resume.",
-			"26-July-2009", //
-			"grapes", "Fix deletion and remembering location", "09-July-2009",
-			"french fries", "order podcasts by date", "22-Jun-2009", //
+			"hummus", "After phone call resume.", "26-July-2009", //
+			"grapes", "Fix deletion and remembering location", "09-July-2009", "french fries", "order podcasts by date", "22-Jun-2009", //
 			"easter egg", "add/delete sites", "21-Jun-2009" };
 
 	private Intent serviceIntent;
@@ -202,8 +161,7 @@ public class CarCastApplication extends Application {
 	private ServiceConnection contentServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder iservice) {
-			Log.i("CarCast", "onServiceConnected; CN is " + name
-					+ "; binder is " + iservice);
+			Log.i("CarCast", "onServiceConnected; CN is " + name + "; binder is " + iservice);
 			if (name.getClassName().equals(ContentService.class.getName())) {
 				contentService = ((LocalBinder) iservice).getService();
 				fireContentServiceChanged();
@@ -232,8 +190,7 @@ public class CarCastApplication extends Application {
 		// need to bind to it again.
 		// BIND_AUTO_CREATE forces the service to start running and continue
 		// running until unbound.
-		bindService(serviceIntent, contentServiceConnection,
-				Context.BIND_AUTO_CREATE);
+		bindService(serviceIntent, contentServiceConnection, Context.BIND_AUTO_CREATE);
 
 		listeners.add(listener);
 		// notify immediately if we have a contentService:
@@ -251,8 +208,7 @@ public class CarCastApplication extends Application {
 	public static String getVersionName(Context context, Class<?> cls) {
 		try {
 			ComponentName comp = new ComponentName(context, cls);
-			PackageInfo pinfo = context.getPackageManager().getPackageInfo(
-					comp.getPackageName(), 0);
+			PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
 			return pinfo.versionName;
 		} catch (android.content.pm.PackageManager.NameNotFoundException e) {
 			return null;
@@ -272,9 +228,7 @@ public class CarCastApplication extends Application {
 	}
 
 	public void stopContentService() {
-		Log
-				.i("CarCast", "requesting stop; contentService is "
-						+ contentService);
+		Log.i("CarCast", "requesting stop; contentService is " + contentService);
 		// BOBH unbindService(contentServiceConnection);
 		stopService(serviceIntent);
 	}
