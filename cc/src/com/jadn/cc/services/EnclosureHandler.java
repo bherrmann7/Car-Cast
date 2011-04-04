@@ -35,8 +35,7 @@ public class EnclosureHandler extends DefaultHandler {
 	}
 
 	@Override
-	public void characters(char[] ch, int start, int length)
-			throws SAXException {
+	public void characters(char[] ch, int start, int length) throws SAXException {
 		if (needTitle && startTitle) {
 			title += new String(ch, start, length);
 			// Log.i("carcast.feedTitle", lastTitle);
@@ -49,8 +48,7 @@ public class EnclosureHandler extends DefaultHandler {
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String name)
-			throws SAXException {
+	public void endElement(String uri, String localName, String name) throws SAXException {
 		super.endElement(uri, localName, name);
 
 		if (needTitle && startTitle) {
@@ -79,21 +77,12 @@ public class EnclosureHandler extends DefaultHandler {
 		return false;
 	}
 
-	boolean isVideo(String url) {
-		if (url.toLowerCase().endsWith(".mp4"))
-			return true;
-		if (url.indexOf(".mp4?") != -1)
-			return true;
-		return false;
-	}
-
 	public void setFeedName(String feedName) {
 		this.feedName = feedName;
 	}
 
 	@Override
-	public void startElement(String namespaceURI, String localName,
-			String qName, Attributes atts) throws SAXException {
+	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
 
 		// This grabs the first title and uses it as the feed title
 		if (needTitle && localName.equals("title")) {
@@ -107,10 +96,8 @@ public class EnclosureHandler extends DefaultHandler {
 		}
 
 		if (localName.equals("enclosure") && atts.getValue("url") != null) {
-			if (!isAudio(atts.getValue("url"))
-					&& !isVideo(atts.getValue("url"))) {
-				// Log.i("content", "url doesn't end right type... "
-				// + atts.getValue("url"));
+			if (!isAudio(atts.getValue("url"))) {
+				Log.i("content", "Not downloading, url doesn't end right type... " + atts.getValue("url"));
 				return;
 			}
 			// Log.i("content", localName + " " + atts.getValue("url"));
@@ -126,17 +113,14 @@ public class EnclosureHandler extends DefaultHandler {
 						}
 					}
 					int length = 0;
-					if (atts.getValue("length") != null
-							&& atts.getValue("length").length() != 0) {
+					if (atts.getValue("length") != null && atts.getValue("length").length() != 0) {
 						try {
-							length = Integer.parseInt(atts.getValue("length")
-									.trim());
+							length = Integer.parseInt(atts.getValue("length").trim());
 						} catch (NumberFormatException nfe) {
 							// some feeds have bad lengths
 						}
 					}
-					MetaNet metaNet = new MetaNet(feedName, new URL(atts
-							.getValue("url")), length);
+					MetaNet metaNet = new MetaNet(feedName, new URL(atts.getValue("url")), length);
 					metaNet.setTitle(lastTitle);
 					if (history.contains(metaNet)) {
 						// stop getting podcasts after we find one in our

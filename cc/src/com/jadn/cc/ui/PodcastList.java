@@ -144,12 +144,10 @@ public class PodcastList extends BaseActivity {
 				if (currTitle.equals(metaFile.getTitle())) {
 					continue;
 				}
-				// if either are 1/2 baked, move on...
-				if (metaFile.getDuration()<=0 || metaFile.getCurrentPos()<=0 ){
+				if (metaFile.getDuration()<=0  ){
 					continue;
 				}
-				if (metaFile.getCurrentPos() > metaHolder.get(i)
-						.getDuration() * .9) {
+				if (metaFile.isListenedTo()) {
 					contentService.deletePodcast(i);
 					list.remove(i);
 				}

@@ -12,8 +12,7 @@ import android.util.Log;
 import com.jadn.cc.trace.TraceUtil;
 
 /**
- * Meta information about a podcast. From rss metadata (hopefully someday from
- * id3tags as well.)
+ * Meta information about a podcast. From rss metadata (hopefully someday from id3tags as well.)
  */
 public class MetaFile {
 
@@ -131,10 +130,23 @@ public class MetaFile {
 
 	public void setCurrentPos(int i) {
 		properties.setProperty("currentPos", Integer.toString(i));
+		if (getDuration() == -1)
+			return;
+		if (i > getDuration() * .9) {
+			setListenedTo();
+		}
 	}
 
 	public void setDuration(int duration) {
 		properties.setProperty("duration", Integer.toString(duration));
+	}
+
+	public void setListenedTo() {
+		properties.setProperty("listenedTo", "true");
+	}
+
+	public boolean isListenedTo() {
+		return properties.getProperty("listenedTo" ) != null;
 	}
 
 }

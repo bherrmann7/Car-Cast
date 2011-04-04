@@ -170,6 +170,10 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 	}
 
 	String[] mySetPodcasts = {
+			"http://www.marklevinshow.com/rss/ilevin.xml",
+			"http://www.rzim.org/rss/rss-lmpt.aspx",
+			"http://www.rzim.org/rss/rss-jt.aspx",
+				
 			// no new line on first line
 			"http://www.cringely.com/feed/podcast/",
 			"http://www.cbc.ca/podcasting/includes/quirks.xml",

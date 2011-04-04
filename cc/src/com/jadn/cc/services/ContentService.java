@@ -444,7 +444,8 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		cm().setCurrentPos(mp.getCurrentPosition());
+		cm().setCurrentPos(0);
+		cm().setListenedTo();
 		cm().save();
 		if (PreferenceManager.getDefaultSharedPreferences(
 				getApplicationContext()).getBoolean("autoPlayNext", true)) {
