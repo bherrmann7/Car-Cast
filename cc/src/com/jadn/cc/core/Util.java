@@ -21,12 +21,14 @@ import com.jadn.cc.services.EnclosureHandler;
 
 public class Util {
 
+	/*
 	public static String getShortURL(String url) {
 		String shortName = url.substring(url.lastIndexOf('/') + 1);
 		if (shortName.indexOf('?') != -1)
 			return shortName.substring(0, shortName.indexOf('?'));
 		return shortName;
 	}
+	*/
 
 	public static boolean isValidURL(String url) {
 		try {
@@ -50,12 +52,14 @@ public class Util {
 		SAXParser sp = saxParserFactory.newSAXParser();
 		URLConnection connection = new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "http://jadn.com/carcast");
+		connection.setConnectTimeout(30*1000);
+		connection.setReadTimeout(20*1000);
 		String charset = getCharset(connection.getContentType());
 
 		// we want to get the encoding
-		PushbackInputStream pis = new PushbackInputStream(connection.getInputStream(), 100);
+		PushbackInputStream pis = new PushbackInputStream(connection.getInputStream(), 1024);
 		StringBuilder xmlHeader = new StringBuilder();
-		byte[] bytes = new byte[100];
+		byte[] bytes = new byte[1023];
 		int i = 0;
 		for (; i < bytes.length; i++) {
 			int b = pis.read();
@@ -68,6 +72,9 @@ public class Util {
 		pis.unread(bytes, 0, i+1);
 		Log.i("CarCast/Util", "xml start:" + xmlHeader);
 		if (xmlHeader.toString().toLowerCase().indexOf("windows-1252") != -1) {
+			charset = "ISO-8859-1";
+		}
+		if (xmlHeader.toString().toLowerCase().indexOf("iso-8859-1") != -1) {
 			charset = "ISO-8859-1";
 		}
 

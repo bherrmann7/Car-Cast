@@ -14,6 +14,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
+			"07-Apr-2011",
+			"Fixed loading of German (ISO-8859-1 encoded) podcasts",
 			"02-Apr-2011",
 			"Merged in Patrick's fixes for pausing on headset unplugged.  Yet another fix to podcast character encodings.\n\nCarCast is opensource!",
 			"01-Apr-2011",

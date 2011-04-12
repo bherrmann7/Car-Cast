@@ -90,7 +90,7 @@ public class DownloadHistory implements Sayer {
 					!historyEntry.subscription.equals(metaNet.getSubscription())){
 					continue;				
 			}
-			if(Util.getShortURL(historyEntry.podcastURL).equals(metaNet.getUrlShortName())){
+			if(historyEntry.podcastURL.equals(metaNet.getUrl())){
 				return true;
 			}
 		}

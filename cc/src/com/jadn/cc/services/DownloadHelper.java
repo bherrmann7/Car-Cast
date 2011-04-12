@@ -127,7 +127,7 @@ public class DownloadHelper implements Sayer {
 
 		int got = 0;
 		for (int i = 0; i < newPodcasts.size(); i++) {
-			String shortName = newPodcasts.get(i).getUrlShortName();
+			String shortName = newPodcasts.get(i).getTitle();
 			say((i + 1) + "/" + newPodcasts.size() + " " + shortName);
 			contentService.updateNotification((i + 1) + "/" + newPodcasts.size() + " " + shortName);
 			podcastsDownloaded = i + 1;
@@ -177,9 +177,11 @@ public class DownloadHelper implements Sayer {
 
 				}
 				say("-");
+				// update progress for player
+				contentService.newContentAdded();
 
 			} catch (Throwable e) {
-				say("Problem downloading " + newPodcasts.get(i).getUrlShortName() + " e:" + e);
+				say("Problem downloading " + newPodcasts.get(i).getUrl() + " e:" + e);
 			}
 		}
 		say("Finished. Downloaded " + got + " new podcasts. " + sdf.format(new Date()));
@@ -195,8 +197,8 @@ public class DownloadHelper implements Sayer {
 		while (redirectLimit-- > 0) {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setInstanceFollowRedirects(false);
-			con.setConnectTimeout(20*1000);
-			con.setReadTimeout(30*1000);
+			con.setConnectTimeout(20 * 1000);
+			con.setReadTimeout(30 * 1000);
 			con.connect();
 			if (con.getResponseCode() == 200) {
 				return con.getInputStream();
@@ -266,6 +268,8 @@ public class DownloadHelper implements Sayer {
 					// URL url = new
 					// URL("http://192.168.0.128:9090/carcast/collectSites");
 					URLConnection conn = url.openConnection();
+					conn.setConnectTimeout(20 * 1000);
+					conn.setReadTimeout(20 * 1000);
 					conn.setDoOutput(true);
 					OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 					wr.write("appVersion=" + URLEncoder.encode(CarCastApplication.getVersion(), "UTF-8"));
@@ -298,6 +302,7 @@ public class DownloadHelper implements Sayer {
 	public void say(String text) {
 		sb.append(text);
 		sb.append('\n');
+		Log.i("CarCast/Download", text);
 	}
 
 }

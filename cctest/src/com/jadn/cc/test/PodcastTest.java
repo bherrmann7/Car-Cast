@@ -26,12 +26,10 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Delete All");
-		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter()
-				.getCount());
+		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter().getCount());
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Reset to Demos");
-		assertEquals(7, solo.getCurrentListViews().get(0).getAdapter()
-				.getCount());
+		assertEquals(7, solo.getCurrentListViews().get(0).getAdapter().getCount());
 	}
 
 	// www.hbo.com/podcasts/billmaher/podcast.xml
@@ -47,8 +45,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		// assertTrue(solo.searchText("Feed is OK"));
 
 		// assertTrue(solo.getEditText(1).getText().toString().trim().length()!=0);
-		assertEquals("Real Time with Bill Maher", solo.getEditText(1).getText()
-				.toString());
+		assertEquals("Real Time with Bill Maher", solo.getEditText(1).getText().toString());
 	}
 
 	// Windows encoding
@@ -59,9 +56,8 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Add");
 		solo.enterText(0, "www.gomaespuma.com/podcast.asp");
 		solo.clickOnButton("Test");
-		solo.waitForDialogToClose(100*20000);
-		assertEquals("Podcast con orejas", solo.getEditText(1).getText()
-				.toString());
+		solo.waitForDialogToClose(100 * 20000);
+		assertEquals("Podcast con orejas", solo.getEditText(1).getText().toString());
 	}
 
 	public void testUTFFast() throws Exception {
@@ -72,8 +68,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.enterText(0, "www.cbc.ca/podcasting/includes/quirks.xml");
 		solo.clickOnButton("Test");
 		solo.waitForDialogToClose(20000);
-		assertEquals("Quirks & Quarks Segmented Show from CBC Radio", solo.getEditText(1).getText()
-				.toString());
+		assertEquals("Quirks & Quarks Segmented Show from CBC Radio", solo.getEditText(1).getText().toString());
 	}
 
 	// Spanish Podcast
@@ -83,16 +78,14 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Add");
-		solo.enterText(0,
-				"www.ondacero.es/OndaCero/rss/La-rosa-de-los-vientos/2166771");
+		solo.enterText(0, "www.ondacero.es/OndaCero/rss/La-rosa-de-los-vientos/2166771");
 		// solo.enterText(0, "jadn.com/podcast.xml");
 		solo.clickOnButton("Test");
 		solo.waitForDialogToClose(20000);
 		// assertTrue(solo.searchText("Feed is OK"));
 
 		// assertTrue(solo.getEditText(1).getText().toString().trim().length()!=0);
-		assertEquals("La rosa de los vientos", solo.getEditText(1).getText()
-				.toString());
+		assertEquals("La rosa de los vientos", solo.getEditText(1).getText().toString());
 	}
 
 	public void testChurchPodcast1() throws Exception {
@@ -100,8 +93,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Add");
-		solo.enterText(0,
-				"cstonechurch.sermon.net/rss/client/cstonechurch/type/audio");
+		solo.enterText(0, "cstonechurch.sermon.net/rss/client/cstonechurch/type/audio");
 		solo.clickOnButton("Test");
 		solo.waitForDialogToClose(20000);
 		// assertTrue(solo.searchText("Feed is OK"));
@@ -128,6 +120,22 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Save");
 
 	}
+	
+	public void testChurchPodcast3() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0, "feeds.feedburner.com/lincolnbereanchurchpodcast");
+		// solo.enterText(0, "jadn.com/podcast.xml");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		// assertTrue(solo.searchText("Feed is OK"));
+
+		assertTrue("" != solo.getEditText(1).getText().toString());
+
+		solo.clickOnText("Save");
+	}
 
 	public void testNPRPodcast2() throws Exception {
 		solo.sendKey(Solo.MENU);
@@ -140,9 +148,58 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.waitForDialogToClose(20000);
 		// assertTrue(solo.searchText("Feed is OK"));
 
-		assertTrue("" != solo.getEditText(1).getText().toString());
+		assertTrue(!"".equals(solo.getEditText(1).getText().toString()));
 
 		solo.clickOnText("Save");
+
+	}
+
+	// test Umlet character in this feed
+	public void testUmlet() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0, "www.cczwei.de/rss_issues.php");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+
+		assertTrue(!"".equals(solo.getEditText(1).getText().toString()));
+
+		solo.clickOnText("Save");
+	}
+
+	// test Umlet character in this feed
+	public void testTwit() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Delete All");
+		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter().getCount());
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0, "twit.tv/node/feed");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		assertTrue(!"".equals(solo.getEditText(1).getText().toString()));
+		solo.clickOnText("Save");
+		solo.goBack();		
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Podcasts");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Erase");
+		solo.clickOnButton("Erase");
+		
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Delete All Podcasts");
+		solo.clickOnText("Confirm");
+
+		assertTrue(solo.searchText("No podcasts loaded."));
+
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Download Podcasts");
+		solo.clickOnText("Start Downloads");
+		solo.waitForText(" COMPLETED ", 1, 20 * 60 * 1000);
 
 	}
 
@@ -163,7 +220,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 			solo.waitForDialogToClose(50000);
 			// assertTrue(solo.searchText("Feed is OK"));
 
-			assertFalse("Unable to read feed title: "+podcast, solo.getEditText(1).getText().toString().length()==0);
+			assertFalse("Unable to read feed title: " + podcast, solo.getEditText(1).getText().toString().length() == 0);
 			solo.clearEditText(1);
 		}
 		// assertTrue(solo.getEditText(1).getText().toString().trim().length()!=0);
@@ -173,7 +230,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 			"http://www.marklevinshow.com/rss/ilevin.xml",
 			"http://www.rzim.org/rss/rss-lmpt.aspx",
 			"http://www.rzim.org/rss/rss-jt.aspx",
-				
+
 			// no new line on first line
 			"http://www.cringely.com/feed/podcast/",
 			"http://www.cbc.ca/podcasting/includes/quirks.xml",
@@ -186,43 +243,33 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 			// App "Stock" examples.
 			"http://rss.sciam.com/sciam/60-second-psych",
 			// "http://audio.commonwealthclub.org/audio/podcast/weekly.xml",
-			"http://nytimes.com/services/xml/rss/nyt/podcasts/techtalk.xml",
-			"http://www.leoville.tv/podcasts/ww.xml",
-			"http://feeds.feedburner.com/tedtalks_audio",
-			"http://hansamann.podspot.de/rss",
-			"http://jbosscommunityasylum.libsyn.com/rss",
+			"http://nytimes.com/services/xml/rss/nyt/podcasts/techtalk.xml", "http://www.leoville.tv/podcasts/ww.xml",
+			"http://feeds.feedburner.com/tedtalks_audio", "http://hansamann.podspot.de/rss", "http://jbosscommunityasylum.libsyn.com/rss",
 			"http://feeds.feedburner.com/cnet/androidatlasmp3?tag=contentBody%3bpodcastMain",
-			"http://www.theregister.co.uk/software/microbite/headlines.rss",
-			"http://twit.tv/node/7952/feed",
+			"http://www.theregister.co.uk/software/microbite/headlines.rss", "http://twit.tv/node/7952/feed",
 			"http://rss.sciam.com/sciam/60-second-earth",
 			"http://michaelkatz.libsyn.com/rss",
 			"http://www.stanford.edu/group/edcorner/uploads/podcast/EducatorsCorner.xml",
 			"http://tempoposse.herod.net/feed.rss",
 			"http://www.thenakedscientists.com/naked_scientists_enhanced_podcast.xml",
 			"http://revision3.com/rofl/feed/mp3",
-			//"Http://Thisweekin.com/thisweekin-android",
-			"http://feeds.feedburner.com/ThisWeekInAndroidaudioOnly",
-			"http://www.discovery.com/radio/xml/sciencechannel.xml",
-			"Http://Steelecreek.libsyn.com/rss",
-			"http://feeds.feedburner.com/Ruby5",
-			"http://rss.sciam.com/sciam/60secsciencepodcast",
+			// "Http://Thisweekin.com/thisweekin-android",
+			"http://feeds.feedburner.com/ThisWeekInAndroidaudioOnly", "http://www.discovery.com/radio/xml/sciencechannel.xml",
+			"Http://Steelecreek.libsyn.com/rss", "http://feeds.feedburner.com/Ruby5", "http://rss.sciam.com/sciam/60secsciencepodcast",
 			"http://www.marketwatch.com/feeds/podcast/podcast.asp?count=10&doctype=116&column=The+Wall+Street+Journal+Tech+Talk",
-			"http://feeds.feedburner.com/androidcentralpodcast",
-			"http://rss.cnn.com/services/podcasting/piersmorganaudio/rss?format=rss",
-			"http://buzzoutloudpodcast.cnet.com",
-			"http://feeds.feedburner.com/Radioandroid?format=xml" };
+			"http://feeds.feedburner.com/androidcentralpodcast", "http://rss.cnn.com/services/podcasting/piersmorganaudio/rss?format=rss",
+			"http://buzzoutloudpodcast.cnet.com", "http://feeds.feedburner.com/Radioandroid?format=xml" };
 
 	public void testJustUtilMethod() throws Exception {
 		for (String podcast : mySetPodcasts) {
 			EnclosureHandler enclosureHandler = new EnclosureHandler(2, DownloadHistory.getInstance());
 			try {
-				Util.downloadPodcast(podcast,enclosureHandler);
-			} catch (Throwable t){
-				fail("on "+podcast+" msg: "+t.getMessage());
+				Util.downloadPodcast(podcast, enclosureHandler);
+			} catch (Throwable t) {
+				fail("on " + podcast + " msg: " + t.getMessage());
 			}
 			assertFalse("No title found, probably cant parse", enclosureHandler.getTitle().equals(""));
 		}
 	}
 
-		
 }

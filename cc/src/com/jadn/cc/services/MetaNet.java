@@ -32,13 +32,10 @@ public class MetaNet {
 		return properties.getProperty("title");
 	}
 
-	String getUrl() {
+	public String getUrl() {
 		return properties.getProperty("url");
 	}
 
-	String getUrlShortName() {
-		return Util.getShortURL(getUrl());
-	}
 
 	public void setTitle(String value) {
 		properties.setProperty("title", value);		
