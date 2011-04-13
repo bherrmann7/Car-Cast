@@ -60,7 +60,7 @@ public class PostDeleteMessageTest extends
 		solo.waitForText(" COMPLETED ", 1, 10 * 1000);
 
 		solo.goBack();
-		assertTrue(solo.searchText("1/1"));
+		assertTrue(solo.searchText("1/2"));
 
 		solo.sendKey(Solo.MENU);
 

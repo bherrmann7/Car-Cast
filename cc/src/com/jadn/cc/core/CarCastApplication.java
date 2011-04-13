@@ -14,6 +14,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
+		"12-Apr-2011",
+		"In podcast list, show listened to podcasts with grey background",
 			"07-Apr-2011",
 			"Fixed loading of German (ISO-8859-1 encoded) podcasts",
 			"02-Apr-2011",

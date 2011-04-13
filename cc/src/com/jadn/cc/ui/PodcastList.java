@@ -2,16 +2,19 @@ package com.jadn.cc.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -47,8 +50,7 @@ public class PodcastList extends BaseActivity {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-				.getMenuInfo();
+		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		if (item.getTitle().equals("Delete")) {
 			contentService.deletePodcast(info.position);
 			list.remove(info.position);
@@ -57,23 +59,18 @@ public class PodcastList extends BaseActivity {
 		}
 		if (item.getTitle().equals("Delete All Before")) {
 			// Ask the user if they want to really delete all
-			new AlertDialog.Builder(this).setIcon(
-					android.R.drawable.ic_dialog_alert)
-					.setMessage("Delete podcasts before?")
-					.setPositiveButton("Delete",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-										contentService
-												.setCurrentPaused(info.position);
-										contentService.purgeToCurrent();
-										showPodcasts();
-										finish();
+			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Delete podcasts before?")
+					.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							contentService.setCurrentPaused(info.position);
+							contentService.purgeToCurrent();
+							showPodcasts();
+							finish();
 
-								}
+						}
 
-							}).setNegativeButton("Cancel", null).show();
+					}).setNegativeButton("Cancel", null).show();
 			return true;
 		}
 		if (item.getTitle().equals("Play")) {
@@ -93,17 +90,16 @@ public class PodcastList extends BaseActivity {
 
 		ListView listView = (ListView) findViewById(R.id.podcastList);
 		registerForContextMenu(listView);
+	
 
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1,
-					int position, long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 				MetaHolder metaHolder = new MetaHolder();
 				MetaFile mfile = metaHolder.get(position);
 
-				if (mfile.getTitle().equals(
-						contentService.currentTitle())) {
+				if (mfile.getTitle().equals(contentService.currentTitle())) {
 					contentService.pauseOrPlay();
 				} else {
 					// This saves our position
@@ -117,8 +113,7 @@ public class PodcastList extends BaseActivity {
 	}
 
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.add("Play");
 		menu.add("Delete");
@@ -144,7 +139,7 @@ public class PodcastList extends BaseActivity {
 				if (currTitle.equals(metaFile.getTitle())) {
 					continue;
 				}
-				if (metaFile.getDuration()<=0  ){
+				if (metaFile.getDuration() <= 0) {
 					continue;
 				}
 				if (metaFile.isListenedTo()) {
@@ -157,43 +152,32 @@ public class PodcastList extends BaseActivity {
 		} else if (item.getItemId() == R.id.deleteAllPodcasts) {
 
 			// Ask the user if they want to really delete all
-			new AlertDialog.Builder(this)
-					.setIcon(android.R.drawable.ic_dialog_alert)
-					.setTitle("Delete All?")
-					.setMessage(
-							"Do you really want to delete all downloaded podcasts?")
-					.setPositiveButton("Confirm Delete All",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									contentService.purgeAll();
-									list.clear();
-									podcastsAdapter.notifyDataSetChanged();
-									finish();
-								}
+			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete All?").setMessage(
+					"Do you really want to delete all downloaded podcasts?").setPositiveButton("Confirm Delete All",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							contentService.purgeAll();
+							list.clear();
+							podcastsAdapter.notifyDataSetChanged();
+							finish();
+						}
 
-							}).setNegativeButton("Cancel", null).show();
+					}).setNegativeButton("Cancel", null).show();
 
 			return true;
 		}
-		if (item.getItemId() == R.id.eraseDownloadHistory) {			
-			new AlertDialog.Builder(this).setIcon(
-					android.R.drawable.ic_dialog_alert)
-					.setMessage("Erase Download History?")
-					.setPositiveButton("Erase",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-										int historyDeleted = DownloadHistory.getInstance().eraseHistory();
-										Util.toast(PodcastList.this, "Erased " + historyDeleted
-												+ " podcast from dowload history.");										
-								}
+		if (item.getItemId() == R.id.eraseDownloadHistory) {
+			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Erase Download History?")
+					.setPositiveButton("Erase", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							int historyDeleted = DownloadHistory.getInstance().eraseHistory();
+							Util.toast(PodcastList.this, "Erased " + historyDeleted + " podcast from dowload history.");
+						}
 
-							}).setNegativeButton("Cancel", null).show();
+					}).setNegativeButton("Cancel", null).show();
 
-			
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}
@@ -208,8 +192,7 @@ public class PodcastList extends BaseActivity {
 		for (int i = 0; i < metaHolder.getSize(); i++) {
 			MetaFile metaFile = metaHolder.get(i);
 			HashMap<String, String> item = new HashMap<String, String>();
-			if (contentService.currentTitle()
-					.equals(metaFile.getTitle())) {
+			if (contentService.currentTitle().equals(metaFile.getTitle())) {
 				if (contentService.isPlaying()) {
 					item.put("line1", "> " + metaFile.getFeedName());
 				} else {
@@ -218,12 +201,15 @@ public class PodcastList extends BaseActivity {
 			} else {
 				item.put("line1", metaFile.getFeedName());
 			}
-			String time = ContentService
-					.getTimeString(metaFile.getCurrentPos())
-					+ "-"
+			String time = ContentService.getTimeString(metaFile.getCurrentPos()) + "-"
 					+ ContentService.getTimeString(metaFile.getDuration());
 			if (metaFile.getCurrentPos() == 0 && metaFile.getDuration() == -1) {
 				time = "";
+			}
+			if(metaFile.isListenedTo()){
+				item.put("listened","true");
+				time = "End" + "-"
+				+ ContentService.getTimeString(metaFile.getDuration());
 			}
 			item.put("xx:xx-xx:xx", time);
 			item.put("line2", metaFile.getTitle());
@@ -237,9 +223,20 @@ public class PodcastList extends BaseActivity {
 			podcastsAdapter = new SimpleAdapter(this, list,
 			// R.layout.main_item_two_line_row, new String[] { "line1",
 					// "line2" }, new int[] { R.id.text1, R.id.text2 });
-					R.layout.podcast_items, new String[] { "line1",
-							"xx:xx-xx:xx", "line2" }, new int[] {
-							R.id.firstLine, R.id.amountHeard, R.id.secondLine });
+					R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine, R.id.amountHeard,
+							R.id.secondLine }) {
+				@Override
+				public View getView(int position, View convertView, ViewGroup parent) {
+					View view = super.getView(position, convertView, parent);
+					Map map = (Map)getItem(position);
+					if (map.get("listened")!=null) {
+						view.setBackgroundColor(Color.rgb(40, 40, 40));
+					} else {
+						view.setBackgroundColor(Color.TRANSPARENT);
+					}
+					return view;
+				}
+			};
 
 			listView.setAdapter(podcastsAdapter);
 		} else {

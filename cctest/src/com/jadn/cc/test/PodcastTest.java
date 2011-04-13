@@ -120,7 +120,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Save");
 
 	}
-	
+
 	public void testChurchPodcast3() throws Exception {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Subscriptions");
@@ -143,6 +143,23 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Add");
 		solo.enterText(0, "www.npr.org/rss/podcast.php?id=35");
+		// solo.enterText(0, "jadn.com/podcast.xml");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		// assertTrue(solo.searchText("Feed is OK"));
+
+		assertTrue(!"".equals(solo.getEditText(1).getText().toString()));
+
+		solo.clickOnText("Save");
+
+	}
+
+	public void testMarkLevin() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0, "www.marklevinshow.com/rss/ilevin.xml");
 		// solo.enterText(0, "jadn.com/podcast.xml");
 		solo.clickOnButton("Test");
 		solo.waitForDialogToClose(20000);
@@ -183,13 +200,13 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.waitForDialogToClose(20000);
 		assertTrue(!"".equals(solo.getEditText(1).getText().toString()));
 		solo.clickOnText("Save");
-		solo.goBack();		
+		solo.goBack();
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Podcasts");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Erase");
 		solo.clickOnButton("Erase");
-		
+
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Delete All Podcasts");
 		solo.clickOnText("Confirm");
