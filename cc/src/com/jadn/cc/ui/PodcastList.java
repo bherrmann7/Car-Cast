@@ -1,8 +1,11 @@
 package com.jadn.cc.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -16,7 +19,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -84,13 +90,12 @@ public class PodcastList extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.podcast_list);
+		setContentView(R.layout.podcast_list_wbar);
 
 		setTitle(CarCastApplication.getAppTitle() + ": Downloaded podcasts");
 
-		ListView listView = (ListView) findViewById(R.id.podcastList);
+		ListView listView = (ListView) findViewById(R.id.list);
 		registerForContextMenu(listView);
-	
 
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -109,6 +114,27 @@ public class PodcastList extends BaseActivity {
 				}
 				showPodcasts();
 			}
+		});
+
+		Button deleteButton = (Button) findViewById(R.id.delete);
+		deleteButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new AlertDialog.Builder(PodcastList.this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Delete "+checkedItems.size()+" podcasts?")
+				.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (contentService.isPlaying())
+							contentService.pauseNow();
+						while(!checkedItems.isEmpty()){
+							contentService.deletePodcast(checkedItems.last());
+							checkedItems.remove(checkedItems.last());
+						}
+						podcastsAdapter.notifyDataSetChanged();
+						showPodcasts();
+					}
+				}).setNegativeButton("Cancel", null).show();
+			};
 		});
 	}
 
@@ -184,7 +210,7 @@ public class PodcastList extends BaseActivity {
 
 	protected void showPodcasts() {
 
-		ListView listView = (ListView) findViewById(R.id.podcastList);
+		ListView listView = (ListView) findViewById(R.id.list);
 
 		MetaHolder metaHolder = new MetaHolder();
 		list.clear();
@@ -206,10 +232,9 @@ public class PodcastList extends BaseActivity {
 			if (metaFile.getCurrentPos() == 0 && metaFile.getDuration() == -1) {
 				time = "";
 			}
-			if(metaFile.isListenedTo()){
-				item.put("listened","true");
-				time = "End" + "-"
-				+ ContentService.getTimeString(metaFile.getDuration());
+			if (metaFile.isListenedTo()) {
+				item.put("listened", "true");
+				time = "End" + "-" + ContentService.getTimeString(metaFile.getDuration());
 			}
 			item.put("xx:xx-xx:xx", time);
 			item.put("line2", metaFile.getTitle());
@@ -223,16 +248,25 @@ public class PodcastList extends BaseActivity {
 			podcastsAdapter = new SimpleAdapter(this, list,
 			// R.layout.main_item_two_line_row, new String[] { "line1",
 					// "line2" }, new int[] { R.id.text1, R.id.text2 });
-					R.layout.podcast_items, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine, R.id.amountHeard,
-							R.id.secondLine }) {
+					R.layout.podcast_items_checks, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine,
+							R.id.amountHeard, R.id.secondLine }) {
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
 					View view = super.getView(position, convertView, parent);
-					Map map = (Map)getItem(position);
-					if (map.get("listened")!=null) {
-						view.setBackgroundColor(Color.rgb(40, 40, 40));
+					Map map = (Map) getItem(position);
+					if (map.get("listened") != null) {
+						view.setBackgroundColor(Color.rgb(0, 70, 70));
 					} else {
 						view.setBackgroundColor(Color.TRANSPARENT);
+					}
+					final CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
+					checkbox.setOnClickListener(checkBoxClicked);
+					Tag tag = (Tag) view.getTag();
+					if (tag == null) {
+						tag = new Tag();
+						tag.position = position;
+						tag.item = map;
+						view.setTag(tag);
 					}
 					return view;
 				}
@@ -244,5 +278,28 @@ public class PodcastList extends BaseActivity {
 		}
 
 	}
+
+	SortedSet<Integer> checkedItems = new TreeSet<Integer>();
+
+	class Tag {
+		int position;
+		Map item;
+	};
+
+	OnClickListener checkBoxClicked = new OnClickListener() {
+		public void onClick(View v) {
+			final CheckBox checkbox = (CheckBox) v;
+			View pView = (View) v.getParent();
+			Tag tag = (Tag) pView.getTag();
+			if (checkbox.isChecked()) {
+				checkedItems.add(tag.position);
+			} else {
+				checkedItems.remove(tag.position);
+			}
+			// v.getTag()
+			Button deleteButton = (Button) findViewById(R.id.delete);
+			deleteButton.setEnabled(!checkedItems.isEmpty());
+		}
+	};
 
 }

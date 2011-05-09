@@ -154,6 +154,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 
 	}
 
+	
 	public void testMarkLevin() throws Exception {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Subscriptions");
