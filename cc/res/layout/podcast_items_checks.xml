@@ -4,7 +4,8 @@
 	android:layout_height="fill_parent">
 	<CheckBox  android:layout_alignParentLeft="true"
 		android:layout_width="wrap_content" android:id="@+id/checkBox1"
-		android:layout_height="wrap_content"></CheckBox>
+		android:layout_height="wrap_content"
+		></CheckBox>
 	<TextView android:textSize="14dp" android:id="@+id/amountHeard"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:singleLine="true" android:layout_alignParentTop="true"

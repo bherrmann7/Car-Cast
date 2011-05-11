@@ -1,7 +1,6 @@
 package com.jadn.cc.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -20,13 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
@@ -55,66 +51,11 @@ public class PodcastList extends BaseActivity {
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		if (item.getTitle().equals("Delete")) {
-			contentService.deletePodcast(info.position);
-			list.remove(info.position);
-			podcastsAdapter.notifyDataSetChanged();
-			return false;
-		}
-		if (item.getTitle().equals("Delete All Before")) {
-			// Ask the user if they want to really delete all
-			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Delete podcasts before?")
-					.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							contentService.setCurrentPaused(info.position);
-							contentService.purgeToCurrent();
-							showPodcasts();
-							finish();
-
-						}
-
-					}).setNegativeButton("Cancel", null).show();
-			return true;
-		}
-		if (item.getTitle().equals("Play")) {
-			contentService.play(info.position);
-			finish();
-			return false;
-		}
-		return true;
-	}
-
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.podcast_list_wbar);
 
 		setTitle(CarCastApplication.getAppTitle() + ": Downloaded podcasts");
-
-		ListView listView = (ListView) findViewById(R.id.list);
-		registerForContextMenu(listView);
-
-		listView.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-				MetaHolder metaHolder = new MetaHolder();
-				MetaFile mfile = metaHolder.get(position);
-
-				if (mfile.getTitle().equals(contentService.currentTitle())) {
-					contentService.pauseOrPlay();
-				} else {
-					// This saves our position
-					if (contentService.isPlaying())
-						contentService.pauseNow();
-					contentService.play(position);
-				}
-				showPodcasts();
-			}
-		});
 
 		Button deleteButton = (Button) findViewById(R.id.delete);
 		deleteButton.setOnClickListener(new OnClickListener() {
@@ -240,7 +181,8 @@ public class PodcastList extends BaseActivity {
 			item.put("line2", metaFile.getTitle());
 			list.add(item);
 
-		}
+		}		
+
 
 		// When doing a delete before, we rebuild the list, but the adapter is
 		// ok.
@@ -261,13 +203,18 @@ public class PodcastList extends BaseActivity {
 					}
 					final CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
 					checkbox.setOnClickListener(checkBoxClicked);
+//					((TextView)view.findViewById(R.id.firstLine)).setOnClickListener(itemClicked);
+//					((TextView)view.findViewById(R.id.secondLine)).setOnClickListener(itemClicked);
+					view.setOnClickListener(itemClicked);
+					
 					Tag tag = (Tag) view.getTag();
 					if (tag == null) {
-						tag = new Tag();
-						tag.position = position;
-						tag.item = map;
-						view.setTag(tag);
+						view.setTag(tag = new Tag());
 					}
+					tag.position = position;
+					tag.item = map;
+				
+					checkbox.setChecked(checkedItems.contains(position));
 					return view;
 				}
 			};
@@ -300,6 +247,27 @@ public class PodcastList extends BaseActivity {
 			Button deleteButton = (Button) findViewById(R.id.delete);
 			deleteButton.setEnabled(!checkedItems.isEmpty());
 		}
+		
 	};
+	
+	OnClickListener itemClicked = new OnClickListener() {
+		public void onClick(View v) {
+			Tag tag = (Tag) v.getTag();
+			
+			MetaHolder metaHolder = new MetaHolder();
+			MetaFile mfile = metaHolder.get(tag.position);
+
+			if (mfile.getTitle().equals(contentService.currentTitle())) {
+				contentService.pauseOrPlay();
+			} else {
+				// This saves our position
+				if (contentService.isPlaying())
+					contentService.pauseNow();
+				contentService.play(tag.position);
+			}
+			showPodcasts();
+		}		
+	};
+		
 
 }

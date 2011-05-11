@@ -14,6 +14,10 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
+		"10-May-2011",
+		"Restore 'press to play' from Podcasts screen",
+		"08-May-2011",
+		"Podcast list now has checkboxes for deleting",
 		"12-Apr-2011",
 		"In podcast list, show listened to podcasts with grey background",
 			"07-Apr-2011",
