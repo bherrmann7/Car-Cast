@@ -13,12 +13,17 @@
 
 			<EditText android:id="@+id/editsite_url"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:text="http://" />
+				android:text="http://"
+				android:inputType="textUri" 
+				android:imeOptions="actionNext"
+				/>
 
 
 			<Button android:id="@+id/testEditSite" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:text="Test"
-				android:singleLine="true" />
+				android:singleLine="true"
+				android:imeOptions="actionNext"
+				 />
 
 			<TextView android:id="@+id/label2" android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:text="Site Name:" />

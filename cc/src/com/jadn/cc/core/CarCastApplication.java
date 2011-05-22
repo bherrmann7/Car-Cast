@@ -14,6 +14,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
+		"20-May-2011",
+		"On podcast screen, long press offers to 'delete all before'",
 		"10-May-2011",
 		"Restore 'press to play' from Podcasts screen",
 		"08-May-2011",
@@ -227,4 +229,7 @@ public class CarCastApplication extends Application {
 		Log.i("CarCast", "requesting stop; contentService is " + contentService);
 		stopService(serviceIntent);
 	}
+	
+	
+	
 }

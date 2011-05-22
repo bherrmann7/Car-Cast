@@ -19,10 +19,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
@@ -206,6 +208,7 @@ public class PodcastList extends BaseActivity {
 //					((TextView)view.findViewById(R.id.firstLine)).setOnClickListener(itemClicked);
 //					((TextView)view.findViewById(R.id.secondLine)).setOnClickListener(itemClicked);
 					view.setOnClickListener(itemClicked);
+					view.setOnLongClickListener(itemLongClicked);
 					
 					Tag tag = (Tag) view.getTag();
 					if (tag == null) {
@@ -269,5 +272,33 @@ public class PodcastList extends BaseActivity {
 		}		
 	};
 		
+	OnLongClickListener itemLongClicked = new OnLongClickListener() {
+		public boolean onLongClick(View v){
+			final Tag tag = (Tag) v.getTag();
+
+			final MetaHolder metaHolder = new MetaHolder();
+			final MetaFile mfile = metaHolder.get(tag.position);
+
+			// Ask the user if they want to really delete all
+			new AlertDialog.Builder(PodcastList.this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete Before?").setMessage(
+					"Delete all before "+mfile.getTitle()).setPositiveButton("Confirm Delete "+tag.position+" podcasts",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (contentService.isPlaying())
+								contentService.pauseNow();
+							
+							while( (tag.position--) != 0){
+								contentService.deletePodcast(0);
+							}
+							
+							podcastsAdapter.notifyDataSetChanged();
+						}
+
+					}).setNegativeButton("Cancel", null).show();
+
+			return true;
+		}		
+	};
 
 }
