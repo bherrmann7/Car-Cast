@@ -10,10 +10,11 @@ public class MetaNet {
 
 	 Properties properties = new Properties();
 
-	public MetaNet(String feedName, URL url, int size) {	
+	public MetaNet(String feedName, URL url, int size, String localFileExtension) {	
 		properties.setProperty("feedName", feedName);
 		properties.setProperty("url", url.toString());
 		properties.setProperty("size", Integer.toString(size));
+		properties.setProperty("localFileExtension", localFileExtension);
 	}
 
 	public int getSize() {
@@ -39,5 +40,13 @@ public class MetaNet {
 
 	public void setTitle(String value) {
 		properties.setProperty("title", value);		
+	}
+
+	public void setLocalFileExtension(String value) {
+		properties.setProperty("localFileExtension", value);
+	}
+	
+	public String getLocalFileExtension() {
+		return properties.getProperty("localFileExtension");
 	}
 }

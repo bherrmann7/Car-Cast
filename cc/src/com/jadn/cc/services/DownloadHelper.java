@@ -128,12 +128,13 @@ public class DownloadHelper implements Sayer {
 		int got = 0;
 		for (int i = 0; i < newPodcasts.size(); i++) {
 			String shortName = newPodcasts.get(i).getTitle();
+			String localFileExt = newPodcasts.get(i).getLocalFileExtension();
 			say((i + 1) + "/" + newPodcasts.size() + " " + shortName);
 			contentService.updateNotification((i + 1) + "/" + newPodcasts.size() + " " + shortName);
 			podcastsDownloaded = i + 1;
 
 			try {
-				File castFile = new File(Config.PodcastsRoot, Long.toString(System.currentTimeMillis()) + ".mp3");
+				File castFile = new File(Config.PodcastsRoot, Long.toString(System.currentTimeMillis()) + localFileExt);
 
 				currentSubscription = newPodcasts.get(i).getSubscription();
 				currentTitle = newPodcasts.get(i).getTitle();

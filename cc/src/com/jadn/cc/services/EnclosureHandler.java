@@ -82,6 +82,22 @@ public class EnclosureHandler extends DefaultHandler {
 			return true;
 		return false;
 	}
+	
+	private String getFileExt(String url, String type) {
+		if (url.toLowerCase().endsWith(".mp3"))
+			return ".mp3";
+		if (url.toLowerCase().endsWith(".m4a"))
+			return ".mp3";
+		if (url.toLowerCase().endsWith(".ogg"))
+			return ".ogg";
+		if (url.indexOf(".mp3?") != -1)
+			return ".mp3";
+		if ("audio/mp3".equals(type))
+			return ".mp3";
+		if ("audio/ogg".equals(type))
+			return ".ogg";
+		return ".bin";
+	}
 
 	public void setFeedName(String feedName) {
 		this.feedName = feedName;
@@ -126,7 +142,7 @@ public class EnclosureHandler extends DefaultHandler {
 							// some feeds have bad lengths
 						}
 					}
-					MetaNet metaNet = new MetaNet(feedName, new URL(atts.getValue("url")), length);
+					MetaNet metaNet = new MetaNet(feedName, new URL(atts.getValue("url")), length, getFileExt(atts.getValue("url"), atts.getValue("type")));
 					metaNet.setTitle(lastTitle);
 					if (history.contains(metaNet)) {
 						// stop getting podcasts after we find one in our
