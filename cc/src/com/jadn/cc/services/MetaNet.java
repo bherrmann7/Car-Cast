@@ -10,11 +10,11 @@ public class MetaNet {
 
 	 Properties properties = new Properties();
 
-	public MetaNet(String feedName, URL url, int size, String localFileExtension) {	
+	public MetaNet(String feedName, URL url, int size, String mimetype) {	
 		properties.setProperty("feedName", feedName);
 		properties.setProperty("url", url.toString());
 		properties.setProperty("size", Integer.toString(size));
-		properties.setProperty("localFileExtension", localFileExtension);
+		properties.setProperty("mimetype", mimetype);
 	}
 
 	public int getSize() {
@@ -42,11 +42,16 @@ public class MetaNet {
 		properties.setProperty("title", value);		
 	}
 
-	public void setLocalFileExtension(String value) {
-		properties.setProperty("localFileExtension", value);
+	public void setMimetype(String value) {
+		properties.setProperty("mimetype", value);
 	}
 	
-	public String getLocalFileExtension() {
-		return properties.getProperty("localFileExtension");
+	public String getMimetype() {
+		String value = properties.getProperty("mimetype");
+		if( value == null || "".equals(value) ) {
+			// backwards compatibility to versions not yet having this property
+			return ".mp3";
+		}
+		return value;
 	}
 }

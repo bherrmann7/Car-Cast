@@ -48,6 +48,16 @@ public class DownloadHelper implements Sayer {
 	}
 
 	SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd hh:mma");
+	
+	private String getLocalFileExtFromMimetype( String mimetype ) {
+		if( "audio/mp3".equals(mimetype) ) {
+			return ".mp3";
+		}
+		if( "audio/ogg".equals(mimetype) ) {
+			return ".ogg";
+		}
+		return ".bin";
+	}
 
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
 		// just to be explicit (or if a DownloadHelper ever gets reused):
@@ -128,7 +138,7 @@ public class DownloadHelper implements Sayer {
 		int got = 0;
 		for (int i = 0; i < newPodcasts.size(); i++) {
 			String shortName = newPodcasts.get(i).getTitle();
-			String localFileExt = newPodcasts.get(i).getLocalFileExtension();
+			String localFileExt = getLocalFileExtFromMimetype(newPodcasts.get(i).getMimetype());
 			say((i + 1) + "/" + newPodcasts.size() + " " + shortName);
 			contentService.updateNotification((i + 1) + "/" + newPodcasts.size() + " " + shortName);
 			podcastsDownloaded = i + 1;
