@@ -47,7 +47,8 @@ public class MetaHolder {
 				continue;				
 			}
 			if (file.getName().endsWith(".mp3")
-					|| file.getName().endsWith(".3gp")) {
+					|| file.getName().endsWith(".3gp")
+					|| file.getName().endsWith(".ogg")) {
 				MetaFile meta = new MetaFile(file);
 				metas.add(meta);
 			}

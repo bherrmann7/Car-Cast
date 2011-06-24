@@ -1,6 +1,7 @@
 package com.jadn.cc.ui;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -45,10 +46,19 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 
 		currentSub = null;
 
-		if (getIntent().getExtras() != null) {
+		if (getIntent().hasExtra("subscription")) {
 			currentSub = (Subscription) getIntent().getExtras().get(
 					"subscription");
+		} else {
+			// we're coming from the browser
+			if( Intent.ACTION_VIEW.equals( getIntent().getAction() ) ) {
+				Log.d("onCreate", "data: "+getIntent().getDataString());
+				String feedUrl = getIntent().getDataString();
+				currentSub = new Subscription("", feedUrl);
+			}
 		}
+		
+		
 
 		((Button) findViewById(R.id.saveEditSite))
 				.setOnClickListener(new OnClickListener() {

@@ -1,6 +1,7 @@
 package com.jadn.cc.core;
 
 import java.io.PushbackInputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -46,30 +47,58 @@ public class Util {
 
 	private static SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
-	// shared with SubscriptionEdit
-	public static void downloadPodcast(String url, EnclosureHandler encloseureHandler) throws Exception {
-		Log.i("CarCast", "Processing URL: " + url);
-		SAXParser sp = saxParserFactory.newSAXParser();
-		URLConnection connection = new URL(url).openConnection();
+	private static HttpURLConnection connectToHttpURL(String url, int followRedirects) throws Exception,
+	MalformedURLException {
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setRequestProperty("User-Agent", "http://jadn.com/carcast");
 		connection.setConnectTimeout(30*1000);
 		connection.setReadTimeout(20*1000);
+		// Android seems to handle redirects improperly: 
+		// the InputStream is of the redirect itself, not the redirected page 
+		connection.setInstanceFollowRedirects(false);
+		
+		// TODO: is there a better way to properly follow redirects?
+		String redirectLocation = connection.getHeaderField( "Location" );
+		if( redirectLocation == null || "".equals(redirectLocation) ) {
+			return connection;
+		}
+		
+		if( followRedirects == 0 ) {
+			throw new Exception( "Maximum HTTP redirects reached" );
+		}
+		
+		Log.i("CarCast/Util", "following redirect: "+redirectLocation);
+		return connectToHttpURL(redirectLocation, followRedirects - 1);
+	}
+	
+	public static final int MAX_REDIRECTS = 10;
+	
+	// shared with SubscriptionEdit
+	public static void downloadPodcast(String url, EnclosureHandler encloseureHandler) throws Exception {
+		final int BUFFSIZE = 1024;
+		
+		Log.i("CarCast", "Processing URL: " + url);
+		URLConnection connection = connectToHttpURL(url, MAX_REDIRECTS);
 		String charset = getCharset(connection.getContentType());
+		SAXParser sp = saxParserFactory.newSAXParser();
 
 		// we want to get the encoding
-		PushbackInputStream pis = new PushbackInputStream(connection.getInputStream(), 1024);
+		PushbackInputStream pis = new PushbackInputStream(connection.getInputStream(), BUFFSIZE);
 		StringBuilder xmlHeader = new StringBuilder();
-		byte[] bytes = new byte[1023];
+		byte[] bytes = new byte[BUFFSIZE];
 		int i = 0;
 		for (; i < bytes.length; i++) {
 			int b = pis.read();
+			if (b == -1) // very short or empty response body 
+				break;
 			bytes[i] = (byte)b;
 			xmlHeader.append((char) b);
 			if (b == '>') {
 				break;
 			}
 		}
-		pis.unread(bytes, 0, i+1);
+		// above loop will leave i at bytes.length after the last (un-break'd) iteration!
+		pis.unread(bytes, 0, Math.min(i+1, BUFFSIZE));
 		Log.i("CarCast/Util", "xml start:" + xmlHeader);
 		if (xmlHeader.toString().toLowerCase().indexOf("windows-1252") != -1) {
 			charset = "ISO-8859-1";
