@@ -47,7 +47,7 @@ public class Util {
 	private static SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
 	// shared with SubscriptionEdit
-	public static void downloadPodcast(String url, EnclosureHandler encloseureHandler) throws Exception {
+	public static void findAvailablePodcasts(String url, EnclosureHandler encloseureHandler) throws Exception {
 		Log.i("CarCast", "Processing URL: " + url);
 		SAXParser sp = saxParserFactory.newSAXParser();
 		URLConnection connection = new URL(url).openConnection();

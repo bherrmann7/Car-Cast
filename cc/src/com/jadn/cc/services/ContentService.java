@@ -107,6 +107,9 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	private MetaFile cm() {
+		if(metaHolder.getSize()==0){
+			return null;
+		}
 		return metaHolder.get(currentPodcastInPlayer);
 	}
 
@@ -149,8 +152,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		StringBuilder sb = new StringBuilder();
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			if (downloadHelper != null)
-				return "\nDownloading podcasts";
-			return "\nNo Podcasts have been downloaded.";
+				return "Downloading podcasts";
+			return "No Podcasts have been downloaded.";
 		}
 		sb.append(cm().getFeedName());
 		sb.append('\n');
@@ -161,7 +164,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	public String currentTitle() {
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			if (downloadHelper != null && !downloadHelper.idle) {
-				return "\nDownloading podcasts\n" + downloadHelper.getStatus();
+				return "Downloading podcasts\n" + downloadHelper.getStatus();
 			}
 			return "No podcasts loaded.\nUse 'Menu' and 'Download Podcasts'";
 		}
@@ -308,14 +311,19 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public Location getLocation() {
 		if (mediaMode == MediaMode.UnInitialized) {
-			return new Location(currentTitle(), currentPostion());
+			return new Location(currentTitle());
 		}
-		return new Location(currentTitle(), mediaPlayer.getCurrentPosition());
+		return new Location(currentTitle());
 	}
 
 	public String getLocationString() {
 		Location useLocation = getLocation();
-		return getTimeString(useLocation.pos);
+		if(isPlaying()){			
+			return getTimeString(mediaPlayer.getCurrentPosition());
+		}
+		if (cm()!=null)
+			return getTimeString(cm().getCurrentPos());
+		return "";
 	}
 
 	public MediaMode getMediaMode() {
@@ -388,15 +396,16 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public void next() {
-		boolean wasPlaying = mediaPlayer.isPlaying();
-		if (wasPlaying) {
-			mediaPlayer.stop();
+		boolean isPlaying = mediaPlayer.isPlaying();
+		if (isPlaying) {
 			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
+			cm().save();
+			mediaPlayer.stop();
 		}
-		next(wasPlaying);
+		next(isPlaying);
 	}
 
-	void next(boolean playing) {
+	void next(boolean isPlaying) {
 		mediaMode = MediaMode.UnInitialized;
 
 		// if we are at end.
@@ -405,14 +414,11 @@ public class ContentService extends Service implements OnCompletionListener {
 			// activity.disableJumpButtons();
 			mediaPlayer.reset();
 			// say(activity, "That's all folks");
-			if (location != null) {
-				location.pos = 0;
-			}
 			return;
 		}
 
 		currentPodcastInPlayer++;
-		if (playing)
+		if (isPlaying)
 			play();
 	}
 
@@ -502,10 +508,13 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public void pauseNow() {
 		if (mediaPlayer.isPlaying()) {
-			mediaPlayer.pause();
-			mediaMode = MediaMode.Paused;
+			
+			// Save current position
 			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
 			cm().save();
+
+			mediaPlayer.pause();
+			mediaMode = MediaMode.Paused;
 			// say(activity, "paused " + currentTitle());
 			saveState();
 		}
@@ -517,6 +526,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		try {
 			if (mediaPlayer.isPlaying()) {
 				pauseNow();
+				setForeground(false);
 				return false;
 			} else {
 				if (mediaMode == MediaMode.Paused) {
@@ -534,6 +544,8 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	private void play() {
+		setForeground(true);
+
 		try {
 			if (!fullReset())
 				return;
@@ -556,7 +568,6 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public void previous() {
-
 		boolean playing = false;
 		if (mediaPlayer.isPlaying()) {
 			playing = true;
@@ -605,7 +616,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	public void saveState() {
 		try {
 			final File stateFile = new File(Config.PodcastsRoot, "state.dat");
-			location = Location.save(stateFile, currentTitle(), mediaPlayer.getCurrentPosition(), mediaPlayer.getDuration());
+			location = Location.save(stateFile, currentTitle());
 		} catch (Throwable e) {
 			// bummer.
 		}
@@ -651,8 +662,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 						try {
 							// The intent here is keep the phone from shutting
-							// down
-							// during a download.
+							// down during a download.
 							ContentService.this.setForeground(true);
 							wl.acquire();
 
@@ -730,7 +740,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			mediaPlayer.reset();
 			mediaPlayer.setDataSource(currentFile().toString());
 			mediaPlayer.prepare();
-			mediaPlayer.seekTo(location.pos);
+			mediaPlayer.seekTo(cm().getCurrentPos());
 			mediaMode = MediaMode.Paused;
 		} catch (Throwable e) {
 			// bummer.
@@ -765,6 +775,8 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public String getDownloadProgress() {
+		if(downloadHelper==null)
+			return "";
 		return downloadHelper.sb.toString();
 	}
 

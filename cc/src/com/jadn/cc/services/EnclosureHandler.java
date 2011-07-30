@@ -14,14 +14,14 @@ import android.util.Log;
 public class EnclosureHandler extends DefaultHandler {
 
 	private static final int STOP = -2;
-	private static final int UNLIMITED = -1;
+	public static final int UNLIMITED = -1;
 
 	String feedName;
 	private boolean grabTitle;
 	DownloadHistory history;
 	private String lastTitle = "";
 
-	public int max;
+	public int max = 2;
 
 	public List<MetaNet> metaNets = new ArrayList<MetaNet>();
 
@@ -29,8 +29,7 @@ public class EnclosureHandler extends DefaultHandler {
 	private boolean startTitle;
 	public String title = "";
 
-	public EnclosureHandler(int max, DownloadHistory history) {
-		this.max = max;
+	public EnclosureHandler(DownloadHistory history) {
 		this.history = history;
 	}
 
@@ -72,8 +71,11 @@ public class EnclosureHandler extends DefaultHandler {
 			return true;
 		if (url.toLowerCase().endsWith(".m4a"))
 			return true;
-		if (url.indexOf(".mp3?") != -1)
+		// Should probably read the first x bytes and verify that it has an mp3 signature...
+		if (url.indexOf(".mp3") != -1){
+			Log.w("carcast", "rejecting url with no .mp3 in it: "+url);
 			return true;
+		}
 		return false;
 	}
 
@@ -134,5 +136,10 @@ public class EnclosureHandler extends DefaultHandler {
 				Log.e("CarCast", this.getClass().getSimpleName(), e);
 			}
 		}
+	}
+
+	public void setMax(int max) {
+		this.max=max;
+		
 	}
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent">
+	android:layout_width="fill_parent" android:layout_height="fill_parent" android:orientation="horizontal">
 	<ScrollView android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
 		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -13,17 +13,13 @@
 
 			<EditText android:id="@+id/editsite_url"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:text="http://"
-				android:inputType="textUri" 
-				android:imeOptions="actionNext"
-				/>
+				android:text="http://" android:inputType="textUri"
+				android:imeOptions="actionNext" />
 
 
 			<Button android:id="@+id/testEditSite" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:text="Test"
-				android:singleLine="true"
-				android:imeOptions="actionNext"
-				 />
+				android:singleLine="true" android:imeOptions="actionNext" />
 
 			<TextView android:id="@+id/label2" android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:text="Site Name:" />
@@ -36,16 +32,22 @@
 				android:layout_marginTop="20px" android:layout_width="fill_parent"
 				android:checked="true" android:layout_height="wrap_content"
 				android:text="Enabled" />
-<!--
-			<CheckBox android:id="@+id/fifoLifo" android:layout_below="@+id/fifolifo_name"
+
+			<CheckBox android:id="@+id/fifoLifo" android:layout_below="@id/enabled"
 				android:layout_marginTop="20px" android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:text="Newest first (vs oldest first for audiobooks)"
 				android:checked="true" />
 
-			<Spinner android:id="@+id/subMax" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:prompt="@string/maxChoices" />
--->
+			<RelativeLayout android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+				<TextView android:text="Max downloads" android:layout_height="wrap_content"
+					android:layout_width="wrap_content" android:id="@+id/max"></TextView>
+
+				<Spinner android:layout_toRightOf="@id/max" android:id="@+id/subMax"
+					android:layout_width="fill_parent" android:layout_height="wrap_content"
+					android:prompt="@string/maxChoices" />
+			</RelativeLayout>
 
 			<Button android:id="@+id/saveEditSite"
 				android:layout_marginTop="20px" android:layout_marginLeft="100px"

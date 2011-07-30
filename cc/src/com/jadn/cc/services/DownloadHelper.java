@@ -13,6 +13,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import android.widget.TextView;
 
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
+import com.jadn.cc.core.OrderingPreference;
 import com.jadn.cc.core.Sayer;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.core.Util;
@@ -31,7 +33,7 @@ public class DownloadHelper implements Sayer {
 	public String currentSubscription = " ";
 	public String currentTitle = " ";
 	DownloadHistory history = DownloadHistory.getInstance();
-	int max;
+	int globalMax;
 	StringBuilder newText = new StringBuilder();
 	int podcastsCurrentBytes;
 	int podcastsDownloaded;
@@ -43,8 +45,8 @@ public class DownloadHelper implements Sayer {
 	boolean idle;
 	StringBuilder sb = new StringBuilder();
 
-	public DownloadHelper(int max) {
-		this.max = max;
+	public DownloadHelper(int globalMax) {
+		this.globalMax = globalMax;
 	}
 
 	SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd hh:mma");
@@ -67,26 +69,27 @@ public class DownloadHelper implements Sayer {
 
 		say("History of downloads contains " + history.size() + " podcasts.");
 
+		List<MetaNet> enclosures = new ArrayList<MetaNet>();
+
 		SAXParserFactory spf = SAXParserFactory.newInstance();
-		EnclosureHandler encloseureHandler = new EnclosureHandler(max, history);
 
 		for (Subscription sub : sites) {
+			EnclosureHandler encloseureHandler = new EnclosureHandler(history);
 
 			if (sub.enabled) {
 				try {
 					say("\nScanning subscription/feed: " + sub.url);
 					URL url = new URL(sub.url);
 					int foundStart = encloseureHandler.metaNets.size();
-					if (sub.maxDownloads == -1) {
-						encloseureHandler.max = max;
-					} else {
-						encloseureHandler.max = sub.maxDownloads;
-					} // endif
+					if (sub.maxDownloads == Subscription.GLOBAL)
+						encloseureHandler.setMax(globalMax);
+					else
+						encloseureHandler.setMax(sub.maxDownloads);
 
 					String name = sub.name;
 					encloseureHandler.setFeedName(name);
 
-					Util.downloadPodcast(sub.url, encloseureHandler);
+					Util.findAvailablePodcasts(sub.url, encloseureHandler);
 
 					String message = sitesScanned + "/" + sites.size() + ": " + name + ", "
 							+ (encloseureHandler.metaNets.size() - foundStart) + " new";
@@ -104,12 +107,17 @@ public class DownloadHelper implements Sayer {
 
 			sitesScanned++;
 
+			if (sub.orderingPreference == OrderingPreference.LIFO)
+				Collections.reverse(encloseureHandler.metaNets);
+
+			enclosures.addAll(encloseureHandler.metaNets);
+
 		} // endforeach
 
-		say("\nTotal enclosures " + encloseureHandler.metaNets.size());
+		say("\nTotal enclosures " + enclosures.size());
 
 		List<MetaNet> newPodcasts = new ArrayList<MetaNet>();
-		for (MetaNet metaNet : encloseureHandler.metaNets) {
+		for (MetaNet metaNet : enclosures) {
 			if (history.contains(metaNet))
 				continue;
 			newPodcasts.add(metaNet);

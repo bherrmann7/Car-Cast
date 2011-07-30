@@ -19,32 +19,29 @@ public class Location {
 			prop.load(fis);
 			fis.close();
 
-			return new Location(prop.get("title").toString(),
-					atoi(prop, "pos"));
+			return new Location(prop.get("title").toString());
 		} catch (Throwable t) {
 			stateFile.delete();
 			return null;
 		}
 	}
-	public static Location save(File stateFile, String title, int pos, int duration)
-			throws IOException {
+
+	public static Location save(File stateFile, String title) throws IOException {
 		Properties prop = new Properties();
 		prop.setProperty("title", title);
-		prop.setProperty("pos", Integer.toString(pos));
+		// prop.setProperty("pos", Integer.toString(pos));
 		FileOutputStream fos = new FileOutputStream(stateFile);
 		prop.save(fos, "");
 		fos.close();
-		return new Location(title,pos);
+		return new Location(title);
 	}
 
-	public int pos;
 
 	public String title;
 
-	public Location(String title, int pos) {
+	public Location(String title) {
 		super();
 		this.title = title;
-		this.pos = pos;
 	}
 
 }
