@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -14,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -141,13 +144,24 @@ public class Subscriptions extends BaseActivity {
 			return true;
 		}
 		if (item.getItemId() == R.id.deleteAllSubscriptions) {
-			contentService.deleteAllSubscriptions();
-			reloadSubscriptions();
-			return true;
+					new AlertDialog.Builder(Subscriptions.this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Delete All Subscriptions?")
+					.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							contentService.deleteAllSubscriptions();
+							reloadSubscriptions();
+						}
+					}).setNegativeButton("Cancel", null).show();
 		}
 		if (item.getItemId() == R.id.resetToDemoSubscriptions) {
-			contentService.resetToDemoSubscriptions();
-			reloadSubscriptions();
+			new AlertDialog.Builder(Subscriptions.this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Reset to Demo Subscriptions (will delete all current subscriptions)?")
+			.setPositiveButton("Reset to Demos", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					contentService.resetToDemoSubscriptions();
+					reloadSubscriptions();
+				}
+			}).setNegativeButton("Cancel", null).show();
 			return true;
 		}
 		if (item.getItemId() == R.id.search) {
