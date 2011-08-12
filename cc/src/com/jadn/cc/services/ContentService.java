@@ -1,5 +1,10 @@
 package com.jadn.cc.services;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -18,6 +23,7 @@ import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
@@ -27,8 +33,6 @@ import com.jadn.cc.core.Subscription;
 import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
-import java.io.File;
-import java.util.List;
 
 public class ContentService extends Service implements OnCompletionListener {
 	/**
@@ -107,7 +111,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	private MetaFile cm() {
-		if(metaHolder.getSize()==0){
+		if (metaHolder.getSize() == 0) {
 			return null;
 		}
 		return metaHolder.get(currentPodcastInPlayer);
@@ -318,10 +322,10 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public String getLocationString() {
 		Location useLocation = getLocation();
-		if(isPlaying()){			
+		if (isPlaying()) {
 			return getTimeString(mediaPlayer.getCurrentPosition());
 		}
-		if (cm()!=null)
+		if (cm() != null)
 			return getTimeString(cm().getCurrentPos());
 		return "";
 	}
@@ -485,6 +489,22 @@ public class ContentService extends Service implements OnCompletionListener {
 		// http://groups.google.com/group/android-developers/browse_thread/thread/6d0dda99b4f42c8f/d7de082acdb0da25
 		headsetReceiver = new HeadsetReceiver(this);
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+
+		// foreground stuff
+		try {
+			mStartForeground = getClass().getMethod("startForeground", mStartForegroundSignature);
+			mStopForeground = getClass().getMethod("stopForeground", mStopForegroundSignature);
+		} catch (NoSuchMethodException e) {
+			// Running on an older platform.
+			mStartForeground = mStopForeground = null;
+			return;
+		}
+		try {
+			mSetForeground = getClass().getMethod("setForeground", mSetForegroundSignature);
+		} catch (NoSuchMethodException e) {
+			throw new IllegalStateException("OS doesn't have Service.startForeground OR Service.setForeground!");
+		}
+
 	}
 
 	public void headsetStatusChanged(boolean headsetPresent) {
@@ -504,11 +524,15 @@ public class ContentService extends Service implements OnCompletionListener {
 		super.onDestroy();
 		Log.i("CarCast", "ContentService destroyed");
 		// Toast.makeText(getApplication(), "Service Destroyed", 1000).show();
+		
+			// Make sure our notification is gone.
+		stopForegroundCompat();
+
 	}
 
 	public void pauseNow() {
 		if (mediaPlayer.isPlaying()) {
-			
+
 			// Save current position
 			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
 			cm().save();
@@ -775,7 +799,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public String getDownloadProgress() {
-		if(downloadHelper==null)
+		if (downloadHelper == null)
 			return "";
 		return downloadHelper.sb.toString();
 	}
@@ -791,4 +815,74 @@ public class ContentService extends Service implements OnCompletionListener {
 	public void newContentAdded() {
 		metaHolder = new MetaHolder();
 	}
+
+	// This section cribbed from
+	// http://developer.android.com/reference/android/app/Service.html#startForeground%28int,%20android.app.Notification%29
+
+	private static final Class<?>[] mSetForegroundSignature = new Class[] { boolean.class };
+	private static final Class<?>[] mStartForegroundSignature = new Class[] { int.class, Notification.class };
+	private static final Class<?>[] mStopForegroundSignature = new Class[] { boolean.class };
+
+	private Method mSetForeground;
+	private Method mStartForeground;
+	private Method mStopForeground;
+	private Object[] mSetForegroundArgs = new Object[1];
+	private Object[] mStartForegroundArgs = new Object[2];
+	private Object[] mStopForegroundArgs = new Object[1];
+
+	void invokeMethod(Method method, Object[] args) {
+		try {
+			mStartForeground.invoke(this, mStartForegroundArgs);
+		} catch (InvocationTargetException e) {
+			// Should not happen.
+			Log.w("CarCast-ContentService", "Unable to invoke method", e);
+		} catch (IllegalAccessException e) {
+			// Should not happen.
+			Log.w("CarCast-ContentService", "Unable to invoke method", e);
+		}
+	}
+
+	/**
+	 * This is a wrapper around the new startForeground method, using the older APIs if it is not available.
+	 */
+	void startForegroundCompat(int id, Notification notification) {
+		// If we have the new startForeground API, then use it.
+		if (mStartForeground != null) {
+			mStartForegroundArgs[0] = Integer.valueOf(id);
+			mStartForegroundArgs[1] = notification;
+			invokeMethod(mStartForeground, mStartForegroundArgs);
+			return;
+		}
+
+		// Fall back on the old API.
+		mSetForegroundArgs[0] = Boolean.TRUE;
+		invokeMethod(mSetForeground, mSetForegroundArgs);
+	}
+
+	/**
+	 * This is a wrapper around the new stopForeground method, using the older APIs if it is not available.
+	 */
+	void stopForegroundCompat() {
+		// If we have the new stopForeground API, then use it.
+		if (mStopForeground != null) {
+			mStopForegroundArgs[0] = Boolean.TRUE;
+			try {
+				mStopForeground.invoke(this, mStopForegroundArgs);
+			} catch (InvocationTargetException e) {
+				// Should not happen.
+				Log.w("CarCast-ContentService", "Unable to invoke stopForeground", e);
+			} catch (IllegalAccessException e) {
+				// Should not happen.
+				Log.w("CarCast-ContentService", "Unable to invoke stopForeground", e);
+			}
+			return;
+		}
+
+		// Fall back on the old API. Note to cancel BEFORE changing the
+		// foreground state, since we could be killed at that point.
+		mSetForegroundArgs[0] = Boolean.FALSE;
+		invokeMethod(mSetForeground, mSetForegroundArgs);
+	}
+
+
 }

@@ -60,8 +60,10 @@ public class EnclosureHandler extends DefaultHandler {
 	public String getTitle() {
 		return title;
 	}
+	
+	
 
-	private boolean isAudio(String url) {
+	private boolean isAudio(String url, String type) {
 		// for http://feeds.feedburner.com/dailyaudiobible
 		// which always has the same intro at the top.
 		if (url.endsWith("/Intro_to_DAB.mp3")) {
@@ -71,14 +73,21 @@ public class EnclosureHandler extends DefaultHandler {
 			return true;
 		if (url.toLowerCase().endsWith(".m4a"))
 			return true;
-		// Should probably read the first x bytes and verify that it has an mp3 signature...
-		if (url.indexOf(".mp3") != -1){
-			Log.w("carcast", "rejecting url with no .mp3 in it: "+url);
+		if (url.toLowerCase().endsWith(".ogg"))
 			return true;
-		}
+		if (url.indexOf(".mp3?") != -1)
+			return true;
+		if (url.indexOf(".m4a?") != -1)
+			return true;
+		if (url.indexOf(".ogg?") != -1)
+			return true;
+		if ("audio/mp3".equals(type))
+			return true;
+		if ("audio/ogg".equals(type))
+			return true;
 		return false;
 	}
-
+	
 	public void setFeedName(String feedName) {
 		this.feedName = feedName;
 	}
@@ -97,11 +106,12 @@ public class EnclosureHandler extends DefaultHandler {
 			lastTitle = "";
 		}
 
-		if (localName.equals("enclosure") && atts.getValue("url") != null) {
-			if (!isAudio(atts.getValue("url"))) {
-				Log.i("content", "Not downloading, url doesn't end right type... " + atts.getValue("url"));
+		if (localName.equals("enclosure") && atts.getValue("url") != null) {			
+			if (!isAudio(atts.getValue("url"), atts.getValue("type"))) {
+				Log.i("content", "Not downloading, url doesn't end right type... " + atts.getValue("url") + ", " + atts.getValue("type"));
 				return;
 			}
+			
 			// Log.i("content", localName + " " + atts.getValue("url"));
 			try {
 				if (max != STOP && (max == UNLIMITED || max > 0)) {
@@ -122,7 +132,7 @@ public class EnclosureHandler extends DefaultHandler {
 							// some feeds have bad lengths
 						}
 					}
-					MetaNet metaNet = new MetaNet(feedName, new URL(atts.getValue("url")), length);
+				    MetaNet metaNet = new MetaNet(feedName, new URL(atts.getValue("url")), length, getMimetype(atts.getValue("url"), atts.getValue("type")));
 					metaNet.setTitle(lastTitle);
 					if (history.contains(metaNet)) {
 						// stop getting podcasts after we find one in our
@@ -142,4 +152,23 @@ public class EnclosureHandler extends DefaultHandler {
 		this.max=max;
 		
 	}
+	
+
+	private String getMimetype(String url, String type) {
+		if (url.toLowerCase().endsWith(".mp3"))
+			return "audio/mp3";
+		if (url.toLowerCase().endsWith(".m4a"))
+			return "audio/mp3";
+		if (url.toLowerCase().endsWith(".ogg"))
+			return "audio/ogg";
+		if (url.indexOf(".mp3?") != -1)
+			return "audio/mp3";
+		// best effort
+		if( type != null && !"".equals(type) ) {
+			return type;
+		}
+		return "application/octet-stream";
+	}
+
+	 
 }
