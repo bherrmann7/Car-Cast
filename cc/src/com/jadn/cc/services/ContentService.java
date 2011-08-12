@@ -489,22 +489,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		// http://groups.google.com/group/android-developers/browse_thread/thread/6d0dda99b4f42c8f/d7de082acdb0da25
 		headsetReceiver = new HeadsetReceiver(this);
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
-
-		// foreground stuff
-		try {
-			mStartForeground = getClass().getMethod("startForeground", mStartForegroundSignature);
-			mStopForeground = getClass().getMethod("stopForeground", mStopForegroundSignature);
-		} catch (NoSuchMethodException e) {
-			// Running on an older platform.
-			mStartForeground = mStopForeground = null;
-			return;
-		}
-		try {
-			mSetForeground = getClass().getMethod("setForeground", mSetForegroundSignature);
-		} catch (NoSuchMethodException e) {
-			throw new IllegalStateException("OS doesn't have Service.startForeground OR Service.setForeground!");
-		}
-
+		
+		startForegroundCompat(0,null);
 	}
 
 	public void headsetStatusChanged(boolean headsetPresent) {
@@ -550,7 +536,6 @@ public class ContentService extends Service implements OnCompletionListener {
 		try {
 			if (mediaPlayer.isPlaying()) {
 				pauseNow();
-				setForeground(false);
 				return false;
 			} else {
 				if (mediaMode == MediaMode.Paused) {
@@ -568,7 +553,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	private void play() {
-		setForeground(true);
+		//setForeground(true);
 
 		try {
 			if (!fullReset())
@@ -687,7 +672,7 @@ public class ContentService extends Service implements OnCompletionListener {
 						try {
 							// The intent here is keep the phone from shutting
 							// down during a download.
-							ContentService.this.setForeground(true);
+							//ContentService.this.setForeground(true);
 							wl.acquire();
 
 							// If we have wifi now, lets hold on to it.
@@ -716,7 +701,7 @@ public class ContentService extends Service implements OnCompletionListener {
 								}
 							}
 
-							ContentService.this.setForeground(false);
+							//ContentService.this.setForeground(false);
 							wl.release();
 						}
 					} catch (Throwable t) {
