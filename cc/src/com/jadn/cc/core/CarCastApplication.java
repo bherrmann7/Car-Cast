@@ -14,6 +14,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
+		"11-Aug-2011",
+		"Fix for www.flatironschurch.com podcast for Darrin Graham and friends",
 			"29-July-2011",
 				"Whew! I've been crazy busy with three other projects.  Finally quieting down.\n\nAdded confirmations to menu items Delete/Reset on Subscriptions screen\n\nEnjoy, Bob",
 			"23-June-2011",
