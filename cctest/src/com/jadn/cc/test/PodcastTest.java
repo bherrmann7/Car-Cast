@@ -26,9 +26,11 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Delete All");
+		solo.clickOnButton("Delete");
 		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter().getCount());
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Reset to Demos");
+		solo.clickOnButton("Reset to Demos");
 		assertEquals(7, solo.getCurrentListViews().get(0).getAdapter().getCount());
 	}
 
@@ -46,10 +48,10 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 
 		// assertTrue(solo.getEditText(1).getText().toString().trim().length()!=0);
 		assertEquals("Real Time with Bill Maher", solo.getEditText(1).getText().toString());
-		
+
 		solo.clickOnText("Save");
 	}
-	
+
 	// http://feeds.feedburner.com/itpc/wwwwaylandws/Wayland_Productions/Were_Alive_-_Podcast/rssxml
 	public void testZombie() throws Exception {
 		solo.sendKey(Solo.MENU);
@@ -64,10 +66,10 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 
 		// assertTrue(solo.getEditText(1).getText().toString().trim().length()!=0);
 		assertEquals("We're Alive - A \"Zombie\" Story of survival", solo.getEditText(1).getText().toString());
-		
+
 		solo.clickOnText("Save");
 	}
-	
+
 	// Windows encoding
 	public void testSubscriptionEncodedWindows() throws Exception {
 		solo.sendKey(Solo.MENU);
@@ -207,17 +209,32 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Save");
 
 	}
-	
-	
-	// http://www.podiobooks.com/title/8810/feed
-	
 
-	// This test takes too long to run... need a fake audio book to test with
-   public void xtestBook() throws Exception {
+	public void testFlatironschurch() throws Exception {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
-		solo.clickOnText("Delete All");	
+		solo.clickOnText("Add");
+		solo.enterText(0, "www.flatironschurch.com/podcasts/fcc_audio_podcast.php");
+		// solo.enterText(0, "jadn.com/podcast.xml");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		// assertTrue(solo.searchText("Feed is OK"));
+
+		assertTrue(!"".equals(solo.getEditText(1).getText().toString()));
+
+		solo.clickOnText("Save");
+
+	}
+
+	// http://www.podiobooks.com/title/8810/feed
+
+	// This test takes too long to run... need a fake audio book to test with
+	public void xtestBook() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Delete All");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Add");
 		solo.enterText(0, "www.podiobooks.com/bookfeed/23795/627/book.xml");
@@ -230,7 +247,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnCheckBox(1);
 		solo.pressSpinnerItem(0, 5);
 		solo.clickOnText("Save");
-		
+
 		solo.goBack();
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Podcasts");
@@ -249,9 +266,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Start Downloads");
 		solo.waitForText(" COMPLETED ", 1, 20 * 60 * 1000);
 
-
 	}
-	
 
 	// test Umlet character in this feed
 	public void testUmlet() throws Exception {
@@ -268,7 +283,6 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Save");
 	}
 
-	
 	public void testDarFM() throws Exception {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Subscriptions");
@@ -282,8 +296,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 
 		solo.clickOnText("Save");
 	}
-	
-	
+
 	// test Umlet character in this feed
 	public void testTwit() throws Exception {
 		solo.sendKey(Solo.MENU);

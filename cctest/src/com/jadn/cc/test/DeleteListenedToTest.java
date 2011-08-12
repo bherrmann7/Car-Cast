@@ -28,9 +28,11 @@ public class DeleteListenedToTest extends
 		solo.goBack();
 		
 		solo.sendKey(Solo.MENU);
+		Thread.sleep(500);
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Delete All");
+		solo.clickOnButton("Delete");
 		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter()
 				.getCount());
 		// add in fakefeed cast
