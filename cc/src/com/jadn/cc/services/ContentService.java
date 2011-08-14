@@ -460,8 +460,8 @@ public class ContentService extends Service implements OnCompletionListener {
 
 				if (state == TelephonyManager.CALL_STATE_OFFHOOK || state == TelephonyManager.CALL_STATE_RINGING) {
 					if (mediaPlayer.isPlaying()) {
-						pauseNow();
 						wasPausedByPhoneCall = true;
+						pauseNow();
 					}
 				}
 
@@ -490,7 +490,19 @@ public class ContentService extends Service implements OnCompletionListener {
 		headsetReceiver = new HeadsetReceiver(this);
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 		
-		startForegroundCompat(0,null);
+		// foreground stuff
+		try {
+			mStartForeground = getClass().getMethod("startForeground", mStartForegroundSignature);
+			mStopForeground = getClass().getMethod("stopForeground", mStopForegroundSignature);
+		} catch (NoSuchMethodException e) {
+			// Running on an older platform.
+			mStartForeground = mStopForeground = null;
+			try {
+				mSetForeground = getClass().getMethod("setForeground", mSetForegroundSignature);
+			} catch (NoSuchMethodException e1) {
+				throw new IllegalStateException("OS doesn't have Service.startForeground OR Service.setForeground!");
+			}
+		}
 	}
 
 	public void headsetStatusChanged(boolean headsetPresent) {
@@ -511,9 +523,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		Log.i("CarCast", "ContentService destroyed");
 		// Toast.makeText(getApplication(), "Service Destroyed", 1000).show();
 		
-			// Make sure our notification is gone.
-		stopForegroundCompat();
-
+		// Make sure our notification is gone.
+		disableNotification();
 	}
 
 	public void pauseNow() {
@@ -528,6 +539,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			// say(activity, "paused " + currentTitle());
 			saveState();
 		}
+		disableNotification();
 		// activity.disableJumpButtons();
 	}
 
@@ -539,6 +551,7 @@ public class ContentService extends Service implements OnCompletionListener {
 				return false;
 			} else {
 				if (mediaMode == MediaMode.Paused) {
+					enableNotification();
 					mediaPlayer.start();
 					mediaMode = MediaMode.Playing;
 					// activity.enableJumpButtons();
@@ -553,9 +566,9 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	private void play() {
-		//setForeground(true);
-
 		try {
+			enableNotification();
+
 			if (!fullReset())
 				return;
 
@@ -672,7 +685,6 @@ public class ContentService extends Service implements OnCompletionListener {
 						try {
 							// The intent here is keep the phone from shutting
 							// down during a download.
-							//ContentService.this.setForeground(true);
 							wl.acquire();
 
 							// If we have wifi now, lets hold on to it.
@@ -701,7 +713,6 @@ public class ContentService extends Service implements OnCompletionListener {
 								}
 							}
 
-							//ContentService.this.setForeground(false);
 							wl.release();
 						}
 					} catch (Throwable t) {
@@ -869,5 +880,16 @@ public class ContentService extends Service implements OnCompletionListener {
 		invokeMethod(mSetForeground, mSetForegroundArgs);
 	}
 
+	void enableNotification() {
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, CarCast.class), 0);
+		Notification notification = new Notification(R.drawable.ccp_launcher, null, System.currentTimeMillis());
+		notification.flags |= Notification.FLAG_ONGOING_EVENT|Notification.FLAG_NO_CLEAR;
+		notification.setLatestEventInfo(this, getText(R.string.notification_status), getText(R.string.notification_text), contentIntent);
 
+		startForegroundCompat(R.string.notification_status, notification);
+	}
+
+	void disableNotification() {
+		stopForegroundCompat();
+	}
 }
