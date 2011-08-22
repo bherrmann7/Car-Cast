@@ -35,18 +35,7 @@ import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
 
 public class ContentService extends Service implements OnCompletionListener {
-	/**
-	 * Class for clients to access. Because we know this service always runs in the same process as its clients, we
-	 * don't need to deal with IPC.
-	 */
-	public class LocalBinder extends Binder {
-		public ContentService getService() {
-			return ContentService.this;
-		}
-	}
-
 	private final IBinder binder = new LocalBinder();
-
 	int currentPodcastInPlayer;
 	DownloadHelper downloadHelper;
 	private File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
@@ -58,18 +47,18 @@ public class ContentService extends Service implements OnCompletionListener {
 	File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
 	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
 	boolean wasPausedByPhoneCall;
-
 	private PlayStatusListener playStatusListener;
-
 	private HeadsetReceiver headsetReceiver;
 
-	/*
-	 * private boolean _wifiWasDisabledBeforeAutoDownload = false;
-	 * 
-	 * public boolean getWifiWasDisabledBeforeAutoDownload() { return _wifiWasDisabledBeforeAutoDownload; }
-	 * 
-	 * public void setWifiWasDisabledBeforeAutoDownload(boolean value) { _wifiWasDisabledBeforeAutoDownload = value; }
+	/**
+	 * Class for clients to access. Because we know this service always runs in the same process as its clients, we
+	 * don't need to deal with IPC.
 	 */
+	public class LocalBinder extends Binder {
+		public ContentService getService() {
+			return ContentService.this;
+		}
+	}
 
 	public static String getTimeString(int time) {
 		StringBuilder sb = new StringBuilder();
@@ -89,7 +78,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		return subHelper.addSubscription(toAdd);
 	}
 
-	public void bump(int bump) {
+	public void bumpForwardSeconds(int bump) {
 		if (currentPodcastInPlayer >= metaHolder.getSize())
 			return;
 		try {
@@ -110,7 +99,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	}
 
-	private MetaFile cm() {
+	private MetaFile currentMeta() {
 		if (metaHolder.getSize() == 0) {
 			return null;
 		}
@@ -121,18 +110,18 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			return 0;
 		}
-		int dur = cm().getDuration();
+		int dur = currentMeta().getDuration();
 		if (dur != -1)
 			return dur;
 		if (mediaMode == MediaMode.UnInitialized) {
-			cm().computeDuration();
-			return cm().getDuration();
+			currentMeta().computeDuration();
+			return currentMeta().getDuration();
 		}
-		return cm().getDuration();
+		return currentMeta().getDuration();
 	}
 
 	public File currentFile() {
-		return cm().file;
+		return currentMeta().file;
 	}
 
 	int currentPostion() {
@@ -159,9 +148,9 @@ public class ContentService extends Service implements OnCompletionListener {
 				return "Downloading podcasts";
 			return "No Podcasts have been downloaded.";
 		}
-		sb.append(cm().getFeedName());
+		sb.append(currentMeta().getFeedName());
 		sb.append('\n');
-		sb.append(cm().getTitle());
+		sb.append(currentMeta().getTitle());
 		return sb.toString();
 	}
 
@@ -172,7 +161,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			}
 			return "No podcasts loaded.\nUse 'Menu' and 'Download Podcasts'";
 		}
-		return cm().getTitle();
+		return currentMeta().getTitle();
 	}
 
 	public void deleteAllSubscriptions() {
@@ -306,7 +295,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			return "";
 		}
-		return cm().getFeedName();
+		return currentMeta().getFeedName();
 	}
 
 	public String getDurationString() {
@@ -325,8 +314,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (isPlaying()) {
 			return getTimeString(mediaPlayer.getCurrentPosition());
 		}
-		if (cm() != null)
-			return getTimeString(cm().getCurrentPos());
+		if (currentMeta() != null)
+			return getTimeString(currentMeta().getCurrentPos());
 		return "";
 	}
 
@@ -337,7 +326,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	public String getPodcastEmailSummary() {
 		StringBuilder sb = new StringBuilder();
 		if (currentPodcastInPlayer < metaHolder.getSize()) {
-			MetaFile mf = cm();
+			MetaFile mf = currentMeta();
 			if (mf != null) {
 				sb.append("\nWanted to let you know about this podcast:\n\n");
 				sb.append("\nTitle: " + mf.getTitle());
@@ -402,8 +391,8 @@ public class ContentService extends Service implements OnCompletionListener {
 	public void next() {
 		boolean isPlaying = mediaPlayer.isPlaying();
 		if (isPlaying) {
-			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
-			cm().save();
+			currentMeta().setCurrentPos(mediaPlayer.getCurrentPosition());
+			currentMeta().save();
 			mediaPlayer.stop();
 		}
 		next(isPlaying);
@@ -440,9 +429,9 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		cm().setCurrentPos(0);
-		cm().setListenedTo();
-		cm().save();
+		currentMeta().setCurrentPos(0);
+		currentMeta().setListenedTo();
+		currentMeta().save();
 		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("autoPlayNext", true)) {
 			next(true);
 		}
@@ -509,7 +498,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		Log.i("CarCast", "ContentService got intent that headset prsent is " + headsetPresent);
 		if (!headsetPresent && isPlaying()) {
 			pauseNow();
-			bump(-2);
+			bumpForwardSeconds(-2);
 			if (playStatusListener != null) {
 				playStatusListener.playStateUpdated(false);
 			}
@@ -531,8 +520,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		if (mediaPlayer.isPlaying()) {
 
 			// Save current position
-			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
-			cm().save();
+			currentMeta().setCurrentPos(mediaPlayer.getCurrentPosition());
+			currentMeta().save();
 
 			mediaPlayer.pause();
 			mediaMode = MediaMode.Paused;
@@ -647,7 +636,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	public void setCurrentPaused(int position) {
 		boolean wasPlaying = mediaPlayer.isPlaying();
 		if (wasPlaying) {
-			cm().setCurrentPos(mediaPlayer.getCurrentPosition());
+			currentMeta().setCurrentPos(mediaPlayer.getCurrentPosition());
 			mediaPlayer.stop();
 		}
 		mediaMode = MediaMode.Paused;
@@ -760,7 +749,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			mediaPlayer.reset();
 			mediaPlayer.setDataSource(currentFile().toString());
 			mediaPlayer.prepare();
-			mediaPlayer.seekTo(cm().getCurrentPos());
+			mediaPlayer.seekTo(currentMeta().getCurrentPos());
 			mediaMode = MediaMode.Paused;
 		} catch (Throwable e) {
 			// bummer.

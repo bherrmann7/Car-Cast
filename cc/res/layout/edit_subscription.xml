@@ -52,7 +52,7 @@
 			<Button android:id="@+id/saveEditSite"
 				android:layout_marginTop="20px" android:layout_marginLeft="100px"
 				android:layout_width="100px" android:layout_height="wrap_content"
-				android:layout_below="@id/enabled" android:text="Save" />
+				android:layout_below="@id/enabled" android:focusable="true" android:text="Save" />
 
 		</LinearLayout>
 	</ScrollView>

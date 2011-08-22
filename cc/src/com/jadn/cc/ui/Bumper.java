@@ -13,7 +13,7 @@ public class Bumper implements OnClickListener {
     }
 
     @Override public void onClick(View v) {
-        carCast.getContentService().bump(bump);
+        carCast.getContentService().bumpForwardSeconds(bump);
         carCast.updateUI();
     }
 }

@@ -53,19 +53,6 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 
 		currentSub = null;
 
-		if (getIntent().hasExtra("subscription")) {
-			currentSub = (Subscription) getIntent().getExtras().get(
-					"subscription");
-		} else {
-			// we're coming from the browser
-			if( Intent.ACTION_VIEW.equals( getIntent().getAction() ) ) {
-				Log.d("onCreate", "data: "+getIntent().getDataString());
-				String feedUrl = getIntent().getDataString();
-				currentSub = new Subscription("", feedUrl);
-			}
-		}
-
-
 		((Button) findViewById(R.id.saveEditSite)).setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -114,22 +101,9 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 
 			@Override
 			public void onClick(View v) {
-				DownloadHistory history = DownloadHistory.getInstance();
-				encloseureHandler = new EnclosureHandler(history);
-				Spinner spinner = (Spinner) findViewById(R.id.subMax);
-				int max = mValues[spinner.getSelectedItemPosition()];
-				if (max == Subscription.GLOBAL) {
-					max = Config.getMax(SubscriptionEdit.this);
-				}
-				encloseureHandler.setMax(max);
-
-				dialog = ProgressDialog.show(SubscriptionEdit.this, "Testing Subscription", "Testing Subscription URL.\nPlease wait...",
-						true);
-				dialog.show();
-
-				new Thread(SubscriptionEdit.this).start();
-
+				testUrl();
 			}
+
 
 		});
 
@@ -144,8 +118,43 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 				}
 			}
 		}
+		
+		
+		if (getIntent().hasExtra("subscription")) {
+			currentSub = (Subscription) getIntent().getExtras().get(
+					"subscription");
+		} else {
+			// we're coming from the browser
+			if( Intent.ACTION_VIEW.equals( getIntent().getAction() ) ) {
+				Log.d("onCreate", "data: "+getIntent().getDataString());
+				String feedUrl = getIntent().getDataString();
+				((TextView) findViewById(R.id.editsite_url)).setText(feedUrl);
+//				currentSub = new Subscription("", feedUrl);
+				testUrl();
+			}
+		}
+
 
 	}
+	
+	private void testUrl() {
+		DownloadHistory history = DownloadHistory.getInstance();
+		encloseureHandler = new EnclosureHandler(history);
+		Spinner spinner = (Spinner) findViewById(R.id.subMax);
+		int max = mValues[spinner.getSelectedItemPosition()];
+		if (max == Subscription.GLOBAL) {
+			max = Config.getMax(SubscriptionEdit.this);
+		}
+		encloseureHandler.setMax(max);
+
+		dialog = ProgressDialog.show(SubscriptionEdit.this, "Testing Subscription", "Testing Subscription URL.\nPlease wait...",
+				true);
+		dialog.show();
+
+		new Thread(SubscriptionEdit.this).start();
+
+	}
+
 
 	private static final String[] mStrings = { "global setting", "2", "4", "6", "10", "Unlimited" };
 	private static final int[] mValues = { Subscription.GLOBAL, 2, 4, 6, 10, EnclosureHandler.UNLIMITED };
@@ -177,6 +186,8 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 			if (testException != null) {
 				Log.e("editSite", "testURL " + getURL(), testException);
 				Util.toast(SubscriptionEdit.this, "Problem accessing feed. " + testException.toString());
+				TextView urlTV = (TextView) findViewById(R.id.editsite_url);
+				urlTV.requestFocus();
 				return;
 			}
 			Util.toast(SubscriptionEdit.this, "Feed is OK.  Would download " + encloseureHandler.metaNets.size() + " podcasts.");
@@ -185,6 +196,8 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 			if (encloseureHandler.title.length() != 0 && nameTV.getText().length() == 0) {
 				nameTV.setText(encloseureHandler.getTitle());
 			}
+			
+			((Button) findViewById(R.id.saveEditSite)).requestFocus();
 
 		}
 	};

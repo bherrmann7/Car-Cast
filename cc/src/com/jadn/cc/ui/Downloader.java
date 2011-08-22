@@ -73,7 +73,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 				"Issue on download...");
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("\nBasic Info\n");
+		sb.append("Thanks. Please describe the problem. \n\n=== Basic Info ===\n");
 		nv(sb, "package_name", TraceData.APP_PACKAGE);
 		nv(sb, "package_version", TraceData.APP_VERSION);
 		nv(sb, "phone_model", TraceData.PHONE_MODEL);
