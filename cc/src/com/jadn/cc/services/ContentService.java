@@ -388,6 +388,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		mediaPlayer.seekTo((int) (d * mediaPlayer.getDuration()));
 	}
 
+	// Called when user hits next button.   Migth be playing or not playing at the time.
 	public void next() {
 		boolean isPlaying = mediaPlayer.isPlaying();
 		if (isPlaying) {
@@ -398,7 +399,10 @@ public class ContentService extends Service implements OnCompletionListener {
 		next(isPlaying);
 	}
 
-	void next(boolean isPlaying) {
+	// called when user hits button (might be playing or not playing) and called when 
+	// the playback engine his the "onCompletion" event (ie. a podcast has finished, in which case
+	// we are actually no longer playing but we were just were a millisecond or so ago.)
+	void next(boolean inTheActOfPlaying) {
 		mediaMode = MediaMode.UnInitialized;
 
 		// if we are at end.
@@ -407,12 +411,16 @@ public class ContentService extends Service implements OnCompletionListener {
 			// activity.disableJumpButtons();
 			mediaPlayer.reset();
 			// say(activity, "That's all folks");
+			if(inTheActOfPlaying)
+				disableNotification();
 			return;
 		}
 
 		currentPodcastInPlayer++;
-		if (isPlaying)
+		if (inTheActOfPlaying)
 			play();
+		else 
+			disableNotification();
 	}
 
 	@Override
@@ -434,6 +442,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		currentMeta().save();
 		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("autoPlayNext", true)) {
 			next(true);
+		} else {
+			disableNotification();
 		}
 	}
 
