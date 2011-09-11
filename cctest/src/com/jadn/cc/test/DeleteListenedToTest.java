@@ -1,7 +1,6 @@
 package com.jadn.cc.test;
 
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
 
 import com.jadn.cc.ui.CarCast;
 import com.jayway.android.robotium.solo.Solo;

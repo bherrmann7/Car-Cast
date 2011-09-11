@@ -2,9 +2,6 @@ package com.jadn.cc.test;
 
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.jadn.cc.core.Util;
-import com.jadn.cc.services.DownloadHistory;
-import com.jadn.cc.services.EnclosureHandler;
 import com.jadn.cc.ui.CarCast;
 import com.jayway.android.robotium.solo.Solo;
 
