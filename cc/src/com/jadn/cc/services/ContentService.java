@@ -19,6 +19,7 @@ import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -229,6 +230,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	void doDownloadCompletedNotification(int got) {
+		
 		// Get the notification manager service.
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
 
@@ -388,7 +390,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		mediaPlayer.seekTo((int) (d * mediaPlayer.getDuration()));
 	}
 
-	// Called when user hits next button.   Migth be playing or not playing at the time.
+	// Called when user hits next button. Migth be playing or not playing at the time.
 	public void next() {
 		boolean isPlaying = mediaPlayer.isPlaying();
 		if (isPlaying) {
@@ -399,7 +401,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		next(isPlaying);
 	}
 
-	// called when user hits button (might be playing or not playing) and called when 
+	// called when user hits button (might be playing or not playing) and called when
 	// the playback engine his the "onCompletion" event (ie. a podcast has finished, in which case
 	// we are actually no longer playing but we were just were a millisecond or so ago.)
 	void next(boolean inTheActOfPlaying) {
@@ -411,7 +413,7 @@ public class ContentService extends Service implements OnCompletionListener {
 			// activity.disableJumpButtons();
 			mediaPlayer.reset();
 			// say(activity, "That's all folks");
-			if(inTheActOfPlaying)
+			if (inTheActOfPlaying)
 				disableNotification();
 			return;
 		}
@@ -419,7 +421,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		currentPodcastInPlayer++;
 		if (inTheActOfPlaying)
 			play();
-		else 
+		else
 			disableNotification();
 	}
 
@@ -451,6 +453,10 @@ public class ContentService extends Service implements OnCompletionListener {
 	public void onCreate() {
 		super.onCreate();
 		ExceptionHandler.register(this);
+
+		partialWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, CarCastApplication
+				.getAppTitle());
+		partialWakeLock.setReferenceCounted(false);
 
 		PhoneStateListener phoneStateListener = new PhoneStateListener() {
 			@Override
@@ -488,7 +494,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		// http://groups.google.com/group/android-developers/browse_thread/thread/6d0dda99b4f42c8f/d7de082acdb0da25
 		headsetReceiver = new HeadsetReceiver(this);
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
-		
+
 		// foreground stuff
 		try {
 			mStartForeground = getClass().getMethod("startForeground", mStartForegroundSignature);
@@ -521,7 +527,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		super.onDestroy();
 		Log.i("CarCast", "ContentService destroyed");
 		// Toast.makeText(getApplication(), "Service Destroyed", 1000).show();
-		
+
 		// Make sure our notification is gone.
 		disableNotification();
 	}
@@ -672,7 +678,9 @@ public class ContentService extends Service implements OnCompletionListener {
 			new Thread() {
 				@Override
 				public void run() {
-					try {
+					try {						
+						partialWakeLock.acquire();
+						
 						Log.i("CarCast", "starting download thread.");
 						// Lets not the phone go to sleep while doing
 						// downloads....
@@ -718,6 +726,7 @@ public class ContentService extends Service implements OnCompletionListener {
 						Log.i("CarCast", "Unpleasentness during download: " + t.getMessage());
 					} finally {
 						Log.i("CarCast", "finished download thread.");
+						partialWakeLock.release();
 					}
 				}
 			}.start();
@@ -879,16 +888,24 @@ public class ContentService extends Service implements OnCompletionListener {
 		invokeMethod(mSetForeground, mSetForegroundArgs);
 	}
 
+	private WakeLock partialWakeLock;
+
 	void enableNotification() {
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, CarCast.class), 0);
 		Notification notification = new Notification(R.drawable.ccp_launcher, null, System.currentTimeMillis());
-		notification.flags |= Notification.FLAG_ONGOING_EVENT|Notification.FLAG_NO_CLEAR;
+		notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR;
 		notification.setLatestEventInfo(this, getText(R.string.notification_status), getText(R.string.notification_text), contentIntent);
 
 		startForegroundCompat(R.string.notification_status, notification);
+
+		partialWakeLock.acquire();
 	}
 
 	void disableNotification() {
 		stopForegroundCompat();
+
+		partialWakeLock.release();
 	}
+	
+	 
 }
