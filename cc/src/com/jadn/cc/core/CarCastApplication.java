@@ -14,6 +14,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] { 
+		"11-Sep-2011", "Fix: A change to keep the Archos tablet from sleeping during downloads.\n\nThanks Stephen Blott!",
 		"22-Aug-2011", "Fix: Dont leave notification icon up after end of podcast(s) reached.",
 		"17-Aug-2011", "Fix: Click on podcast link from a web browser, will show/add subscription to CarCast.",
 		"14-Aug-2011a", "Hopefully a fix for Foreground/Background issues.\n\nThanks to Baruch Even!!!\nhttp://baruch.ev-en.org/",
