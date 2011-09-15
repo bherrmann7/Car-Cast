@@ -50,6 +50,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	boolean wasPausedByPhoneCall;
 	private PlayStatusListener playStatusListener;
 	private HeadsetReceiver headsetReceiver;
+	private RemoteControlReceiver remoteControlReceiver;
 
 	/**
 	 * Class for clients to access. Because we know this service always runs in the same process as its clients, we
@@ -494,6 +495,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		// http://groups.google.com/group/android-developers/browse_thread/thread/6d0dda99b4f42c8f/d7de082acdb0da25
 		headsetReceiver = new HeadsetReceiver(this);
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+		remoteControlReceiver = new RemoteControlReceiver(this);
+		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_MEDIA_BUTTON));
 
 		// foreground stuff
 		try {
