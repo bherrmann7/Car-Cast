@@ -92,7 +92,6 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.waitForDialogToClose(20000);
 		assertEquals("Quirks and Quarks Segmented Show from CBC Radio", solo.getEditText(1).getText().toString());
 	}
-	
 
 	public void testChurchPodcast1() throws Exception {
 		solo.sendKey(Solo.MENU);
@@ -219,6 +218,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Delete All");
+		solo.clickOnButton("Delete");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Add");
 		solo.enterText(0, "www.podiobooks.com/bookfeed/23795/627/book.xml");
@@ -384,6 +384,34 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 			}
 			assertFalse("No title found, probably cant parse", enclosureHandler.getTitle().equals(""));
 		}
+	}
+
+	// "http://rss.sciam.com/sciam/60-second-earth",
+	public void test60SecEarth() throws Exception {
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Subscriptions");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Delete All");
+		solo.clickOnButton("Delete");
+		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter().getCount());
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Add");
+		solo.enterText(0, "rss.sciam.com/sciam/60-second-earth");
+		solo.clickOnButton("Test");
+		solo.waitForDialogToClose(20000);
+		assertTrue(!"".equals(solo.getEditText(1).getText().toString()));
+		solo.clickOnText("Save");
+		solo.goBack();
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Podcasts");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Erase");
+		solo.clickOnButton("Erase");
+		solo.sendKey(Solo.MENU);
+		solo.clickOnText("Delete All Podcasts");
+		solo.clickOnText("Confirm");
+
+		assertTrue(solo.searchText("No podcasts loaded."));
 	}
 
 }
