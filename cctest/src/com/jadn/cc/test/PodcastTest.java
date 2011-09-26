@@ -90,25 +90,9 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.enterText(0, "www.cbc.ca/podcasting/includes/quirks.xml");
 		solo.clickOnButton("Test");
 		solo.waitForDialogToClose(20000);
-		assertEquals("Quirks & Quarks Segmented Show from CBC Radio", solo.getEditText(1).getText().toString());
+		assertEquals("Quirks and Quarks Segmented Show from CBC Radio", solo.getEditText(1).getText().toString());
 	}
-
-	// Spanish Podcast
-	// 
-	public void testSpanishPodcast() throws Exception {
-		solo.sendKey(Solo.MENU);
-		solo.clickOnText("Subscriptions");
-		solo.sendKey(Solo.MENU);
-		solo.clickOnText("Add");
-		solo.enterText(0, "www.ondacero.es/OndaCero/rss/La-rosa-de-los-vientos/2166771");
-		// solo.enterText(0, "jadn.com/podcast.xml");
-		solo.clickOnButton("Test");
-		solo.waitForDialogToClose(20000);
-		// assertTrue(solo.searchText("Feed is OK"));
-
-		// assertTrue(solo.getEditText(1).getText().toString().trim().length()!=0);
-		assertEquals("La rosa de los vientos", solo.getEditText(1).getText().toString());
-	}
+	
 
 	public void testChurchPodcast1() throws Exception {
 		solo.sendKey(Solo.MENU);
@@ -303,6 +287,7 @@ public class PodcastTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Delete All");
+		solo.clickOnButton("Delete");
 		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter().getCount());
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Add");
