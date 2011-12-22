@@ -34,7 +34,8 @@ public class Util {
 		connection.setReadTimeout(20 * 1000);
 		String charset = getCharset(connection.getContentType());
 
-		// we want to get the encoding
+		// We want to get the encoding of the xml document and take a peek so we can properly decode the entire stream
+		// especially important for non-UTF8 feeds
 		PushbackInputStream pis = new PushbackInputStream(connection.getInputStream(), 1024);
 		StringBuilder xmlHeader = new StringBuilder();
 		byte[] bytes = new byte[1023];
