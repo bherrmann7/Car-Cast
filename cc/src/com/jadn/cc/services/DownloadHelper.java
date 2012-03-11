@@ -142,6 +142,7 @@ public class DownloadHelper implements Sayer {
 
 		System.setProperty("http.maxRedirects", "50");
 		say("\n");
+		byte[] buf = new byte[16383];
 
 		int got = 0;
 		for (int i = 0; i < newPodcasts.size(); i++) {
@@ -162,7 +163,6 @@ public class DownloadHelper implements Sayer {
 				say("enclosure url: " + new URL(newPodcasts.get(i).getUrl()));
 				InputStream is = getInputStream(new URL(newPodcasts.get(i).getUrl()));
 				FileOutputStream fos = new FileOutputStream(tempFile);
-				byte[] buf = new byte[16383];
 				int amt = 0;
 				int expectedSizeKilo = newPodcasts.get(i).getSize() / 1024;
 				String preDownload = sb.toString();
