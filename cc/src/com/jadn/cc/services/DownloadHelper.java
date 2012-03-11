@@ -188,7 +188,7 @@ public class DownloadHelper implements Sayer {
 
 				got++;
 				if (totalForThisPodcast != newPodcasts.get(i).getSize()) {
-					say("Note: reported size in rss did not match download.");
+					say("Note: reported size in rss did not match download. (means the progress bar will be wacked)");
 					// subtract out wrong value
 					podcastsTotalBytes -= newPodcasts.get(i).getSize();
 					// add in correct value
@@ -282,7 +282,7 @@ public class DownloadHelper implements Sayer {
 						data.append(sub.url);
 					}
 
-					// Send data
+					// Send data - we collect sites to build the searchable podcast database
 					URL url = new URL("http://jadn.com/carcast/collectSites");
 					// URL url = new
 					// URL("http://192.168.0.128:9090/carcast/collectSites");
@@ -309,7 +309,6 @@ public class DownloadHelper implements Sayer {
 					rd.close();
 				} catch (Exception e) {
 					Log.e("carcast", "updateSite", e);
-
 				}
 
 			}

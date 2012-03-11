@@ -40,4 +40,9 @@
 		android:title="Keep email address secret" 
 		android:summary="Used for internal tracking only" 
 		android:defaultValue="false" />
+	<CheckBoxPreference 
+		android:key="notifiyOnZeroDownloads" 
+		android:title="Show Zero Downloads?" 
+		android:summary="Show download notification when no downloads?" 
+		android:defaultValue="true" />
 </PreferenceScreen>

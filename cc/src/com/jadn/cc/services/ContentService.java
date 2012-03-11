@@ -13,6 +13,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.wifi.WifiManager;
@@ -231,7 +232,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	void doDownloadCompletedNotification(int got) {
-		
+
 		// Get the notification manager service.
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
 
@@ -245,14 +246,19 @@ public class ContentService extends Service implements OnCompletionListener {
 			e.printStackTrace();
 		}
 
-		Notification notification = new Notification(R.drawable.icon2, "Download complete", System.currentTimeMillis());
+		SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		if (got == 0 && !app_preferences.getBoolean("notifiyOnZeroDownloads", true)) {
+			mNotificationManager.cancel(22);
+		} else {
+			Notification notification = new Notification(R.drawable.icon2, "Download complete", System.currentTimeMillis());
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, CarCast.class), 0);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, CarCast.class), 0);
 
-		notification.setLatestEventInfo(getBaseContext(), "Downloads Finished", "Downloaded " + got + " podcasts.", contentIntent);
-		notification.flags = Notification.FLAG_AUTO_CANCEL;
+			notification.setLatestEventInfo(getBaseContext(), "Downloads Finished", "Downloaded " + got + " podcasts.", contentIntent);
+			notification.flags = Notification.FLAG_AUTO_CANCEL;
 
-		mNotificationManager.notify(22, notification);
+			mNotificationManager.notify(22, notification);
+		}
 
 		// clear so next user request will start new download
 		// downloadHelper = null;
@@ -455,8 +461,8 @@ public class ContentService extends Service implements OnCompletionListener {
 		super.onCreate();
 		ExceptionHandler.register(this);
 
-		partialWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, CarCastApplication
-				.getAppTitle());
+		partialWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+				CarCastApplication.getAppTitle());
 		partialWakeLock.setReferenceCounted(false);
 
 		PhoneStateListener phoneStateListener = new PhoneStateListener() {
@@ -681,9 +687,9 @@ public class ContentService extends Service implements OnCompletionListener {
 			new Thread() {
 				@Override
 				public void run() {
-					try {						
+					try {
 						partialWakeLock.acquire();
-						
+
 						Log.i("CarCast", "starting download thread.");
 						// Lets not the phone go to sleep while doing
 						// downloads....
@@ -909,6 +915,5 @@ public class ContentService extends Service implements OnCompletionListener {
 
 		partialWakeLock.release();
 	}
-	
-	 
+
 }
