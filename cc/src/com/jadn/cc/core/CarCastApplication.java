@@ -14,6 +14,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] { 
+		"30-Mar-2012", "Don't duplicate every ESPN feed... despite it being their issue....",
 		"10-Mar-2012", "Add new Setting -> if no downloads then don't show notification.",
 		"25-Sep-2011", "For some headphone pause buttons and bluetooth pause buttons, CarCast now pauses.",
 		"11-Sep-2011", "Fix: A change to keep the Archos tablet from sleeping during downloads.\n\nThanks Stephen Blott!",

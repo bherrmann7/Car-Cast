@@ -138,8 +138,15 @@ public class EnclosureHandler extends DefaultHandler {
 						// stop getting podcasts after we find one in our
 						// history.
 						max = STOP;
-					} else {
-						metaNets.add(metaNet);
+					} else {		
+						boolean found = false;
+						for(MetaNet i: metaNets){
+							if(i.getUrl().equals(metaNet.getUrl())){
+								found = true;
+							}
+						}
+						if(!found)
+							metaNets.add(metaNet);
 					}
 				}
 			} catch (MalformedURLException e) {
