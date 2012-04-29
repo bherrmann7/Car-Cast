@@ -92,7 +92,8 @@ public class CarCast extends BaseActivity {
 		ExceptionHandler.register(this);
 
         mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        mRemoteControlResponder = new ComponentName(getPackageName(), HeadsetReceiver.class.getName());
+		mRemoteControlResponder = new ComponentName(getPackageName(),
+				HeadsetReceiver.class.getName());
 
 		super.onCreate(savedInstanceState);
 

@@ -1,33 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.jadn.cc" android:versionCode="131" android:versionName="1.0.131">
-	<application android:icon="@drawable/ccp_launcher"
-		android:label="Car Cast" android:debuggable="true"
-		android:name="com.jadn.cc.core.CarCastApplication">
-		<activity android:name=".ui.CarCast" android:label="Car Cast">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		<activity android:name="com.admob.android.ads.AdMobActivity"
-			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-			android:configChanges="orientation|keyboard|keyboardHidden" />
+    package="com.jadn.cc"
+    android:versionCode="132"
+    android:versionName="1.0.132" >
 
-		<receiver android:name="com.admob.android.ads.analytics.InstallReceiver"
-			android:exported="true">
-			<intent-filter>
-				<action android:name="com.android.vending.INSTALL_REFERRER" />
-			</intent-filter>
-		</receiver>
+    <application
+        android:name="com.jadn.cc.core.CarCastApplication"
+        android:debuggable="true"
+        android:icon="@drawable/ccp_launcher"
+        android:label="Car Cast" >
+        <activity
+            android:name=".ui.CarCast"
+            android:label="Car Cast" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-		<activity android:name=".ui.AudioRecorder"></activity>
-		<activity android:name=".ui.Downloader"
-			android:screenOrientation="portrait"></activity>
-		<activity android:name=".ui.DownloadProgress"
-			android:screenOrientation="portrait"></activity>
-		<activity android:name=".ui.SubscriptionEdit">
-			<!-- intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.admob.android.ads.AdMobActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <receiver
+            android:name="com.admob.android.ads.analytics.InstallReceiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".ui.AudioRecorder" >
+        </activity>
+        <activity
+            android:name=".ui.Downloader"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".ui.DownloadProgress"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name=".ui.SubscriptionEdit" >
+
+            <!--
+            intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -35,84 +52,121 @@
                 <data android:scheme="pcast" />
                 <data android:scheme="feed" />
                 <data android:scheme="rss" />
-            </intent-filter-->
+            </intent-filter
+            -->
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="*"
-                    android:pathPattern=".*xml" />
-                <data android:scheme="http" android:host="*"
-                    android:pathPattern=".*rss" />
-                <data android:scheme="http" android:host="*"
-                    android:pathPattern=".*feed.*" />
-                <data android:scheme="http" android:host="*"
-                    android:pathPattern=".*podcast.*" />
-                <data android:scheme="http" android:host="*"
-                    android:pathPattern=".*Podcast.*" />
-                <data android:scheme="http" android:host="*"
-                    android:pathPattern=".*rss.*" />
-                <data android:scheme="http" android:host="*"
-                    android:pathPattern=".*RSS.*" />
-            </intent-filter>
 
+                <data
+                    android:host="*"
+                    android:pathPattern=".*xml"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*rss"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*feed.*"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*podcast.*"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*Podcast.*"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*rss.*"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*RSS.*"
+                    android:scheme="http" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:mimeType="text/xml" android:scheme="http" />
-                <data android:mimeType="application/rss+xml" android:scheme="http" />
-                <data android:mimeType="application/atom+xml" android:scheme="http" />
+
+                <data
+                    android:mimeType="text/xml"
+                    android:scheme="http" />
+                <data
+                    android:mimeType="application/rss+xml"
+                    android:scheme="http" />
+                <data
+                    android:mimeType="application/atom+xml"
+                    android:scheme="http" />
             </intent-filter>
-		</activity>
-		<activity android:name=".ui.Settings"></activity>
-		<activity android:name=".ui.Subscriptions"></activity>
-		<activity android:name=".ui.Search"></activity>
-		<activity android:name=".ui.Splash"></activity>
-		<activity android:name=".ui.SearchResults"></activity>
-		<activity android:name=".ui.PodcastList"></activity>
-		<activity android:name=".ui.FeedbackHelp"></activity>
+        </activity>
+        <activity android:name=".ui.Settings" >
+        </activity>
+        <activity android:name=".ui.Subscriptions" >
+        </activity>
+        <activity android:name=".ui.Search" >
+        </activity>
+        <activity android:name=".ui.Splash" >
+        </activity>
+        <activity android:name=".ui.SearchResults" >
+        </activity>
+        <activity android:name=".ui.PodcastList" >
+        </activity>
+        <activity android:name=".ui.FeedbackHelp" >
+        </activity>
+        <activity
+            android:name="com.google.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
-		<service android:name=".services.ContentService" />
-		<service android:name=".services.AlarmService" />
-		<service android:name=".services.AlarmHostService">
-			<intent-filter>
-				<action android:name="com.jadn.cc.services.AlarmHostService" />
-			</intent-filter>
-		</service>
+        <service android:name=".services.ContentService" />
+        <service android:name=".services.AlarmService" />
+        <service android:name=".services.AlarmHostService" >
+            <intent-filter>
+                <action android:name="com.jadn.cc.services.AlarmHostService" />
+            </intent-filter>
+        </service>
 
-		<receiver android:name=".services.AlarmReceiver">
-			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED" />
-				<category android:name="android.intent.category.HOME" />
-			</intent-filter>
-		</receiver>
-		<!--
+        <receiver android:name=".services.AlarmReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+        <!--
 			<receiver android:name=".services.UnpluggedListener"> <intent-filter>
 			<action android:name="android.intent.action.ACTION_HEADSET_PLUG" />
 			</intent-filter> </receiver>
-		-->
-		<meta-data android:value="a14ca09b777254f" android:name="ADMOB_PUBLISHER_ID" />
-	</application>
+        -->
 
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.RECORD_AUDIO" />
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-	<uses-permission android:name="android.permission.READ_LOGS" />
+    </application>
 
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-	<meta-data android:name="ADMOB_ALLOW_LOCATION_FOR_ADS"
-		android:value="true" />
+    <uses-sdk
+        android:minSdkVersion="3"
+        android:targetSdkVersion="4" />
 
-	<supports-screens android:smallScreens="true"
-		android:normalScreens="true" android:largeScreens="true"
-		android:anyDensity="true" />
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
 
-</manifest> 
+</manifest>
