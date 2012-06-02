@@ -19,11 +19,18 @@ public class HeadsetReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
 			KeyEvent ke = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
-			Log.e("CarCast", "Bone.." + ke.getKeyCode());
 			if ((ke.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE || ke.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK)
 					&& ke.getAction() == KeyEvent.ACTION_UP) {
 				contentService.pauseOrPlay();
 				abortBroadcast();
+			}
+			if(ke.getKeyCode() ==  KeyEvent.KEYCODE_MEDIA_NEXT && ke.getAction() == KeyEvent.ACTION_UP ){
+				contentService.next();
+				abortBroadcast();			
+			}
+			if(ke.getKeyCode() ==  KeyEvent.KEYCODE_MEDIA_PREVIOUS && ke.getAction() == KeyEvent.ACTION_UP){
+				contentService.previous();
+				abortBroadcast();			
 			}
 			return;
 		}
