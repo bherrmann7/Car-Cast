@@ -9,6 +9,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.graphics.drawable.GradientDrawable.Orientation;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -201,7 +203,20 @@ public class CarCast extends BaseActivity {
 
 		Recording.updateNotification(this);
 		
-		
+		String[] orientations = {"AUTO", "Landscape", "Flipped Landscape", "Portrait", "Flipped Portrait"};
+		int[] orientationValues = { ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
+				ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+		};
+		String orientation = app_preferences.getString("orientation", null);
+		if(orientation!=null){
+			for(int i=0;i<orientations.length;i++){
+				if(orientation.equals(orientations[i])){
+					setRequestedOrientation(orientationValues[i]);
+					Log.i("CarCast", "Orientation set to "+orientation+" v="+orientationValues[i]);
+					break;
+				}
+			}
+		}
 	}
 
 

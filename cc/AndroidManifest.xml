@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jadn.cc"
-    android:versionCode="132"
-    android:versionName="1.0.132" >
+    android:versionCode="133"
+    android:versionName="1.0.133" >
 
     <application
         android:name="com.jadn.cc.core.CarCastApplication"

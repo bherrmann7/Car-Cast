@@ -58,7 +58,7 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 			@Override
 			public void onClick(View v) {
 				String name = ((TextView) findViewById(R.id.editsite_name)).getText().toString();
-				String url = ((TextView) findViewById(R.id.editsite_url)).getText().toString();
+				String url = getURL();
 				Boolean enabled = ((CheckBox) findViewById(R.id.enabled)).isChecked();
 				CheckBox newestFirst = ((CheckBox) findViewById(R.id.fifoLifo));
 				Spinner spinner = (Spinner) findViewById(R.id.subMax);
@@ -174,7 +174,14 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 	}
 
 	private String getURL() {
-		return ((TextView) findViewById(R.id.editsite_url)).getText().toString();
+		String url = ((TextView) findViewById(R.id.editsite_url)).getText().toString();
+		if (!url.startsWith("http://") && !url.startsWith("https://")){
+			url = "http://"+url;
+		}
+		if(url.startsWith("http://http://")){
+			url = url.substring("http://".length());
+		}
+		return url;
 	}
 
 	Exception testException;

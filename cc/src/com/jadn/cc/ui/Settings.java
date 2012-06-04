@@ -75,5 +75,11 @@ public class Settings extends PreferenceActivity {
 				Log.e("Settings", "starting AlarmHostService", e);
 			}
 		}
+		
+		 Intent i = getApplicationContext().getPackageManager()
+		 .getLaunchIntentForPackage(getApplicationContext().getPackageName() );
+
+		 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK );
+		 startActivity(i);
 	}
 }
