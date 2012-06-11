@@ -68,7 +68,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 		emailIntent.setType("plain/text");
 		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
-				new String[] { "carcast-devs@googlegroups.com" });
+				new String[] { "carcast-devs@googlegroups.com", "bob@jadn.com" });
 		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
 				"Issue on download...");
 
@@ -154,7 +154,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 				if(line.startsWith("D/dalvikvm(")&& line.indexOf("GC freed")!=-1)
 					continue;
 				lines.add(line);
-				if(lines.size()>600){
+				if(lines.size()>1000){
 					lines.remove(0);
 				}
 			}

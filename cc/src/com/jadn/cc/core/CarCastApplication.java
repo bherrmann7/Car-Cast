@@ -14,6 +14,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] { 
+		"09-Jun-2012", "Better debugging: When emailing download details 1000 lines of log info are sent.",
+		"03-Jun-2012", "New setting - Orientation Preference",
 		"02-Jun-2012", "Podcast database nearly 8000 entries\nBluetooth headset forward/next working  (thx Ed)\nHandle subscription typos better",
 		"30-Mar-2012", "Don't duplicate every ESPN feed... despite it being their issue....",
 		"10-Mar-2012", "Add new Setting -> if no downloads then don't show notification.",

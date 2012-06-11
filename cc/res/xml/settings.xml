@@ -47,7 +47,7 @@
 		android:defaultValue="true" />
 	<ListPreference 
 		android:key="orientation"
-		android:title="orientation preference"
+		android:title="Orientation Preference"
 		android:entries="@array/orientationChoice_array"
 		android:entryValues="@array/orientationChoice_array"
 		android:dialogTitle="Orientation Preference"

@@ -47,7 +47,8 @@ public class CarCast extends BaseActivity {
 
 	// Create runnable for posting
 	final Runnable mUpdateResults = new Runnable() {
-		@Override public void run() {
+		@Override
+		public void run() {
 			updateUI();
 		}
 	};
@@ -84,7 +85,7 @@ public class CarCast extends BaseActivity {
 			pausePlay.setImageResource(R.drawable.player_102_play);
 		}
 	}
-	
+
 	private AudioManager mAudioManager;
 	private ComponentName mRemoteControlResponder;
 
@@ -93,9 +94,8 @@ public class CarCast extends BaseActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		ExceptionHandler.register(this);
 
-        mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-		mRemoteControlResponder = new ComponentName(getPackageName(),
-				HeadsetReceiver.class.getName());
+		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		mRemoteControlResponder = new ComponentName(getPackageName(), HeadsetReceiver.class.getName());
 
 		super.onCreate(savedInstanceState);
 
@@ -120,7 +120,8 @@ public class CarCast extends BaseActivity {
 		pausePlay.setSoundEffectsEnabled(true);
 		pausePlay.setImageResource(R.drawable.player_102_play);
 		pausePlay.setOnClickListener(new OnClickListener() {
-			@Override public void onClick(View v) {
+			@Override
+			public void onClick(View v) {
 				if (contentService.getCount() == 0)
 					return;
 				if (contentService.pauseOrPlay()) {
@@ -161,8 +162,7 @@ public class CarCast extends BaseActivity {
 					return true;
 				// if clicking on the audio recorder (lower 1/3 of screen on 1/2
 				// of right)
-				if (event.getAction() == MotionEvent.ACTION_UP
-						&& event.getX() > (v.getWidth() * 0.66)
+				if (event.getAction() == MotionEvent.ACTION_UP && event.getX() > (v.getWidth() * 0.66)
 						&& (event.getY()) > (v.getHeight() * 0.5)) {
 					try {
 						if (contentService.isPlaying()) {
@@ -173,8 +173,7 @@ public class CarCast extends BaseActivity {
 					}
 
 					pausePlay.setImageResource(R.drawable.player_102_play);
-					startActivityForResult(new Intent(CarCast.this,
-							AudioRecorder.class), 0);
+					startActivityForResult(new Intent(CarCast.this, AudioRecorder.class), 0);
 				}
 				return true;
 			}
@@ -195,30 +194,28 @@ public class CarCast extends BaseActivity {
 			editor.putBoolean("showSplash", false);
 			editor.commit();
 		} else if (!lastRun.equals(CarCastApplication.releaseData[0])) {
-			new AlertDialog.Builder(CarCast.this).setTitle(
-					CarCastApplication.getAppTitle() + " updated").setMessage(CarCastApplication.releaseData[1])
-					.setNeutralButton("Close", null).show();
+			new AlertDialog.Builder(CarCast.this).setTitle(CarCastApplication.getAppTitle() + " updated")
+					.setMessage(CarCastApplication.releaseData[1]).setNeutralButton("Close", null).show();
 		}
 		saveLastRun();
 
 		Recording.updateNotification(this);
-		
-		String[] orientations = {"AUTO", "Landscape", "Flipped Landscape", "Portrait", "Flipped Portrait"};
+
+		String[] orientations = { "AUTO", "Landscape", "Flipped Landscape", "Portrait", "Flipped Portrait" };
 		int[] orientationValues = { ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
-				ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-		};
+				ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,
+				ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT };
 		String orientation = app_preferences.getString("orientation", null);
-		if(orientation!=null){
-			for(int i=0;i<orientations.length;i++){
-				if(orientation.equals(orientations[i])){
+		if (orientation != null) {
+			for (int i = 0; i < orientations.length; i++) {
+				if (orientation.equals(orientations[i])) {
 					setRequestedOrientation(orientationValues[i]);
-					Log.i("CarCast", "Orientation set to "+orientation+" v="+orientationValues[i]);
+					Log.i("CarCast", "Orientation set to " + orientation + " v=" + orientationValues[i]);
 					break;
 				}
 			}
 		}
 	}
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -228,92 +225,90 @@ public class CarCast extends BaseActivity {
 		return true;
 	}
 
-	@Override public void finish() {
-	    Log.i("CarCast", "Finishing CC; contentService is "+contentService);
-	    if (contentService != null
-	            && contentService.isIdle()) {
-            getCarCastApplication().stopContentService();
-        }
-	    super.finish();
+	@Override
+	public void finish() {
+		Log.i("CarCast", "Finishing CC; contentService is " + contentService);
+		if (contentService != null && contentService.isIdle()) {
+			getCarCastApplication().stopContentService();
+		}
+		super.finish();
 	}
-	
-	 private static Method mRegisterMediaButtonEventReceiver;
-	    private static Method mUnregisterMediaButtonEventReceiver;
+
+	private static Method mRegisterMediaButtonEventReceiver;
+	private static Method mUnregisterMediaButtonEventReceiver;
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
+
 		unregisterRemoteControl();
 	}
-	
+
 	static {
-        initializeRemoteControlRegistrationMethods();
-    }
-	
-	 private void registerRemoteControl() {
-	        try {
-	            if (mRegisterMediaButtonEventReceiver == null) {
-	                return;
-	            }
-	            mRegisterMediaButtonEventReceiver.invoke(mAudioManager, mRemoteControlResponder);
-	        } catch (InvocationTargetException ite) {
-	            /* unpack original exception when possible */
-	            Throwable cause = ite.getCause();
-	            if (cause instanceof RuntimeException) {
-	                throw (RuntimeException) cause;
-	            } else if (cause instanceof Error) {
-	                throw (Error) cause;
-	            } else {
-	                /* unexpected checked exception; wrap and re-throw */
-	                throw new RuntimeException(ite);
-	            }
-	        } catch (IllegalAccessException ie) {
-	            Log.e("CarCast", "unexpected " + ie);
-	        }
-	    }
-	    
-	    private void unregisterRemoteControl() {
-	        try {
-	            if (mUnregisterMediaButtonEventReceiver == null) {
-	                return;
-	            }
-	            mUnregisterMediaButtonEventReceiver.invoke(mAudioManager, mRemoteControlResponder);
-	        } catch (InvocationTargetException ite) {
-	            /* unpack original exception when possible */
-	            Throwable cause = ite.getCause();
-	            if (cause instanceof RuntimeException) {
-	                throw (RuntimeException) cause;
-	            } else if (cause instanceof Error) {
-	                throw (Error) cause;
-	            } else {
-	                /* unexpected checked exception; wrap and re-throw */
-	                throw new RuntimeException(ite);
-	            }
-	        } catch (IllegalAccessException ie) {
-	            System.err.println("unexpected " + ie);  
-	        }
-	    }
-	
-	private static void initializeRemoteControlRegistrationMethods() {
-		   try {
-		      if (mRegisterMediaButtonEventReceiver == null) {
-		         mRegisterMediaButtonEventReceiver = AudioManager.class.getMethod(
-		               "registerMediaButtonEventReceiver",
-		               new Class[] { ComponentName.class } );
-		      }
-		      if (mUnregisterMediaButtonEventReceiver == null) {
-		         mUnregisterMediaButtonEventReceiver = AudioManager.class.getMethod(
-		               "unregisterMediaButtonEventReceiver",
-		               new Class[] { ComponentName.class } );
-		      }
-		      /* success, this device will take advantage of better remote */
-		      /* control event handling                                    */
-		   } catch (NoSuchMethodException nsme) {
-		      /* failure, still using the legacy behavior, but this app    */
-		      /* is future-proof!                                          */
-		   }
+		initializeRemoteControlRegistrationMethods();
+	}
+
+	private void registerRemoteControl() {
+		try {
+			if (mRegisterMediaButtonEventReceiver == null) {
+				return;
+			}
+			mRegisterMediaButtonEventReceiver.invoke(mAudioManager, mRemoteControlResponder);
+		} catch (InvocationTargetException ite) {
+			/* unpack original exception when possible */
+			Throwable cause = ite.getCause();
+			if (cause instanceof RuntimeException) {
+				throw (RuntimeException) cause;
+			} else if (cause instanceof Error) {
+				throw (Error) cause;
+			} else {
+				/* unexpected checked exception; wrap and re-throw */
+				throw new RuntimeException(ite);
+			}
+		} catch (IllegalAccessException ie) {
+			Log.e("CarCast", "unexpected " + ie);
 		}
+	}
+
+	private void unregisterRemoteControl() {
+		try {
+			if (mUnregisterMediaButtonEventReceiver == null) {
+				return;
+			}
+			mUnregisterMediaButtonEventReceiver.invoke(mAudioManager, mRemoteControlResponder);
+		} catch (InvocationTargetException ite) {
+			/* unpack original exception when possible */
+			Throwable cause = ite.getCause();
+			if (cause instanceof RuntimeException) {
+				throw (RuntimeException) cause;
+			} else if (cause instanceof Error) {
+				throw (Error) cause;
+			} else {
+				/* unexpected checked exception; wrap and re-throw */
+				throw new RuntimeException(ite);
+			}
+		} catch (IllegalAccessException ie) {
+			System.err.println("unexpected " + ie);
+		}
+	}
+
+	private static void initializeRemoteControlRegistrationMethods() {
+		try {
+			if (mRegisterMediaButtonEventReceiver == null) {
+				mRegisterMediaButtonEventReceiver = AudioManager.class.getMethod("registerMediaButtonEventReceiver",
+						new Class[] { ComponentName.class });
+			}
+			if (mUnregisterMediaButtonEventReceiver == null) {
+				mUnregisterMediaButtonEventReceiver = AudioManager.class.getMethod("unregisterMediaButtonEventReceiver",
+						new Class[] { ComponentName.class });
+			}
+			/* success, this device will take advantage of better remote */
+			/* control event handling */
+		} catch (NoSuchMethodException nsme) {
+			/* failure, still using the legacy behavior, but this app */
+			/* is future-proof! */
+		}
+	}
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -323,24 +318,18 @@ public class CarCast extends BaseActivity {
 		}
 		if (item.getItemId() == R.id.downloadNewPodcasts) {
 
-			startActivityForResult(
-					new Intent(this, DownloadProgress.class), 0);
+			startActivityForResult(new Intent(this, DownloadProgress.class), 0);
 
 			return true;
 		}
 		if (item.getItemId() == R.id.email) {
-			Intent emailIntent = new Intent(
-					android.content.Intent.ACTION_SEND);
+			Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 			emailIntent.setType("plain/text");
-			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
-					new String[] { "" });
-			emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-					CarCastApplication.getAppTitle() + ": about podcast "
-							+ contentService.currentTitle());
-			emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-					contentService.getPodcastEmailSummary());
-			startActivity(Intent.createChooser(emailIntent,
-					"Email about podcast"));
+			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "" });
+			emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, CarCastApplication.getAppTitle() + ": about podcast "
+					+ contentService.currentTitle());
+			emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, contentService.getPodcastEmailSummary());
+			startActivity(Intent.createChooser(emailIntent, "Email about podcast"));
 		}
 		if (item.getItemId() == R.id.feedback) {
 			startActivityForResult(new Intent(this, FeedbackHelp.class), 0);
@@ -377,7 +366,7 @@ public class CarCast extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 
-		registerRemoteControl();		
+		registerRemoteControl();
 		updater = new Updater(handler, mUpdateResults);
 	}
 
@@ -394,19 +383,16 @@ public class CarCast extends BaseActivity {
 		if (contentService == null)
 			return;
 		try {
-			if (!android.os.Environment.getExternalStorageState().equals(
-					android.os.Environment.MEDIA_MOUNTED)) {
+			if (!android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
 
 				TextView textView = (TextView) findViewById(R.id.title);
-				textView.setText("ERROR ** " + CarCastApplication.getAppTitle()
-						+ " requires the sdcard ** ");
+				textView.setText("ERROR ** " + CarCastApplication.getAppTitle() + " requires the sdcard ** ");
 				return;
 			}
 			if (!Config.PodcastsRoot.exists()) {
 				if (!Config.PodcastsRoot.mkdirs()) {
 					TextView textView = (TextView) findViewById(R.id.title);
-					textView.setText("ERROR ** " + CarCastApplication.getAppTitle()
-							+ " cannot write to sdcard ** ");
+					textView.setText("ERROR ** " + CarCastApplication.getAppTitle() + " cannot write to sdcard ** ");
 					return;
 				}
 			}
