@@ -32,6 +32,7 @@ public class HeadsetReceiver extends BroadcastReceiver {
 				contentService.previous();
 				abortBroadcast();			
 			}
+			Log.i("CarCast", "Got ACTION_MEDIA_BUTTON, but didnt use it..." + ke);
 			return;
 		}
 

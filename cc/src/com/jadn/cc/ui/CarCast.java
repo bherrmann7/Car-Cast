@@ -4,13 +4,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.drawable.GradientDrawable.Orientation;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -96,7 +94,7 @@ public class CarCast extends BaseActivity {
 
 		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		mRemoteControlResponder = new ComponentName(getPackageName(), HeadsetReceiver.class.getName());
-
+	
 		super.onCreate(savedInstanceState);
 
 		setTitle(CarCastApplication.getAppTitle());

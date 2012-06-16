@@ -3,8 +3,6 @@ package com.jadn.cc.services;
 import java.net.URL;
 import java.util.Properties;
 
-import com.jadn.cc.core.Util;
-
 /** Meta information about a podcast.  Loosely defined so things can be added later (like time) */
 public class MetaNet {
 

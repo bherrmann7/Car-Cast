@@ -15,7 +15,6 @@ import android.util.Log;
 
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Sayer;
-import com.jadn.cc.core.Util;
 
 /**
  * The history of all downloaded episodes the data is backed into a file on the SD-card

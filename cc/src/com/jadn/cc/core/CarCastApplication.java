@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.jadn.cc.services.ContentService;
 import com.jadn.cc.services.ContentService.LocalBinder;
 import com.jadn.cc.trace.TraceUtil;

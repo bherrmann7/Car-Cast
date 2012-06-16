@@ -19,3 +19,8 @@ robotium
 otherAssets
 .metadata
 cc/ant.properties
+cctest/gen
+cctest/bin
+cctest/.classpath
+cctest/.project
+cctest/.settings
