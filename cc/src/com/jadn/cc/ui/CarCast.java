@@ -1,15 +1,10 @@
 package com.jadn.cc.ui;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import android.app.AlertDialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -29,10 +24,9 @@ import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.MediaMode;
-import com.jadn.cc.services.HeadsetReceiver;
 import com.jadn.cc.trace.ExceptionHandler;
 
-public class CarCast extends BaseActivity {
+public class CarCast extends MediaControlActivity {
 	final static String tag = CarCast.class.getSimpleName();
 	boolean toggleOnPause;
 	Updater updater;
@@ -84,16 +78,10 @@ public class CarCast extends BaseActivity {
 		}
 	}
 
-	private AudioManager mAudioManager;
-	private ComponentName mRemoteControlResponder;
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		ExceptionHandler.register(this);
-
-		mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-		mRemoteControlResponder = new ComponentName(getPackageName(), HeadsetReceiver.class.getName());
 	
 		super.onCreate(savedInstanceState);
 
@@ -232,81 +220,6 @@ public class CarCast extends BaseActivity {
 		super.finish();
 	}
 
-	private static Method mRegisterMediaButtonEventReceiver;
-	private static Method mUnregisterMediaButtonEventReceiver;
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-
-		unregisterRemoteControl();
-	}
-
-	static {
-		initializeRemoteControlRegistrationMethods();
-	}
-
-	private void registerRemoteControl() {
-		try {
-			if (mRegisterMediaButtonEventReceiver == null) {
-				return;
-			}
-			mRegisterMediaButtonEventReceiver.invoke(mAudioManager, mRemoteControlResponder);
-		} catch (InvocationTargetException ite) {
-			/* unpack original exception when possible */
-			Throwable cause = ite.getCause();
-			if (cause instanceof RuntimeException) {
-				throw (RuntimeException) cause;
-			} else if (cause instanceof Error) {
-				throw (Error) cause;
-			} else {
-				/* unexpected checked exception; wrap and re-throw */
-				throw new RuntimeException(ite);
-			}
-		} catch (IllegalAccessException ie) {
-			Log.e("CarCast", "unexpected " + ie);
-		}
-	}
-
-	private void unregisterRemoteControl() {
-		try {
-			if (mUnregisterMediaButtonEventReceiver == null) {
-				return;
-			}
-			mUnregisterMediaButtonEventReceiver.invoke(mAudioManager, mRemoteControlResponder);
-		} catch (InvocationTargetException ite) {
-			/* unpack original exception when possible */
-			Throwable cause = ite.getCause();
-			if (cause instanceof RuntimeException) {
-				throw (RuntimeException) cause;
-			} else if (cause instanceof Error) {
-				throw (Error) cause;
-			} else {
-				/* unexpected checked exception; wrap and re-throw */
-				throw new RuntimeException(ite);
-			}
-		} catch (IllegalAccessException ie) {
-			System.err.println("unexpected " + ie);
-		}
-	}
-
-	private static void initializeRemoteControlRegistrationMethods() {
-		try {
-			if (mRegisterMediaButtonEventReceiver == null) {
-				mRegisterMediaButtonEventReceiver = AudioManager.class.getMethod("registerMediaButtonEventReceiver",
-						new Class[] { ComponentName.class });
-			}
-			if (mUnregisterMediaButtonEventReceiver == null) {
-				mUnregisterMediaButtonEventReceiver = AudioManager.class.getMethod("unregisterMediaButtonEventReceiver",
-						new Class[] { ComponentName.class });
-			}
-			/* success, this device will take advantage of better remote */
-			/* control event handling */
-		} catch (NoSuchMethodException nsme) {
-			/* failure, still using the legacy behavior, but this app */
-			/* is future-proof! */
-		}
-	}
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -363,8 +276,7 @@ public class CarCast extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		registerRemoteControl();
+	
 		updater = new Updater(handler, mUpdateResults);
 	}
 

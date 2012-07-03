@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jadn.cc"
-    android:versionCode="135"
-    android:versionName="1.0.135" >
+    android:versionCode="138"
+    android:versionName="1.0.138"
+    android:installLocation="auto"
+     >
 
     <application
-        android:name="com.jadn.cc.core.CarCastApplication"
-        android:debuggable="true"
+        android:name="com.jadn.cc.core.CarCastApplication"  
         android:icon="@drawable/ccp_launcher"
         android:label="Car Cast" >
         <activity

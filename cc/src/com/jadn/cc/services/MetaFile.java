@@ -18,6 +18,10 @@ public class MetaFile {
 
 	File file;
 	Properties properties = new Properties();
+	
+	String getFilename(){
+		return file.getName();
+	}
 
 	MetaFile(File file) {
 		this.file = file;

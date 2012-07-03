@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.SortedSet;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -918,6 +919,22 @@ public class ContentService extends Service implements OnCompletionListener {
 		stopForegroundCompat();
 
 		partialWakeLock.release();
+	}
+
+	public SortedSet<Integer> moveTop(SortedSet<Integer> checkedItems) {
+		return metaHolder.moveTop(checkedItems);
+	}
+
+	public SortedSet<Integer> moveUp(SortedSet<Integer> checkedItems) {
+		return metaHolder.moveUp(checkedItems);
+	}
+
+	public SortedSet<Integer> moveBottom(SortedSet<Integer> checkedItems) {
+		return metaHolder.moveBottom(checkedItems);
+	}
+
+	public SortedSet<Integer> moveDown(SortedSet<Integer> checkedItems) {
+		return metaHolder.moveDown(checkedItems);
 	}
 
 }

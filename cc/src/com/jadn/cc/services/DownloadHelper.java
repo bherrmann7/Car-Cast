@@ -188,7 +188,7 @@ public class DownloadHelper implements Sayer {
 
 				got++;
 				if (totalForThisPodcast != newPodcasts.get(i).getSize()) {
-					say("Note: reported size in rss did not match download. (means the progress bar will be wacked)");
+					say("Note: reported size (in feed) doesnt match actual size (downloaded file)");
 					// subtract out wrong value
 					podcastsTotalBytes -= newPodcasts.get(i).getSize();
 					// add in correct value

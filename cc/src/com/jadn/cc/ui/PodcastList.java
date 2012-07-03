@@ -2,6 +2,7 @@ package com.jadn.cc.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -62,20 +63,65 @@ public class PodcastList extends BaseActivity {
 		deleteButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new AlertDialog.Builder(PodcastList.this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Delete "+checkedItems.size()+" podcasts?")
-				.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (contentService.isPlaying())
-							contentService.pauseNow();
-						while(!checkedItems.isEmpty()){
-							contentService.deletePodcast(checkedItems.last());
-							checkedItems.remove(checkedItems.last());
-						}
-						podcastsAdapter.notifyDataSetChanged();
-						showPodcasts();
-					}
-				}).setNegativeButton("Cancel", null).show();
+				new AlertDialog.Builder(PodcastList.this).setIcon(android.R.drawable.ic_dialog_alert)
+						.setMessage("Delete " + checkedItems.size() + " podcasts?")
+						.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								if (contentService.isPlaying())
+									contentService.pauseNow();
+								while (!checkedItems.isEmpty()) {
+									contentService.deletePodcast(checkedItems.last());
+									checkedItems.remove(checkedItems.last());
+								}
+								podcastsAdapter.notifyDataSetChanged();
+								showPodcasts();
+							}
+						}).setNegativeButton("Cancel", null).show();
+			};
+		});
+
+		((Button) findViewById(R.id.top)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (contentService.isPlaying())
+					contentService.pauseNow();
+				checkedItems = contentService.moveTop(checkedItems);
+				podcastsAdapter.notifyDataSetChanged();
+				showPodcasts();
+			};
+		});
+
+		((Button) findViewById(R.id.up)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (contentService.isPlaying())
+					contentService.pauseNow();
+				checkedItems = contentService.moveUp(checkedItems);
+				podcastsAdapter.notifyDataSetChanged();
+				showPodcasts();
+			};
+		});
+
+		((Button) findViewById(R.id.down)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (contentService.isPlaying())
+					contentService.pauseNow();
+				checkedItems = contentService.moveDown(checkedItems);
+				podcastsAdapter.notifyDataSetChanged();
+				showPodcasts();
+			};
+		});
+
+		((Button) findViewById(R.id.bottom)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (contentService.isPlaying())
+					contentService.pauseNow();
+				checkedItems = contentService.moveBottom(checkedItems);
+				podcastsAdapter.notifyDataSetChanged();
+				showPodcasts();
 			};
 		});
 	}
@@ -120,9 +166,9 @@ public class PodcastList extends BaseActivity {
 		} else if (item.getItemId() == R.id.deleteAllPodcasts) {
 
 			// Ask the user if they want to really delete all
-			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete All?").setMessage(
-					"Do you really want to delete all downloaded podcasts?").setPositiveButton("Confirm Delete All",
-					new DialogInterface.OnClickListener() {
+			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete All?")
+					.setMessage("Do you really want to delete all downloaded podcasts?")
+					.setPositiveButton("Confirm Delete All", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							contentService.purgeAll();
@@ -182,15 +228,14 @@ public class PodcastList extends BaseActivity {
 			item.put("line2", metaFile.getTitle());
 			list.add(item);
 
-		}		
-
+		}
 
 		// When doing a delete before, we rebuild the list, but the adapter is
 		// ok.
 		if (podcastsAdapter == null) {
 			podcastsAdapter = new SimpleAdapter(this, list,
 			// R.layout.main_item_two_line_row, new String[] { "line1",
-					// "line2" }, new int[] { R.id.text1, R.id.text2 });
+			// "line2" }, new int[] { R.id.text1, R.id.text2 });
 					R.layout.podcast_items_checks, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine,
 							R.id.amountHeard, R.id.secondLine }) {
 				@Override
@@ -204,18 +249,18 @@ public class PodcastList extends BaseActivity {
 					}
 					final CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
 					checkbox.setOnClickListener(checkBoxClicked);
-//					((TextView)view.findViewById(R.id.firstLine)).setOnClickListener(itemClicked);
-//					((TextView)view.findViewById(R.id.secondLine)).setOnClickListener(itemClicked);
+					// ((TextView)view.findViewById(R.id.firstLine)).setOnClickListener(itemClicked);
+					// ((TextView)view.findViewById(R.id.secondLine)).setOnClickListener(itemClicked);
 					view.setOnClickListener(itemClicked);
 					view.setOnLongClickListener(itemLongClicked);
-					
+
 					Tag tag = (Tag) view.getTag();
 					if (tag == null) {
 						view.setTag(tag = new Tag());
 					}
 					tag.position = position;
 					tag.item = map;
-				
+
 					checkbox.setChecked(checkedItems.contains(position));
 					return view;
 				}
@@ -246,16 +291,27 @@ public class PodcastList extends BaseActivity {
 				checkedItems.remove(tag.position);
 			}
 			// v.getTag()
-			Button deleteButton = (Button) findViewById(R.id.delete);
-			deleteButton.setEnabled(!checkedItems.isEmpty());
+			for (Button button : getBarButtons()) {
+				button.setEnabled(!checkedItems.isEmpty());
+			}
 		}
-		
+
 	};
-	
+
+	public List<Button> getBarButtons() {
+		List<Button> barButtons = new ArrayList<Button>();
+		barButtons.add((Button) findViewById(R.id.delete));
+		barButtons.add((Button) findViewById(R.id.top));
+		barButtons.add((Button) findViewById(R.id.up));
+		barButtons.add((Button) findViewById(R.id.down));
+		barButtons.add((Button) findViewById(R.id.bottom));
+		return barButtons;
+	}
+
 	OnClickListener itemClicked = new OnClickListener() {
 		public void onClick(View v) {
 			Tag tag = (Tag) v.getTag();
-			
+
 			MetaHolder metaHolder = new MetaHolder();
 			MetaFile mfile = metaHolder.get(tag.position);
 
@@ -268,36 +324,36 @@ public class PodcastList extends BaseActivity {
 				contentService.play(tag.position);
 			}
 			showPodcasts();
-		}		
+		}
 	};
-		
+
 	OnLongClickListener itemLongClicked = new OnLongClickListener() {
-		public boolean onLongClick(View v){
+		public boolean onLongClick(View v) {
 			final Tag tag = (Tag) v.getTag();
 
 			final MetaHolder metaHolder = new MetaHolder();
 			final MetaFile mfile = metaHolder.get(tag.position);
 
 			// Ask the user if they want to really delete all
-			new AlertDialog.Builder(PodcastList.this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete Before?").setMessage(
-					"Delete all before "+mfile.getTitle()).setPositiveButton("Confirm Delete "+tag.position+" podcasts",
-					new DialogInterface.OnClickListener() {
+			new AlertDialog.Builder(PodcastList.this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Delete Before?")
+					.setMessage("Delete all before " + mfile.getTitle())
+					.setPositiveButton("Confirm Delete " + tag.position + " podcasts", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							if (contentService.isPlaying())
 								contentService.pauseNow();
-							
-							while( (tag.position--) != 0){
+
+							while ((tag.position--) != 0) {
 								contentService.deletePodcast(0);
 							}
-							
+
 							podcastsAdapter.notifyDataSetChanged();
 						}
 
 					}).setNegativeButton("Cancel", null).show();
 
 			return true;
-		}		
+		}
 	};
 
 }
