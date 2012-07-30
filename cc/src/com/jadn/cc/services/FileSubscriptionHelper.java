@@ -34,7 +34,7 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
     }
 
     @Override
-    public boolean addSubscription(Subscription toAdd) {
+    public boolean addSubscription(Subscription toAdd) {    	
         List<Subscription> subs = getSubscriptions();
 
         if (containsSubscriptionURL(subs, toAdd.url)) {

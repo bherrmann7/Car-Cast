@@ -15,6 +15,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] { 
+		"18-Jul-2012", "Bug fixes for Kindle Fire",
 		"23-Jun-2012", "Added simple ability to reorder podcasts",
 		"09-Jun-2012", "Better debugging: When emailing download details 1000 lines of log info are sent.",
 		"03-Jun-2012", "New setting - Orientation Preference",

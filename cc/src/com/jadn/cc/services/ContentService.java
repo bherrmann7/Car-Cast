@@ -53,6 +53,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	private PlayStatusListener playStatusListener;
 	private HeadsetReceiver headsetReceiver;
 	private RemoteControlReceiver remoteControlReceiver;
+	private AudioFocusConcern audioFocusConcern = new AudioFocusConcern();
 
 	/**
 	 * Class for clients to access. Because we know this service always runs in the same process as its clients, we
@@ -913,12 +914,16 @@ public class ContentService extends Service implements OnCompletionListener {
 		startForegroundCompat(R.string.notification_status, notification);
 
 		partialWakeLock.acquire();
+		
+		audioFocusConcern.playing(getApplicationContext());
 	}
 
 	void disableNotification() {
 		stopForegroundCompat();
 
 		partialWakeLock.release();
+		
+		audioFocusConcern.stoppedPlaying();
 	}
 
 	public SortedSet<Integer> moveTop(SortedSet<Integer> checkedItems) {

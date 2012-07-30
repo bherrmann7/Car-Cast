@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -77,6 +78,11 @@ public class CarCast extends MediaControlActivity {
 			pausePlay.setImageResource(R.drawable.player_102_play);
 		}
 	}
+	
+	private boolean isKindleAndNoMicrophone() {
+		// Yea, should be something like "Capabilities.has(MICROPHONE)" - but Android doesnt seem to have this
+		return android.os.Build.MODEL.equals("Kindle Fire");
+	}
 
 	/** Called when the activity is first created. */
 	@Override
@@ -144,6 +150,8 @@ public class CarCast extends MediaControlActivity {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				if(isKindleAndNoMicrophone())
+					return true;
 				if (event.getAction() != MotionEvent.ACTION_UP)
 					return true;
 				// if clicking on the audio recorder (lower 1/3 of screen on 1/2
@@ -163,6 +171,7 @@ public class CarCast extends MediaControlActivity {
 				}
 				return true;
 			}
+			
 		});
 
 		app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -200,6 +209,13 @@ public class CarCast extends MediaControlActivity {
 					break;
 				}
 			}
+		}
+		
+
+		if(isKindleAndNoMicrophone()){
+			// Don't show the microphone (which is in the background image.)
+			TextView titleTextView = (TextView)findViewById(R.id.title);
+			titleTextView.setBackgroundDrawable((Drawable)null);
 		}
 	}
 
