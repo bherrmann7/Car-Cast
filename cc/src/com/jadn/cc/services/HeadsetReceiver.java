@@ -20,18 +20,33 @@ public class HeadsetReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
 			KeyEvent ke = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
-			if ((ke.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE || ke.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK)
-					&& ke.getAction() == KeyEvent.ACTION_UP) {
-				contentService.pauseOrPlay();
+			if ((ke.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE || ke.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK)) {
+				if (ke.getAction() == KeyEvent.ACTION_UP) {
+					contentService.pauseOrPlay();
+				}
 				abortBroadcast();
+				return;
 			}
-			if(ke.getKeyCode() ==  KeyEvent.KEYCODE_MEDIA_NEXT && ke.getAction() == KeyEvent.ACTION_UP ){
-				contentService.next();
-				abortBroadcast();			
+			if (ke.getKeyCode() == KeyEvent.KEYCODE_MEDIA_NEXT) {
+				if (ke.getAction() == KeyEvent.ACTION_UP) {
+					contentService.next();
+				}
+				abortBroadcast();
+				return;
 			}
-			if(ke.getKeyCode() ==  KeyEvent.KEYCODE_MEDIA_PREVIOUS && ke.getAction() == KeyEvent.ACTION_UP){
-				contentService.previous();
-				abortBroadcast();			
+			if (ke.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
+				if (ke.getAction() == KeyEvent.ACTION_UP) {
+					contentService.previous();
+				}
+				abortBroadcast();
+				return;
+			}
+			if (ke.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
+				if (ke.getAction() == KeyEvent.ACTION_UP) {
+					contentService.pauseOrPlay();
+				}
+				abortBroadcast();
+				return;
 			}
 			Log.i("CarCast", "Got ACTION_MEDIA_BUTTON, but didnt use it..." + ke);
 			return;
@@ -44,5 +59,4 @@ public class HeadsetReceiver extends BroadcastReceiver {
 		contentService.headsetStatusChanged(headsetPresent);
 	}
 
-	
 }
