@@ -508,7 +508,10 @@ public class ContentService extends Service implements OnCompletionListener {
 		headsetReceiver = new HeadsetReceiver(this);
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 		remoteControlReceiver = new RemoteControlReceiver(this);
-		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_MEDIA_BUTTON));
+		IntentFilter intentFilter =  new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+		// priority cribbed from http://www.gauntface.co.uk/blog/2010/04/14/using-android-headset-buttons-earphone-buttons/
+		intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+		registerReceiver(headsetReceiver, intentFilter);
 
 		// foreground stuff
 		try {
