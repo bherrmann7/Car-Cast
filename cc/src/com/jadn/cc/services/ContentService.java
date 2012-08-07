@@ -1,6 +1,7 @@
 package com.jadn.cc.services;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.jadn.cc.core.Subscription;
 import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
+import com.jadn.cc.util.ExportOpml;
 
 public class ContentService extends Service implements OnCompletionListener {
 	private final IBinder binder = new LocalBinder();
@@ -943,6 +945,10 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public SortedSet<Integer> moveDown(SortedSet<Integer> checkedItems) {
 		return metaHolder.moveDown(checkedItems);
+	}
+
+	public void exportOPML(FileOutputStream fileOutputStream) {
+		ExportOpml.export(getSubscriptions(), fileOutputStream);		
 	}
 
 }

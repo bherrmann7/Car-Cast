@@ -1,5 +1,7 @@
 package com.jadn.cc.ui;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,7 +11,9 @@ import java.util.Map;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -31,7 +35,7 @@ import com.jadn.cc.services.DownloadHistory;
 
 /**
  * A good video about listview http://code.google.com/events/io/2010/sessions/world-of-listview-android.html
- *
+ * 
  * Although right now Subscriptions is using a very simple approach
  */
 
@@ -51,7 +55,7 @@ public class Subscriptions extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.subscription_list);
-		setTitle(CarCastApplication.getAppTitle()+": Subscriptions");
+		setTitle(CarCastApplication.getAppTitle() + ": Subscriptions");
 		listView = (ListView) findViewById(R.id.siteList);
 		registerForContextMenu(listView);
 
@@ -61,8 +65,8 @@ public class Subscriptions extends BaseActivity {
 			return;
 		}
 
-		listAdapter = new SimpleAdapter(this, subscriptions, R.layout.main_item_two_line_row, new String[] { "name", "enabled" }, new int[] {
-				R.id.text1, R.id.text2 });
+		listAdapter = new SimpleAdapter(this, subscriptions, R.layout.main_item_two_line_row, new String[] { "name", "enabled" },
+				new int[] { R.id.text1, R.id.text2 });
 		listView.setAdapter(listAdapter);
 	}
 
@@ -86,8 +90,7 @@ public class Subscriptions extends BaseActivity {
 
 		Subscription sub = (Subscription) rowData.get("subscription");
 
-		if(item.getTitle().equals(DISABLE_SUBSCRIPTION) || item.getTitle().equals(ENABLE_SUBSCRIPTION))
-		{
+		if (item.getTitle().equals(DISABLE_SUBSCRIPTION) || item.getTitle().equals(ENABLE_SUBSCRIPTION)) {
 			contentService.toggleSubscription(sub);
 			reloadSubscriptions();
 			Subscriptions.this.listAdapter.notifyDataSetChanged();
@@ -114,7 +117,7 @@ public class Subscriptions extends BaseActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 		Map<?, ?> rowData = (Map<?, ?>) listView.getAdapter().getItem(info.position);
 		Subscription sub = (Subscription) rowData.get("subscription");
 		menu.setHeaderTitle(sub.name);
@@ -143,7 +146,7 @@ public class Subscriptions extends BaseActivity {
 			return true;
 		}
 		if (item.getItemId() == R.id.deleteAllSubscriptions) {
-					new AlertDialog.Builder(Subscriptions.this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Delete All Subscriptions?")
+			new AlertDialog.Builder(Subscriptions.this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Delete All Subscriptions?")
 					.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -153,19 +156,23 @@ public class Subscriptions extends BaseActivity {
 					}).setNegativeButton("Cancel", null).show();
 		}
 		if (item.getItemId() == R.id.resetToDemoSubscriptions) {
-			new AlertDialog.Builder(Subscriptions.this).setIcon(android.R.drawable.ic_dialog_alert).setMessage("Reset to Demo Subscriptions (will delete all current subscriptions)?")
-			.setPositiveButton("Reset to Demos", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					contentService.resetToDemoSubscriptions();
-					reloadSubscriptions();
-				}
-			}).setNegativeButton("Cancel", null).show();
+			new AlertDialog.Builder(Subscriptions.this).setIcon(android.R.drawable.ic_dialog_alert)
+					.setMessage("Reset to Demo Subscriptions (will delete all current subscriptions)?")
+					.setPositiveButton("Reset to Demos", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							contentService.resetToDemoSubscriptions();
+							reloadSubscriptions();
+						}
+					}).setNegativeButton("Cancel", null).show();
 			return true;
 		}
 		if (item.getItemId() == R.id.search) {
 			startActivityForResult(new Intent(this, Search.class), Integer.MAX_VALUE);
 			return true;
+		}
+		if (item.getItemId() == R.id.export) {
+			exportOpml();
 		}
 		return super.onMenuItemSelected(featureId, item);
 
@@ -186,7 +193,7 @@ public class Subscriptions extends BaseActivity {
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put("name", sub.name);
 
-			if(sub.enabled)
+			if (sub.enabled)
 				item.put("enabled", "");
 			else
 				item.put("enabled", "(Disabled)");
@@ -196,6 +203,33 @@ public class Subscriptions extends BaseActivity {
 		}
 
 		listAdapter.notifyDataSetChanged();
+	}
+
+	public void exportOpml() {
+		File tempFile = null;
+		try {
+			tempFile = File.createTempFile("carcast", ".opml");
+			tempFile = new File(tempFile.getParentFile(), "carcast.opml");
+			tempFile.delete();
+			FileOutputStream fileOutputStream = new FileOutputStream(tempFile);			
+			contentService.exportOPML(fileOutputStream);
+			fileOutputStream.close();
+		} catch (Exception ex) {
+			// Do a toast...
+			Util.toast(this, "Problem creating temporary file\n"+ex.getMessage());
+			return;
+		}
+		Log.i("carcast", "temporary file is "+tempFile.length());
+
+		Intent sendIntent = new Intent(Intent.ACTION_SEND);
+		// Mime type of the attachment (or) u can use sendIntent.setType("*/*")
+		sendIntent.setType("text/xml");
+		// Subject for the message or Email
+		sendIntent.putExtra(Intent.EXTRA_SUBJECT, "CarCast OPML");
+		// Full Path to the attachment
+		sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tempFile));
+		// Use a chooser to decide whether email or mms
+		startActivity(Intent.createChooser(sendIntent, "Export OPML..."));
 	}
 
 }
