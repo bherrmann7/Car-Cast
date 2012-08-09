@@ -15,6 +15,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] { 
+		"08-Aug-2012j", "OnSale",
 		"07-Aug-2012", "Add 'Export OPML' to Subscriptions screen (used to transfer subscriptions from phone to phone.)\n\nDont yet have OPML Import... coming soon.",
 		"30-Jul-2012", "Enable ipod/iphone headphones button to pause playback",
 		"18-Jul-2012", "Bug fixes for Kindle Fire",

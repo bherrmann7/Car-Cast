@@ -1,11 +1,12 @@
 package com.jadn.cc.ui;
 
-
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -78,7 +79,7 @@ public class CarCast extends MediaControlActivity {
 			pausePlay.setImageResource(R.drawable.player_102_play);
 		}
 	}
-	
+
 	private boolean isKindleAndNoMicrophone() {
 		// Yea, should be something like "Capabilities.has(MICROPHONE)" - but Android doesnt seem to have this
 		return android.os.Build.MODEL.equals("Kindle Fire");
@@ -88,7 +89,7 @@ public class CarCast extends MediaControlActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		ExceptionHandler.register(this);
-	
+
 		super.onCreate(savedInstanceState);
 
 		setTitle(CarCastApplication.getAppTitle());
@@ -150,7 +151,7 @@ public class CarCast extends MediaControlActivity {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				if(isKindleAndNoMicrophone())
+				if (isKindleAndNoMicrophone())
 					return true;
 				if (event.getAction() != MotionEvent.ACTION_UP)
 					return true;
@@ -171,7 +172,7 @@ public class CarCast extends MediaControlActivity {
 				}
 				return true;
 			}
-			
+
 		});
 
 		app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -189,8 +190,24 @@ public class CarCast extends MediaControlActivity {
 			editor.putBoolean("showSplash", false);
 			editor.commit();
 		} else if (!lastRun.equals(CarCastApplication.releaseData[0])) {
-			new AlertDialog.Builder(CarCast.this).setTitle(CarCastApplication.getAppTitle() + " updated")
-					.setMessage(CarCastApplication.releaseData[1]).setNeutralButton("Close", null).show();
+			if (CarCastApplication.releaseData[1].equals("OnSale")) {
+				new AlertDialog.Builder(CarCast.this).setTitle(CarCastApplication.getAppTitle() + " Pro Sale!")
+						.setMessage("\nJust $0.99 USD gets rid of Ads and You are helping make CarCast better.").setNeutralButton("No Thanks", null).setPositiveButton("YES! Get Pro",  new DialogInterface.OnClickListener() {							
+			                public void onClick(DialogInterface dialog, int id) {			
+			                    //dialog.cancel();
+			                	//System.out.println("Do something");
+			                	// market://search?q=pname:com.jadn.cc
+			                	Intent intent = new Intent(Intent.ACTION_VIEW);
+			                	intent.setData(Uri.parse("market://details?id=com.jadn.ccpro"));
+			                	startActivity(intent);
+			                }			
+			            })
+						.show();
+
+			} else {
+				new AlertDialog.Builder(CarCast.this).setTitle(CarCastApplication.getAppTitle() + " updated")
+						.setMessage(CarCastApplication.releaseData[1]).setNeutralButton("Close", null).show();
+			}
 		}
 		saveLastRun();
 
@@ -210,12 +227,11 @@ public class CarCast extends MediaControlActivity {
 				}
 			}
 		}
-		
 
-		if(isKindleAndNoMicrophone()){
+		if (isKindleAndNoMicrophone()) {
 			// Don't show the microphone (which is in the background image.)
-			TextView titleTextView = (TextView)findViewById(R.id.title);
-			titleTextView.setBackgroundDrawable((Drawable)null);
+			TextView titleTextView = (TextView) findViewById(R.id.title);
+			titleTextView.setBackgroundDrawable((Drawable) null);
 		}
 	}
 
@@ -235,7 +251,6 @@ public class CarCast extends MediaControlActivity {
 		}
 		super.finish();
 	}
-
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -292,7 +307,7 @@ public class CarCast extends MediaControlActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-	
+
 		updater = new Updater(handler, mUpdateResults);
 	}
 
