@@ -3,7 +3,6 @@ cc/out*
 cc/target*
 cc/bin/*
 cc/gen/*
-cc/project.properties
 .gradle
 cc/Car-Cast.iml
 cc/build.gradle
