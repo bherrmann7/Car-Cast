@@ -20,6 +20,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -55,7 +56,6 @@ public class ContentService extends Service implements OnCompletionListener {
 	private PlayStatusListener playStatusListener;
 	private HeadsetReceiver headsetReceiver;
 	private RemoteControlReceiver remoteControlReceiver;
-	private AudioFocusConcern audioFocusConcern = new AudioFocusConcern();
 
 	/**
 	 * Class for clients to access. Because we know this service always runs in the same process as its clients, we
@@ -509,11 +509,14 @@ public class ContentService extends Service implements OnCompletionListener {
 		// http://groups.google.com/group/android-developers/browse_thread/thread/6d0dda99b4f42c8f/d7de082acdb0da25
 		headsetReceiver = new HeadsetReceiver(this);
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
-		remoteControlReceiver = new RemoteControlReceiver(this);
-		IntentFilter intentFilter =  new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-		// priority cribbed from http://www.gauntface.co.uk/blog/2010/04/14/using-android-headset-buttons-earphone-buttons/
-		intentFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-		registerReceiver(headsetReceiver, intentFilter);
+		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_MEDIA_BUTTON));
+
+//		remoteControlReceiver = new RemoteControlReceiver(this);
+//		IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+		// priority cribbed from
+		// http://www.gauntface.co.uk/blog/2010/04/14/using-android-headset-buttons-earphone-buttons/
+//		intentFilter.setPriority(10*IntentFilter.SYSTEM_HIGH_PRIORITY);
+//		registerReceiver(remoteControlReceiver, intentFilter);
 
 		// foreground stuff
 		try {
@@ -528,6 +531,7 @@ public class ContentService extends Service implements OnCompletionListener {
 				throw new IllegalStateException("OS doesn't have Service.startForeground OR Service.setForeground!");
 			}
 		}
+
 	}
 
 	public void headsetStatusChanged(boolean headsetPresent) {
@@ -919,16 +923,13 @@ public class ContentService extends Service implements OnCompletionListener {
 		startForegroundCompat(R.string.notification_status, notification);
 
 		partialWakeLock.acquire();
-		
-		audioFocusConcern.playing(getApplicationContext());
+
 	}
 
 	void disableNotification() {
 		stopForegroundCompat();
 
 		partialWakeLock.release();
-		
-		audioFocusConcern.stoppedPlaying();
 	}
 
 	public SortedSet<Integer> moveTop(SortedSet<Integer> checkedItems) {
@@ -948,7 +949,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public void exportOPML(FileOutputStream fileOutputStream) {
-		ExportOpml.export(getSubscriptions(), fileOutputStream);		
+		ExportOpml.export(getSubscriptions(), fileOutputStream);
 	}
 
 }
