@@ -42,6 +42,8 @@ public abstract class MediaControlActivity extends BaseActivity {
 		} catch (NoSuchMethodException nsme) {
 			/* failure, still using the legacy behavior, but this app */
 			/* is future-proof! */
+			nsme.printStackTrace();
+			Log.i("CarCast", "Boink...");
 		}
 	}
 
