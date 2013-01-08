@@ -4,56 +4,95 @@
 	android:layout_width="fill_parent" android:layout_height="fill_parent" android:orientation="horizontal">
 	<ScrollView android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
-		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			android:orientation="vertical" android:layout_width="fill_parent"
-			android:layout_height="fill_parent">
 
-			<TextView android:id="@+id/label" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="Podcast Site URL:" />
+		<LinearLayout
+		    xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:orientation="vertical" >
 
-			<EditText android:id="@+id/editsite_url"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:text="http://" android:inputType="textUri"
-				android:imeOptions="actionNext" />
+		    <TextView
+		        android:id="@+id/label"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:text="Podcast Site URL:" />
 
+		    <EditText
+		        android:id="@+id/editsite_url"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:imeOptions="actionNext"
+		        android:inputType="textUri"
+		        android:text="http://" />
 
-			<Button android:id="@+id/testEditSite" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:text="Test"
-				android:singleLine="true" android:imeOptions="actionNext" />
+		    <Button
+		        android:id="@+id/testEditSite"
+		        android:layout_width="105dp"
+		        android:layout_height="wrap_content"
+		        android:imeOptions="actionNext"
+		        android:singleLine="true"
+		        android:text="Test" />
 
-			<TextView android:id="@+id/label2" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="Site Name:" />
+		    <TextView
+		        android:id="@+id/label2"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:text="Site Name:" />
 
-			<EditText android:id="@+id/editsite_name"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:paddingBottom="20dip" android:singleLine="true" />
+		    <EditText
+		        android:id="@+id/editsite_name"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:paddingBottom="20dip"
+		        android:singleLine="true" />
 
-			<CheckBox android:id="@+id/enabled" android:layout_below="@+id/editsite_name"
-				android:layout_marginTop="20px" android:layout_width="fill_parent"
-				android:checked="true" android:layout_height="wrap_content"
-				android:text="Enabled" />
+		    <CheckBox
+		        android:id="@+id/enabled"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/editsite_name"
+		        android:layout_marginTop="20px"
+		        android:checked="true"
+		        android:text="Enabled" />
 
-			<CheckBox android:id="@+id/fifoLifo" android:layout_below="@id/enabled"
-				android:layout_marginTop="20px" android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:text="Newest first (vs oldest first for audiobooks)"
-				android:checked="true" />
+		    <CheckBox
+		        android:id="@+id/fifoLifo"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/enabled"
+		        android:layout_marginTop="20px"
+		        android:checked="true"
+		        android:text="Newest first (vs oldest first for audiobooks)" />
 
-			<RelativeLayout android:layout_width="fill_parent"
-				android:layout_height="wrap_content">
-				<TextView android:text="Max downloads" android:layout_height="wrap_content"
-					android:layout_width="wrap_content" android:id="@+id/max"></TextView>
+		    <RelativeLayout
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content" >
 
-				<Spinner android:layout_toRightOf="@id/max" android:id="@+id/subMax"
-					android:layout_width="fill_parent" android:layout_height="wrap_content"
-					android:prompt="@string/maxChoices" />
-			</RelativeLayout>
+		        <TextView
+		            android:id="@+id/max"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="Max downloads" >
+		        </TextView>
 
-			<Button android:id="@+id/saveEditSite"
-				android:layout_marginTop="20px" android:layout_marginLeft="100px"
-				android:layout_width="100px" android:layout_height="wrap_content"
-				android:layout_below="@id/enabled" android:focusable="true" android:text="Save" />
+		        <Spinner
+		            android:id="@+id/subMax"
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:layout_toRightOf="@id/max"
+		            android:prompt="@string/maxChoices" />
+		    </RelativeLayout>
 
+		    <Button
+		        android:id="@+id/saveEditSite"
+		        android:layout_width="121dp"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/enabled"
+		        android:layout_marginLeft="100px"
+		        android:layout_marginTop="20px"
+		        android:focusable="true"
+		        android:text="Save" />
 		</LinearLayout>
+
 	</ScrollView>
 </LinearLayout>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jadn.cc"
-    android:versionCode="142"
-    android:versionName="1.0.142"
+    android:versionCode="143"
+    android:versionName="1.0.143"
     android:installLocation="auto"
      >
 
@@ -125,7 +125,22 @@
         <activity
             android:name="com.google.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
-
+        <activity android:name="com.jadn.cc.ui.OpmlImport" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*oiml"
+                   android:mimeType="text/xml"/>
+                <data
+                    android:host="*"
+                    android:pathPattern=".*oiml"
+                   android:mimeType="application/octet-stream"/>                          
+            </intent-filter>
+        </activity>
+        
         <service android:name=".services.ContentService" />
         <service android:name=".services.AlarmService" />
         <service android:name=".services.AlarmHostService" >
@@ -146,7 +161,6 @@
 			<action android:name="android.intent.action.ACTION_HEADSET_PLUG" />
 			</intent-filter> </receiver>
         -->
-
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
