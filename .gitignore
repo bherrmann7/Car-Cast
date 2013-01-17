@@ -23,3 +23,6 @@ cctest/bin
 cctest/.classpath
 cctest/.project
 cctest/.settings
+${out.packaged.file}.d
+${out.packaged.file}
+cctest/lint.xml
