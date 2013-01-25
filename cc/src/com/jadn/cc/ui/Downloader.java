@@ -18,6 +18,7 @@ import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Sayer;
 import com.jadn.cc.trace.TraceData;
+import com.jadn.cc.util.Updater;
 
 /**
  * Lets the user observe download details in all their command line glory.

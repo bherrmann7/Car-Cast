@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
+import com.jadn.cc.util.Updater;
 
 public class DownloadProgress extends BaseActivity implements Runnable {
 
@@ -59,7 +60,9 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 				SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(DownloadProgress.this);
         		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
-				if (app_preferences.getBoolean("wifiDownload", true) && (!wifi.isWifiEnabled() || wifi.getConnectionInfo().getIpAddress() == 0)) {
+				if (app_preferences.getBoolean("wifiDownload", true) && (!wifi.isWifiEnabled() || wifi.getConnectionInfo().getIpAddress() == 0)
+						&& app_preferences.getBoolean("wifiWarning", true) 
+						) {
 
 					String title =  "WIFI is not enabled.";
 					if (wifi.getConnectionInfo().getIpAddress() == 0) title = "WIFI is not connected.";

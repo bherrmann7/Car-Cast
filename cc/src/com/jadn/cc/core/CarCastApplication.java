@@ -15,6 +15,9 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
+		"24-Jan-2013", "BETA2 feature - more working\n\nAutomatically forward Audio Notes to your email when you connect to WiFi.",	
+		"21-Jan-2013", "BETA feature\n\nAutomatically forward Audio Notes to your email when you connect to WiFi.",	
+		"17-Jan-2013", "Two new preferences\n\nAuto delete \"Listened To\" Podcasts (during download)\n\nDon't warn when downloading on dataplan (aka unlimited dataplan)",	
 		"22-Dec-2012", "You can now Export and Import your subscriptions using OPML (tested via email)",	
 		"08-Aug-2012j", "OnSale",
 		"07-Aug-2012", "Add 'Export OPML' to Subscriptions screen (used to transfer subscriptions from phone to phone.)\n\nDont yet have OPML Import... coming soon.",
@@ -189,6 +192,7 @@ public class CarCastApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		serviceIntent = new Intent(this, ContentService.class);
+		WifiConnectedReceiver.registerForWifiBroadcasts(getApplicationContext());
 	}
 
 	private ServiceConnection contentServiceConnection = new ServiceConnection() {

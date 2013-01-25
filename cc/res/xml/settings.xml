@@ -1,55 +1,96 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<CheckBoxPreference 
-		android:key="autoDownload" 
-		android:title="Auto download" 
-		android:summary="Download podcasts automatically" 
-		android:defaultValue="false" />
-	<com.jadn.cc.ui.TimePickerPreference 
-		android:key="timeAutoDownload"
-		android:title="Download time"
-		android:dialogTitle="Time of day to download podcasts"
-		android:summary="Set time of day on which to download podcasts" />
-	<CheckBoxPreference 
-		android:key="wifiDownload"
-		android:title="Require WIFI" 
-	 	android:summary="Require WIFI for auto download"
-	 	android:defaultValue="true" />
-	<ListPreference 
-		android:key="listmax"
-		android:title="Max downloads"
-		android:entries="@array/maxs"
-		android:entryValues="@array/maxsValues"
-		android:dialogTitle="Max podcasts to download per site per run"
-		android:summary="Set max number of downloads to obtain from one site in a run" />
-	<CheckBoxPreference 
-		android:key="showSplash" 
-		android:title="Enable splash screen" 
-		android:summary="On startup show splash screen once more" />
-	<CheckBoxPreference 
-		android:key="autoPlayNext"
-		android:title="Auto play next" 
-	 	android:summary="When the current podcast finishes, play the next one"
-	 	android:defaultValue="true" />
-	<CheckBoxPreference 
-		android:key="canCollectData" 
-		android:title="Allow data collection" 
-		android:summary="Data helps us improve" 
-		android:defaultValue="true" />
-	<CheckBoxPreference 
-		android:key="emailSecret" 
-		android:title="Keep email address secret" 
-		android:summary="Used for internal tracking only" 
-		android:defaultValue="false" />
-	<CheckBoxPreference 
-		android:key="notifiyOnZeroDownloads" 
-		android:title="Show Zero Downloads?" 
-		android:summary="Show download notification when no downloads?" 
-		android:defaultValue="true" />
-	<ListPreference 
-		android:key="orientation"
-		android:title="Orientation Preference"
-		android:entries="@array/orientationChoice_array"
-		android:entryValues="@array/orientationChoice_array"
-		android:dialogTitle="Orientation Preference"
-		android:summary="Specify player orienation" />
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="autoDownload"
+        android:summary="Download podcasts automatically"
+        android:title="Auto download" />
+    <CheckBoxPreference
+        android:key="autoDelete"
+        android:summary="when downloading, delete &quot;listened to&quot; podcasts"
+        android:title="Automatically delete &quot;listened to&quot; podcasts during downloads" />
+
+    <com.jadn.cc.ui.TimePickerPreference
+        android:dialogTitle="Time of day to download podcasts"
+        android:key="timeAutoDownload"
+        android:summary="Set time of day on which to download podcasts"
+        android:title="Download time" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="wifiDownload"
+        android:summary="Require WIFI for auto download"
+        android:title="Require WIFI" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="wifiWarning"
+        android:summary="Show warning accessing using data plan (w/o wifi)"
+        android:title="Wifi Warning" />
+
+    <ListPreference
+        android:dialogTitle="Max podcasts to download per site per run"
+        android:entries="@array/maxs"
+        android:entryValues="@array/maxsValues"
+        android:key="listmax"
+        android:summary="Set max number of downloads to obtain from one site in a run"
+        android:title="Max downloads" />
+
+    <CheckBoxPreference
+        android:key="showSplash"
+        android:summary="On startup show splash screen once more"
+        android:title="Enable splash screen" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="autoPlayNext"
+        android:summary="When the current podcast finishes, play the next one"
+        android:title="Auto play next" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="canCollectData"
+        android:summary="Data helps us improve"
+        android:title="Allow data collection" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="emailSecret"
+        android:summary="Used for internal tracking only"
+        android:title="Keep email address secret" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="notifiyOnZeroDownloads"
+        android:summary="Show download notification when no downloads?"
+        android:title="Show Zero Downloads?" />
+
+    <ListPreference
+        android:dialogTitle="Orientation Preference"
+        android:entries="@array/orientationChoice_array"
+        android:entryValues="@array/orientationChoice_array"
+        android:key="orientation"
+        android:summary="Specify player orienation"
+        android:title="Orientation Preference" />
+
+    <PreferenceScreen
+        android:key="audionoteforwarding"
+        android:summary="Allows notes to be forwared to email"
+        android:title="BETA Audio Note Email Forwarding BETA" >
+        <EditTextPreference
+            android:key="smtp_username"
+            android:summary="for sending email"
+            android:title="Username" />
+        <EditTextPreference
+            android:key="smtp_password"
+            android:summary="for sending email"
+            android:title="Password" />
+        <EditTextPreference
+            android:key="smtp_host"
+            android:summary="SMTP host"
+            android:title="SMTP Host (ex. smtp.gmail.com)"
+            android:defaultValue="smtp.gmail.com"/>
+        <CheckBoxPreference
+            android:key="smtp_secure" 
+            android:summary="Use SSL for email"
+            android:title="Use secure email"
+            android:defaultValue="true"/>
+            />
+    </PreferenceScreen>
+
 </PreferenceScreen>

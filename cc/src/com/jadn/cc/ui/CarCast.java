@@ -27,6 +27,8 @@ import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.MediaMode;
 import com.jadn.cc.trace.ExceptionHandler;
+import com.jadn.cc.util.Recording;
+import com.jadn.cc.util.Updater;
 
 public class CarCast extends MediaControlActivity {
 	final static String tag = CarCast.class.getSimpleName();

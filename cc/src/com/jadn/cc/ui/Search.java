@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
+import com.jadn.cc.util.Updater;
 
 public class Search extends BaseActivity {
 

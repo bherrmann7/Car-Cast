@@ -20,7 +20,6 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -39,6 +38,7 @@ import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
 import com.jadn.cc.util.ExportOpml;
+import com.jadn.cc.util.MailRecordings;
 
 public class ContentService extends Service implements OnCompletionListener {
 	private final IBinder binder = new LocalBinder();
@@ -511,12 +511,12 @@ public class ContentService extends Service implements OnCompletionListener {
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 		registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_MEDIA_BUTTON));
 
-//		remoteControlReceiver = new RemoteControlReceiver(this);
-//		IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+		// remoteControlReceiver = new RemoteControlReceiver(this);
+		// IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
 		// priority cribbed from
 		// http://www.gauntface.co.uk/blog/2010/04/14/using-android-headset-buttons-earphone-buttons/
-//		intentFilter.setPriority(10*IntentFilter.SYSTEM_HIGH_PRIORITY);
-//		registerReceiver(remoteControlReceiver, intentFilter);
+		// intentFilter.setPriority(10*IntentFilter.SYSTEM_HIGH_PRIORITY);
+		// registerReceiver(remoteControlReceiver, intentFilter);
 
 		// foreground stuff
 		try {
@@ -688,6 +688,22 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public void startDownloadingNewPodCasts(final int max) {
+
+		boolean autoDelete = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("autoDelete", false);
+		if (autoDelete) {
+			for (int i = metaHolder.getSize() - 1; i >= 0; i--) {
+				MetaFile metaFile = metaHolder.get(i);
+				if (currentTitle().equals(metaFile.getTitle())) {
+					continue;
+				}
+				if (metaFile.getDuration() <= 0) {
+					continue;
+				}
+				if (metaFile.isListenedTo()) {
+					deletePodcast(i);
+				}
+			}
+		}
 
 		if (downloadHelper == null || downloadHelper.idle) {
 			// cause display to reflect that we are getting ready to do a
@@ -950,6 +966,71 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	public void exportOPML(FileOutputStream fileOutputStream) {
 		ExportOpml.export(getSubscriptions(), fileOutputStream);
+	}
+
+	Thread publishRecordingsThread;
+
+	public void publishRecordings() {
+
+		if (publishRecordingsThread != null) {
+			return;
+		}
+
+		publishRecordingsThread = new Thread() {
+			@Override
+			public void run() {
+				try {
+					partialWakeLock.acquire();
+
+					Log.i("CarCast", "starting recording thread.");
+					// Lets not the phone go to sleep while doing
+					// downloads....
+					PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+					PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ContentService download thread");
+
+					WifiManager.WifiLock wifiLock = null;
+
+					try {
+						// The intent here is keep the phone from shutting
+						// down during a download.
+						wl.acquire();
+
+						// If we have wifi now, lets hold on to it.
+						WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+						if (wifi.isWifiEnabled()) {
+							wifiLock = wifi.createWifiLock("CarCast");
+							if (wifiLock != null)
+								wifiLock.acquire();
+							Log.i("CarCast", "recording Locked Wifi.");
+						}
+						
+						Thread.sleep(2000); // Give wifi two seconds to stablize
+						
+						MailRecordings.doIt(ContentService.this);  
+					
+					} finally {
+						if (wifiLock != null) {
+							try {
+								wifiLock.release();
+								Log.i("CarCast", "recording released Wifi.");
+							} catch (Throwable t) {
+								Log.i("CarCast", "recording Yikes, issue releasing Wifi.");
+							}
+						}
+
+						wl.release();
+					}
+				} catch (Throwable t) {
+					Log.i("CarCast", "Unpleasentness during recording post: " + t.getMessage()+ " "+ t.getClass());
+				} finally {
+					Log.i("CarCast", "finished recording post thread.");
+					partialWakeLock.release();
+					publishRecordingsThread = null;
+				}
+			}
+		};
+		publishRecordingsThread.start();
+
 	}
 
 }

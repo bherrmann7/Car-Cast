@@ -1,4 +1,4 @@
-package com.jadn.cc.ui;
+package com.jadn.cc.util;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -18,16 +18,16 @@ import android.util.Log;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.Config;
+import com.jadn.cc.ui.AudioRecorder;
 
 public class Recording {
 
 	static File recordDir = new File(Config.CarCastRoot, "recordings");
 	static MediaRecorder recorder;
-
-	static File recordFile;
-
+	static File recordFile;  // a file that in progress
 	static SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d h:mm a");
-
+	private File file;
+    
 	static {
 		recordDir.mkdirs();
 	}
@@ -87,22 +87,20 @@ public class Recording {
 			File newFile = new File(recordDir, recordFile.getName().replaceAll("\\.tmp$", "-" + duration + ".3gp"));
 			recordFile.renameTo(newFile);
 
-			updateNotification(activity);
+			updateNotification(activity);		
 		} catch (Exception e) {
 			Log.e("carcast", "Recording.save", e);
 		}
-
+	
 	}
-
-	File file;
 
 	public static void updateNotification(Activity activity) {
 		NotificationManager mNotificationManager = (NotificationManager) activity.getSystemService(Activity.NOTIFICATION_SERVICE);
 
-		mNotificationManager.cancel(24);
-
 		int r = getRecordings().size();
-		if (r != 0) {
+		if (r == 0) {
+			mNotificationManager.cancel(24);
+		} else {
 
 			Notification notification = new Notification(R.drawable.idea, "Audio Recordings ", System.currentTimeMillis());
 
@@ -162,6 +160,10 @@ public class Recording {
 			Log.e("carcast", "Recording.play", e);
 		}
 
+	}
+
+	public File getFile() {
+		return file;
 	}
 
 }

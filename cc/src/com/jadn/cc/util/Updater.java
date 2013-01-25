@@ -1,4 +1,4 @@
-package com.jadn.cc.ui; import android.os.Handler;
+package com.jadn.cc.util; import android.os.Handler;
 
 public class Updater extends Thread {
 
