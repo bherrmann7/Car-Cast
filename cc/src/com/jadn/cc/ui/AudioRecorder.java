@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -19,13 +20,41 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
-import com.jadn.cc.core.PushToServer;
+import com.jadn.cc.util.MailRecordings;
 import com.jadn.cc.util.Recording;
+import com.jadn.cc.util.Updater;
 
 public class AudioRecorder extends BaseActivity {
+	
+	Updater updater;
+	// Need handler for callbacks to the UI thread
+	final Handler handler = new Handler();
+	
+	final Runnable mUpdateResults = new Runnable() {
+		@Override
+		public void run() {
+			
+			ListView listView = (ListView) findViewById(R.id.audioRecorderListing);
+			if (listView.getCount() != Recording.getRecordings().size())
+				showRecordings();
+		}
+	};
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		updater.allDone();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		updater = new Updater(handler, mUpdateResults);
+	}
 
 	private Button fb(int id) {
 		return (Button) findViewById(id);
@@ -100,7 +129,9 @@ public class AudioRecorder extends BaseActivity {
 		registerForContextMenu(listView);
 
 		showRecordings();
+				
 
+		updater = new Updater(handler, mUpdateResults);
 	}
 
 	@Override
@@ -124,7 +155,11 @@ public class AudioRecorder extends BaseActivity {
 			Recording.deleteAll();
 			showRecordings();
 		}
-		if (item.getItemId() == R.id.playAll) {
+		if (item.getItemId() == R.id.sendAudioToEmail) {
+			if(MailRecordings.isAudioSendingConfigured(contentService))
+				contentService.publishRecordings();
+			else
+				Toast.makeText(this, "Audio Note emailing not configured.  See settings.", Toast.LENGTH_LONG).show();
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}

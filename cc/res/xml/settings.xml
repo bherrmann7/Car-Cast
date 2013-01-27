@@ -72,6 +72,11 @@
         android:key="audionoteforwarding"
         android:summary="Allows notes to be forwared to email"
         android:title="BETA Audio Note Email Forwarding BETA" >
+        
+        <EditTextPreference
+            android:key="audioEmail"
+            android:summary="What inbox gets the audio notes"
+            android:title="Receiver Email address" />        
         <EditTextPreference
             android:key="smtp_username"
             android:summary="for sending email"

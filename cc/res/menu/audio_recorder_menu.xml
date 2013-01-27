@@ -1,4 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 <item android:id="@+id/deleteAll" android:title="Delete All" android:icon="@drawable/menu_48_delete" />
 <item android:visible="false" android:id="@+id/playAll" android:title="Play All"></item>
+<item android:id="@+id/sendAudioToEmail" android:title="Send All to Email" android:icon="@drawable/menu_48_email" ></item>
 </menu>

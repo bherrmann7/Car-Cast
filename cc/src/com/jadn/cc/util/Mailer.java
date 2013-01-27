@@ -67,8 +67,10 @@ public class Mailer extends javax.mail.Authenticator {
 		CommandMap.setDefaultCommandMap(mc);
 	}
 
-	public Mailer(String user, String pass, String host, boolean isSSL ) {
+	public Mailer(String email, String user, String pass, String host, boolean isSSL ) {
 		this();
+		_from = email;
+		_to = new String[]{ email };
 		_host = host;
 		_user = user;
 		_pass = pass;		
