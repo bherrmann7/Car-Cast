@@ -65,7 +65,7 @@ public class OpmlImport extends BaseActivity {
 			int count = 0;
 			while ((eventType = parser.next()) != XmlPullParser.END_DOCUMENT) {	
 				if(eventType == XmlPullParser.START_TAG) {
-					if(parser.getName() == "outline"){
+					if(parser.getName().equals("outline")){
 						String title = parser.getAttributeValue(null, "title");
 						String xmlUrl = parser.getAttributeValue(null, "xmlUrl");
 						//Log.i("com.jadn.cc.oiml", "title="+title+"  xmlUrl="+xmlUrl);

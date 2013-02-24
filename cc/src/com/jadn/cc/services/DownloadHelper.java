@@ -222,6 +222,11 @@ public class DownloadHelper implements Sayer {
 			if (con.getResponseCode() == 200) {
 				return con.getInputStream();
 			}
+			if (con.getResponseCode() == 404 && url.getPath().contains(" ")){
+				String newURL = url.getProtocol()+"://"+url.getHost()+(url.getPort()==-1?"":(":"+url.getPort()))+
+						url.getPath().replaceAll(" ", "%20"); 
+				return getInputStream(new URL(newURL));
+			}
 			if (con.getResponseCode() > 300 && con.getResponseCode() > 399) {
 				say(url + " gave resposneCode " + con.getResponseCode());
 				throw new IOException();
