@@ -532,7 +532,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
 		Config.PodcastsRoot.mkdirs();
 		metaHolder = new MetaHolder();
-		mediaPlayer.setOnCompletionListener(this);
+//		mediaPlayer.setOnCompletionListener(this);
 
 		// restore state;
 		currentPodcastInPlayer = 0;
