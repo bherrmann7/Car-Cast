@@ -16,8 +16,8 @@ import com.jadn.cc.trace.TraceUtil;
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
 		"23-Feb-2012", "Fix OIML Import bug.  Thanks to Kerry Sainsbury!",
-		"01-Feb-2013", "Fix for poorly formed subscriptions/feeds with spaces in enclosure URLs",			
-		"26-Jan-2013", "BETA3 feature Audio Note mailer\n\nConfigure receiver email address\nmenu item to send auto notes on demand",			
+		"01-Feb-2013", "Fix for poorly formed subscriptions/feeds with spaces in enclosure URLs",
+		"26-Jan-2013", "BETA3 feature Audio Note mailer\n\nConfigure receiver email address\nmenu item to send auto notes on demand",
 		"24-Jan-2013", "BETA2 feature - more working\n\nAutomatically forward Audio Notes to your email when you connect to WiFi.",	
 		"21-Jan-2013", "BETA feature\n\nAutomatically forward Audio Notes to your email when you connect to WiFi.",	
 		"17-Jan-2013", "Two new preferences\n\nAuto delete \"Listened To\" Podcasts (during download)\n\nDon't warn when downloading on dataplan (aka unlimited dataplan)",	
@@ -204,6 +204,7 @@ public class CarCastApplication extends Application {
 			Log.i("CarCast", "onServiceConnected; CN is " + name + "; binder is " + iservice);
 			if (name.getClassName().equals(ContentService.class.getName())) {
 				contentService = ((LocalBinder) iservice).getService();
+                contentService.setApplicationContext(getApplicationContext());
 				contentServiceListener.onContentServiceChanged(contentService);
 			}
 		}

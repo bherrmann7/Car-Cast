@@ -185,7 +185,19 @@ public class CarCast extends MediaControlActivity {
 			editor.commit();
 		}
 
-		String lastRun = app_preferences.getString("lastRun", null);
+        if (!app_preferences.contains("speedChoice")) {
+            SharedPreferences.Editor editor = app_preferences.edit();
+            editor.putString("speedChoice", "1");
+            editor.commit();
+        }
+
+        if (!app_preferences.contains("variableSpeedEnabled")) {
+            SharedPreferences.Editor editor = app_preferences.edit();
+            editor.putBoolean("variableSpeedEnabled", false);
+            editor.commit();
+        }
+
+        String lastRun = app_preferences.getString("lastRun", null);
 		if (lastRun == null || app_preferences.getBoolean("showSplash", false)) {
 			startActivity(new Intent(this, Splash.class));
 			SharedPreferences.Editor editor = app_preferences.edit();
