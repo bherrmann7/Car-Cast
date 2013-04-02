@@ -12,12 +12,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
+import android.content.*;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
@@ -28,6 +23,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.aocate.media.MediaPlayer;
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
@@ -40,14 +36,14 @@ import com.jadn.cc.ui.CarCast;
 import com.jadn.cc.util.ExportOpml;
 import com.jadn.cc.util.MailRecordings;
 
-public class ContentService extends Service implements OnCompletionListener {
+public class ContentService extends Service implements MediaPlayer.OnCompletionListener {
 	private final IBinder binder = new LocalBinder();
 	int currentPodcastInPlayer;
 	DownloadHelper downloadHelper;
 	private File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
 	Location location;
 	MediaMode mediaMode = MediaMode.UnInitialized;
-	MediaPlayer mediaPlayer = new MediaPlayer();
+    MediaPlayer mediaPlayer = null;
 	MetaHolder metaHolder;
 	SearchHelper searchHelper;
 	File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
@@ -56,8 +52,19 @@ public class ContentService extends Service implements OnCompletionListener {
 	private PlayStatusListener playStatusListener;
 	private HeadsetReceiver headsetReceiver;
 	private RemoteControlReceiver remoteControlReceiver;
+    private Context context;
 
-	/**
+    public void setApplicationContext(Context context) {
+        this.context = context;
+        try {
+            mediaPlayer = new MediaPlayer(context, true);
+            fullReset();
+        } catch (Exception e) {
+            Log.d("CarCast", "Error doing reset", e);
+        }
+    }
+
+    /**
 	 * Class for clients to access. Because we know this service always runs in the same process as its clients, we
 	 * don't need to deal with IPC.
 	 */
@@ -145,6 +152,9 @@ public class ContentService extends Service implements OnCompletionListener {
 				return 0;
 			return currentPostion() * 100 / duration;
 		}
+        if (mediaPlayer.getDuration() == 0) {
+            return 0;
+        }
 		return mediaPlayer.getCurrentPosition() * 100 / mediaPlayer.getDuration();
 	}
 
@@ -288,19 +298,44 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	private boolean fullReset() throws Exception {
+        if (mediaPlayer != null) {
+            mediaPlayer.reset();
+        }
 
-		mediaPlayer.reset();
+        applyVariableSpeedProperties();
 
-		if (currentPodcastInPlayer >= metaHolder.getSize())
+        if (currentPodcastInPlayer >= metaHolder.getSize())
 			return false;
 
-		mediaPlayer.setDataSource(currentFile().toString());
-		mediaPlayer.prepare();
-		mediaPlayer.seekTo(metaHolder.get(currentPodcastInPlayer).getCurrentPos());
+
+        mediaPlayer.setDataSource(currentFile().toString());
+ 		mediaPlayer.prepare();
+        mediaPlayer.setOnCompletionListener(this);
+
+        mediaPlayer.seekTo(metaHolder.get(currentPodcastInPlayer).getCurrentPos());
 		return true;
 	}
 
-	public int getCount() {
+    private void applyVariableSpeedProperties() {
+        SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean variableSpeed = app_preferences.getBoolean("variableSpeedEnabled", false);
+
+        mediaPlayer.setUseService(variableSpeed);
+        mediaPlayer.setEnableSpeedAdjustment(variableSpeed);
+
+        Log.d("CarCast", "SPEED CHOICE " + app_preferences.getString("speedChoice", "undefined"));
+        Float speed = null;
+        try {
+            speed = Float.parseFloat(app_preferences.getString("speedChoice", "1.75"));
+        } catch (Exception e) {
+            Log.d("CarCast", e.getMessage());
+            speed = 1.75f;
+        }
+
+        mediaPlayer.setPlaybackSpeed(speed);
+    }
+
+    public int getCount() {
 		return metaHolder.getSize();
 	}
 
@@ -464,7 +499,7 @@ public class ContentService extends Service implements OnCompletionListener {
 		}
 	}
 
-	@Override
+    @Override
 	public void onCreate() {
 		super.onCreate();
 		ExceptionHandler.register(this);
@@ -497,7 +532,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 		Config.PodcastsRoot.mkdirs();
 		metaHolder = new MetaHolder();
-		mediaPlayer.setOnCompletionListener(this);
+//		mediaPlayer.setOnCompletionListener(this);
 
 		// restore state;
 		currentPodcastInPlayer = 0;
@@ -590,6 +625,7 @@ public class ContentService extends Service implements OnCompletionListener {
 				return true;
 			}
 		} catch (Exception e) {
+            Log.e("CarCast", "Unexpected exception", e);
 			return false;
 		}
 	}
@@ -603,7 +639,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 			// say(activity, "started " + currentTitle());
 			mediaPlayer.start();
-			mediaMode = MediaMode.Playing;
+            mediaMode = MediaMode.Playing;
 			saveState();
 		} catch (Exception e) {
 			TraceUtil.report(e);
@@ -816,7 +852,7 @@ public class ContentService extends Service implements OnCompletionListener {
 
 	}
 
-	void updateNotification(String update) {
+    void updateNotification(String update) {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
 
 		Notification notification = new Notification(R.drawable.iconbusy, "Downloading started", System.currentTimeMillis());
@@ -831,7 +867,7 @@ public class ContentService extends Service implements OnCompletionListener {
 	}
 
 	public boolean isPlaying() {
-		return mediaPlayer.isPlaying();
+		return mediaPlayer != null &&  mediaPlayer.isPlaying();
 	}
 
 	public boolean isIdle() {

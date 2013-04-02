@@ -36,6 +36,19 @@
         android:title="Max downloads" />
 
     <CheckBoxPreference
+            android:key="variableSpeedEnabled"
+            android:summary="Enable use of Stable Speed or Presto 3rd party variable speed playback engine"
+            android:title="Enable Variable Speeds" />
+
+    <ListPreference
+            android:dialogTitle="Playback speed"
+            android:entries="@array/speedChoice_array"
+            android:entryValues="@array/speedChoice_array"
+            android:key="speedChoice"
+            android:summary="Playback speed"
+            android:title="Playback speed" />
+
+    <CheckBoxPreference
         android:key="showSplash"
         android:summary="On startup show splash screen once more"
         android:title="Enable splash screen" />
