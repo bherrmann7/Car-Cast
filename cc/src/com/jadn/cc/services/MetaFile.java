@@ -152,5 +152,9 @@ public class MetaFile {
 	public boolean isListenedTo() {
 		return properties.getProperty("listenedTo" ) != null;
 	}
+	
+	public String getDescription(){
+		return properties.getProperty("description");
+	}
 
 }

@@ -224,6 +224,7 @@ public class PodcastList extends BaseActivity {
 				item.put("listened", "true");
 				time = "End" + "-" + ContentService.getTimeString(metaFile.getDuration());
 			}
+			item.put("description", metaFile.getDescription());
 			item.put("xx:xx-xx:xx", time);
 			item.put("line2", metaFile.getTitle());
 			list.add(item);
@@ -236,8 +237,8 @@ public class PodcastList extends BaseActivity {
 			podcastsAdapter = new SimpleAdapter(this, list,
 			// R.layout.main_item_two_line_row, new String[] { "line1",
 			// "line2" }, new int[] { R.id.text1, R.id.text2 });
-					R.layout.podcast_items_checks, new String[] { "line1", "xx:xx-xx:xx", "line2" }, new int[] { R.id.firstLine,
-							R.id.amountHeard, R.id.secondLine }) {
+					R.layout.podcast_items_checks, new String[] { "line1", "xx:xx-xx:xx", "line2", "description" }, new int[] { R.id.firstLine,
+							R.id.amountHeard, R.id.secondLine, R.id.description }) {
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
 					View view = super.getView(position, convertView, parent);

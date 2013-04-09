@@ -11,6 +11,13 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import android.util.Log;
 
+/**
+ *  SAX Parsing kinda sucks, I probably should have gone with DOM or TRAX or something else....
+ * 
+ * @author bob
+ *
+ */
+
 public class EnclosureHandler extends DefaultHandler {
 
 	private static final int STOP = -2;
@@ -19,7 +26,6 @@ public class EnclosureHandler extends DefaultHandler {
 	String feedName;
 	private boolean grabTitle;
 	DownloadHistory history;
-	private String lastTitle = "";
 
 	public int max = 2;
 
@@ -28,6 +34,10 @@ public class EnclosureHandler extends DefaultHandler {
 	private boolean needTitle = true;
 	private boolean startTitle;
 	public String title = "";
+	private String lastTitle = "";
+	
+	private boolean startDescription = false;
+	private String lastDescription = "";
 
 	public EnclosureHandler(DownloadHistory history) {
 		this.history = history;
@@ -44,6 +54,10 @@ public class EnclosureHandler extends DefaultHandler {
 			lastTitle += new String(ch, start, length);
 			// Log.i("carcast.itemTitle", lastTitle);
 		}
+		
+		if(startDescription)
+			lastDescription += new String(ch, start, length);
+			
 	}
 
 	@Override
@@ -55,6 +69,7 @@ public class EnclosureHandler extends DefaultHandler {
 			needTitle = false;
 		}
 		grabTitle = false;
+		startDescription = false;
 	}
 
 	public String getTitle() {
@@ -104,6 +119,11 @@ public class EnclosureHandler extends DefaultHandler {
 			grabTitle = true;
 		} else if (localName.equals("item")) {
 			lastTitle = "";
+			lastDescription = "";
+		}
+
+		if(localName.equals("description")){
+			startDescription = true;
 		}
 
 		if (localName.equals("enclosure") && atts.getValue("url") != null) {			
@@ -134,6 +154,7 @@ public class EnclosureHandler extends DefaultHandler {
 					}
 				    MetaNet metaNet = new MetaNet(feedName, new URL(atts.getValue("url")), length, getMimetype(atts.getValue("url"), atts.getValue("type")));
 					metaNet.setTitle(lastTitle);
+					metaNet.setDescription(lastDescription);
 					if (history.contains(metaNet)) {
 						// stop getting podcasts after we find one in our
 						// history.

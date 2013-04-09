@@ -21,11 +21,12 @@
         android:key="wifiDownload"
         android:summary="Require WIFI for auto download"
         android:title="Require WIFI" />
+    
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="wifiWarning"
-        android:summary="Show warning accessing using data plan (w/o wifi)"
-        android:title="Wifi Warning" />
+        android:key="keep_display_on"
+        android:summary="Keep Display Always On"
+        android:title="Keep Display On" />
 
     <ListPreference
         android:dialogTitle="Max podcasts to download per site per run"

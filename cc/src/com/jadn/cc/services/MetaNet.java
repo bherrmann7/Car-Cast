@@ -31,6 +31,10 @@ public class MetaNet {
 		return properties.getProperty("title");
 	}
 
+	public String getDescription() {
+		return properties.getProperty("description");
+	}
+
 	public String getUrl() {
 		return properties.getProperty("url");
 	}
@@ -38,6 +42,10 @@ public class MetaNet {
 
 	public void setTitle(String value) {
 		properties.setProperty("title", value);		
+	}
+
+	public void setDescription(String value) {
+		properties.setProperty("description", value);		
 	}
 
 	public void setMimetype(String value) {

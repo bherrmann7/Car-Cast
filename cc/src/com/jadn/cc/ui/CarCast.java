@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -185,19 +186,19 @@ public class CarCast extends MediaControlActivity {
 			editor.commit();
 		}
 
-        if (!app_preferences.contains("speedChoice")) {
-            SharedPreferences.Editor editor = app_preferences.edit();
-            editor.putString("speedChoice", "1");
-            editor.commit();
-        }
+		if (!app_preferences.contains("speedChoice")) {
+			SharedPreferences.Editor editor = app_preferences.edit();
+			editor.putString("speedChoice", "1");
+			editor.commit();
+		}
 
-        if (!app_preferences.contains("variableSpeedEnabled")) {
-            SharedPreferences.Editor editor = app_preferences.edit();
-            editor.putBoolean("variableSpeedEnabled", false);
-            editor.commit();
-        }
+		if (!app_preferences.contains("variableSpeedEnabled")) {
+			SharedPreferences.Editor editor = app_preferences.edit();
+			editor.putBoolean("variableSpeedEnabled", false);
+			editor.commit();
+		}
 
-        String lastRun = app_preferences.getString("lastRun", null);
+		String lastRun = app_preferences.getString("lastRun", null);
 		if (lastRun == null || app_preferences.getBoolean("showSplash", false)) {
 			startActivity(new Intent(this, Splash.class));
 			SharedPreferences.Editor editor = app_preferences.edit();
@@ -206,17 +207,17 @@ public class CarCast extends MediaControlActivity {
 		} else if (!lastRun.equals(CarCastApplication.releaseData[0])) {
 			if (CarCastApplication.releaseData[1].equals("OnSale")) {
 				new AlertDialog.Builder(CarCast.this).setTitle(CarCastApplication.getAppTitle() + " Pro Sale!")
-						.setMessage("\nJust $0.99 USD gets rid of Ads and You are helping make CarCast better.").setNeutralButton("No Thanks", null).setPositiveButton("YES! Get Pro",  new DialogInterface.OnClickListener() {							
-			                public void onClick(DialogInterface dialog, int id) {			
-			                    //dialog.cancel();
-			                	//System.out.println("Do something");
-			                	// market://search?q=pname:com.jadn.cc
-			                	Intent intent = new Intent(Intent.ACTION_VIEW);
-			                	intent.setData(Uri.parse("market://details?id=com.jadn.ccpro"));
-			                	startActivity(intent);
-			                }			
-			            })
-						.show();
+						.setMessage("\nJust $0.99 USD gets rid of Ads and You are helping make CarCast better.")
+						.setNeutralButton("No Thanks", null).setPositiveButton("YES! Get Pro", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								// dialog.cancel();
+								// System.out.println("Do something");
+								// market://search?q=pname:com.jadn.cc
+								Intent intent = new Intent(Intent.ACTION_VIEW);
+								intent.setData(Uri.parse("market://details?id=com.jadn.ccpro"));
+								startActivity(intent);
+							}
+						}).show();
 
 			} else {
 				new AlertDialog.Builder(CarCast.this).setTitle(CarCastApplication.getAppTitle() + " updated")
@@ -247,6 +248,7 @@ public class CarCast extends MediaControlActivity {
 			TextView titleTextView = (TextView) findViewById(R.id.title);
 			titleTextView.setBackgroundDrawable((Drawable) null);
 		}
+
 	}
 
 	@Override
@@ -321,6 +323,12 @@ public class CarCast extends MediaControlActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		if (app_preferences.getBoolean("keep_display_on", true))
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		else
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 
 		updater = new Updater(handler, mUpdateResults);
 	}

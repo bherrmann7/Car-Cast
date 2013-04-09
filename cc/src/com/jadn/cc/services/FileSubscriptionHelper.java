@@ -267,7 +267,6 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
     public List<Subscription> resetToDemoSubscriptions() {
         List<Subscription> subs = new ArrayList<Subscription>();
         subs.add(new Subscription("Quirks and Quarks", "http://www.cbc.ca/podcasting/includes/quirks.xml"));
-        subs.add(new Subscription("Cringely", "http://www.cringely.com/feed/podcast/"));
         subs.add(new Subscription("60 second science", "http://rss.sciam.com/sciam/60secsciencepodcast"));
         subs.add(new Subscription("60 second psych", "http://rss.sciam.com/sciam/60-second-psych"));
         subs.add(new Subscription("60 second earth", "http://rss.sciam.com/sciam/60-second-earth"));

@@ -15,7 +15,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
-		"23-Feb-2012", "Fix OIML Import bug.  Thanks to Kerry Sainsbury!",
+		"08-APR-2013", "New Setting: Keep Display Awake\nFix Help/FAQ page\n    (Thanks Eddy Petrișor)\nBETA: Pay to Play Fast Support\n   (Thanks Kerry Sainsbury!)",
+		"23-Feb-2013", "Fix OIML Import bug.  Thanks to Kerry Sainsbury!",
 		"01-Feb-2013", "Fix for poorly formed subscriptions/feeds with spaces in enclosure URLs",
 		"26-Jan-2013", "BETA3 feature Audio Note mailer\n\nConfigure receiver email address\nmenu item to send auto notes on demand",
 		"24-Jan-2013", "BETA2 feature - more working\n\nAutomatically forward Audio Notes to your email when you connect to WiFi.",	

@@ -25,4 +25,15 @@
 		android:singleLine="true" android:ellipsize="marquee"
 		android:text="I'm the name of the episode" />
 
+	<TextView
+	    android:id="@+id/description"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/secondLine"
+	    android:layout_toRightOf="@+id/checkBox1"
+	    android:ellipsize="marquee"
+	    android:singleLine="true"
+	    android:text="I&apos;m the description I&apos;m the description I&apos;m the description I&apos;m the description I&apos;m the description"
+	    android:textSize="18dp" />
+
 </RelativeLayout>
