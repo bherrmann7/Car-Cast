@@ -7,11 +7,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.SortedSet;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
+import android.app.*;
 import android.content.*;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
@@ -36,7 +32,7 @@ import com.jadn.cc.ui.CarCast;
 import com.jadn.cc.util.ExportOpml;
 import com.jadn.cc.util.MailRecordings;
 
-public class ContentService extends Service implements MediaPlayer.OnCompletionListener {
+public class ContentService extends Service implements MediaPlayer.OnCompletionListener, SharedPreferences.OnSharedPreferenceChangeListener {
 	private final IBinder binder = new LocalBinder();
 	int currentPodcastInPlayer;
 	DownloadHelper downloadHelper;
@@ -316,24 +312,35 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 		return true;
 	}
 
+   public static String VARIABLE_SPEED_ENABLED = "variableSpeedEnabled";
+   private static String SPEED_CHOICE = "speedChoice";
+
     private void applyVariableSpeedProperties() {
         SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean variableSpeed = app_preferences.getBoolean("variableSpeedEnabled", false);
+        boolean variableSpeed = app_preferences.getBoolean(VARIABLE_SPEED_ENABLED, false);
 
         mediaPlayer.setUseService(variableSpeed);
         mediaPlayer.setEnableSpeedAdjustment(variableSpeed);
 
-        Log.d("CarCast", "SPEED CHOICE " + app_preferences.getString("speedChoice", "undefined"));
+        Log.d("CarCast", "SPEED CHOICE " + app_preferences.getString(SPEED_CHOICE, "undefined"));
         Float speed = null;
         try {
-            speed = Float.parseFloat(app_preferences.getString("speedChoice", "1.75"));
+            speed = Float.parseFloat(app_preferences.getString(SPEED_CHOICE, "1.7"));
         } catch (Exception e) {
             Log.d("CarCast", e.getMessage());
-            speed = 1.75f;
+            speed = 1.7f;
         }
 
         mediaPlayer.setPlaybackSpeed(speed);
     }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(VARIABLE_SPEED_ENABLED) || key.equals(SPEED_CHOICE))  {
+            applyVariableSpeedProperties();
+        }
+    }
+
 
     public int getCount() {
 		return metaHolder.getSize();
@@ -504,7 +511,10 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 		super.onCreate();
 		ExceptionHandler.register(this);
 
-		partialWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
+        partialWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 				CarCastApplication.getAppTitle());
 		partialWakeLock.setReferenceCounted(false);
 
@@ -583,7 +593,10 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 	@Override
 	public void onDestroy() {
 		unregisterReceiver(headsetReceiver);
-		super.onDestroy();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+
+        super.onDestroy();
 		Log.i("CarCast", "ContentService destroyed");
 		// Toast.makeText(getApplication(), "Service Destroyed", 1000).show();
 
