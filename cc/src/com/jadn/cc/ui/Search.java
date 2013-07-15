@@ -59,6 +59,7 @@ public class Search extends BaseActivity {
 					KeyEvent event) {
 				searchButton.setEnabled(false);
 				searchText.setEnabled(false);
+				Toast.makeText(getContentService(), "Searching....", 1000).show();
 				contentService.startSearch(searchText.getText().toString());
 				updater = new Updater(handler, mUpdateResults);
 				return true;

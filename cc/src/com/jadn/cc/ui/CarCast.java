@@ -91,7 +91,8 @@ public class CarCast extends MediaControlActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		ExceptionHandler.register(this);
+		// google handles surprise exceptions
+		//ExceptionHandler.register(this);
 
 		super.onCreate(savedInstanceState);
 

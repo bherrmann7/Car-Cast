@@ -502,7 +502,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     @Override
 	public void onCreate() {
 		super.onCreate();
-		ExceptionHandler.register(this);
+		
+		// Google handles surprise exceptions now, so we dont have to.
+		//ExceptionHandler.register(this);
 
 		partialWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 				CarCastApplication.getAppTitle());
@@ -784,6 +786,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 									"none");
 							boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
 									"canCollectData", true);
+							// I've not been using this data.   Primarily this was used to seed the podcast database, but I'm thinking
+							// of using Apple's itunes database going forward.   They do a better job.
+							canCollectData = false;
 
 							downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
 						} finally {

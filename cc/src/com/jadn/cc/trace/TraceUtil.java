@@ -12,12 +12,14 @@ public class TraceUtil {
 
 	public static void report(Throwable e) {
 		saveTrace(e);
-		ExceptionHandler.clearStackTraceCache();
-		ExceptionHandler.submitStackTraces();
+		//ExceptionHandler.clearStackTraceCache();
+		//ExceptionHandler.submitStackTraces();
 	}
 
 	public static void saveTrace(Throwable e) {
-		try {
+		Log.e(TraceUtil.class.getName(), "Huh", e);
+		return;		
+/*		try {
 			final Writer result = new StringWriter();
 			long traceTime = System.currentTimeMillis();
 			e.printStackTrace(new PrintWriter(result));
@@ -30,7 +32,7 @@ public class TraceUtil {
 		} catch (Exception ebos) {
 			Log.e(TraceUtil.class.getName(), "Unable to save trace.", ebos);
 		}
-
+*/
 	}
 
 }

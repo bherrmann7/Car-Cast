@@ -15,6 +15,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
 	public final static String[] releaseData = new String[] {
+		"20-MAY-2013", "Stop collecting anonymous data... I'm not using it and it slows my server down.",		
 		"08-APR-2013", "New Setting: Keep Display Awake\nFix Help/FAQ page\n    (Thanks Eddy Petrișor)\nBETA: Pay to Play Fast Support\n   (Thanks Kerry Sainsbury!)",
 		"23-Feb-2013", "Fix OIML Import bug.  Thanks to Kerry Sainsbury!",
 		"01-Feb-2013", "Fix for poorly formed subscriptions/feeds with spaces in enclosure URLs",
