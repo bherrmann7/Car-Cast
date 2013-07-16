@@ -29,7 +29,10 @@ import com.jadn.cc.core.Config;
 import com.jadn.cc.core.MediaMode;
 import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.util.Recording;
+import com.jadn.cc.util.RecordingSet;
 import com.jadn.cc.util.Updater;
+
+import java.io.File;
 
 public class CarCast extends MediaControlActivity {
 	final static String tag = CarCast.class.getSimpleName();
@@ -227,7 +230,8 @@ public class CarCast extends MediaControlActivity {
 		}
 		saveLastRun();
 
-		Recording.updateNotification(this);
+        RecordingSet recordingSet = new RecordingSet(this);
+		recordingSet.updateNotification();
 
 		String[] orientations = { "AUTO", "Landscape", "Flipped Landscape", "Portrait", "Flipped Portrait" };
 		int[] orientationValues = { ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
@@ -343,20 +347,21 @@ public class CarCast extends MediaControlActivity {
 		editor.commit();
 	}
 
+    private Config config;
+    private File podroot;
+
 	public void updateUI() {
 		if (contentService == null)
 			return;
+        if(config == null){
+            config = new Config(getApplicationContext());
+            podroot = config.getPodcastsRoot();
+        }
 		try {
-			if (!android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
-
-				TextView textView = (TextView) findViewById(R.id.title);
-				textView.setText("ERROR ** " + CarCastApplication.getAppTitle() + " requires the sdcard ** ");
-				return;
-			}
-			if (!Config.PodcastsRoot.exists()) {
-				if (!Config.PodcastsRoot.mkdirs()) {
+			if (!podroot.exists()) {
+				if (!podroot.mkdirs()) {
 					TextView textView = (TextView) findViewById(R.id.title);
-					textView.setText("ERROR ** " + CarCastApplication.getAppTitle() + " cannot write to sdcard ** ");
+					textView.setText("ERROR ** " + CarCastApplication.getAppTitle() + " cannot write to storage: "+podroot+" ** ");
 					return;
 				}
 			}

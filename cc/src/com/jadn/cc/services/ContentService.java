@@ -40,14 +40,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 	private final IBinder binder = new LocalBinder();
 	int currentPodcastInPlayer;
 	DownloadHelper downloadHelper;
-	private File legacyFile = new File(Config.CarCastRoot, "podcasts.txt");
 	Location location;
 	MediaMode mediaMode = MediaMode.UnInitialized;
     MediaPlayer mediaPlayer = null;
 	MetaHolder metaHolder;
 	SearchHelper searchHelper;
-	File siteListFile = new File(Config.CarCastRoot, "podcasts.properties");
-	SubscriptionHelper subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
 	boolean wasPausedByPhoneCall;
 	private PlayStatusListener playStatusListener;
 	private HeadsetReceiver headsetReceiver;
@@ -192,7 +189,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 			pauseNow();
 		}
 		metaHolder.get(currentPodcastInPlayer).delete();
-		metaHolder = new MetaHolder();
+		metaHolder = new MetaHolder(getApplicationContext());
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			currentPodcastInPlayer = 0;
 		}
@@ -239,7 +236,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 		for (int i = 0; i < upTo; i++) {
 			metaHolder.delete(0);
 		}
-		metaHolder = new MetaHolder();
+		metaHolder = new MetaHolder(getApplicationContext());
 		tryToRestoreLocation();
 		if (location == null)
 			currentPodcastInPlayer = 0;
@@ -277,7 +274,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 		// clear so next user request will start new download
 		// downloadHelper = null;
 
-		metaHolder = new MetaHolder();
+		metaHolder = new MetaHolder(getApplicationContext());
 		if (currentPodcastInPlayer >= metaHolder.getSize()) {
 			currentPodcastInPlayer = 0;
 		}
@@ -499,11 +496,20 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 		}
 	}
 
+    private Config config;
+    FileSubscriptionHelper subHelper;
+
     @Override
 	public void onCreate() {
 		super.onCreate();
-		
-		// Google handles surprise exceptions now, so we dont have to.
+        config = new Config(getApplicationContext());
+
+        File legacyFile = config.getCarCastPath("podcasts.txt");
+        File siteListFile = config.getCarCastPath("podcasts.properties");
+        subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
+        config.getPodcastsRoot().mkdirs();
+
+        // Google handles surprise exceptions now, so we dont have to.
 		//ExceptionHandler.register(this);
 
 		partialWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
@@ -532,8 +538,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 		final TelephonyManager telMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
 		telMgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
-		Config.PodcastsRoot.mkdirs();
-		metaHolder = new MetaHolder();
+		metaHolder = new MetaHolder(getApplicationContext());
 //		mediaPlayer.setOnCompletionListener(this);
 
 		// restore state;
@@ -686,7 +691,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 	}
 
 	public void restoreState() {
-		final File stateFile = new File(Config.PodcastsRoot, "state.dat");
+		final File stateFile = config.getPodcastRootPath("state.dat");
 		if (!stateFile.exists()) {
 			location = null;
 			return;
@@ -704,7 +709,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
 	public void saveState() {
 		try {
-			final File stateFile = new File(Config.PodcastsRoot, "state.dat");
+            final File stateFile = config.getPodcastRootPath("state.dat");
 			location = Location.save(stateFile, currentTitle());
 		} catch (Throwable e) {
 			// bummer.
@@ -898,7 +903,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 	}
 
 	public void newContentAdded() {
-		metaHolder = new MetaHolder();
+		metaHolder = new MetaHolder(getApplicationContext());
 	}
 
 	// This section cribbed from
@@ -1047,7 +1052,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 						
 						Thread.sleep(2000); // Give wifi two seconds to stablize
 						
-						MailRecordings.doIt(ContentService.this);  
+						MailRecordings.doIt(ContentService.this);
 					
 					} finally {
 						if (wifiLock != null) {

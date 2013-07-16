@@ -2,6 +2,7 @@ package com.jadn.cc.core;
 
 import com.jadn.cc.services.ContentService;
 import com.jadn.cc.util.Recording;
+import com.jadn.cc.util.RecordingSet;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -37,7 +38,7 @@ public class WifiConnectedReceiver extends BroadcastReceiver {
 				if (username == null || username.trim().length() == 0 || password == null && password.trim().length() == 0) {
 					return;
 				}
-				if (Recording.getRecordings().size() == 0)
+				if (new RecordingSet(context).getRecordings().size() == 0)
 					return;
 				//
 				// Start emailing recorded audio

@@ -11,17 +11,21 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.jadn.cc.core.Config;
 
 /** Meta information about podcasts. **/
 public class MetaHolder {
+    private Context context;
+    private Config config;
 
 	private List<MetaFile> metas = new ArrayList<MetaFile>();
-	File order = new File(Config.PodcastsRoot, "podcast-order.txt");
 
-	public MetaHolder() {
+	public MetaHolder(Context context) {
+        this.context = context;
+        this.config = new Config(context);
 		loadMeta();
 	}
 
@@ -31,7 +35,6 @@ public class MetaHolder {
 	}
 
 	public MetaFile extract(int i) {
-		// metas.get(i).delete();
 		return metas.remove(i);
 	}
 
@@ -39,18 +42,16 @@ public class MetaHolder {
 		return metas.get(current);
 	}
 
-	// public List<MetaFile> getMeta() {
-	// return metas;
-	// }
-
 	public int getSize() {
 		return metas.size();
 	}
 
 	/* Really a part of the constructor -- assumes "metas" is empty */
 	private void loadMeta() {
-		File[] files = Config.PodcastsRoot.listFiles();
-		if (files == null)
+		File[] files = config.getPodcastsRoot().listFiles();
+        File order = config.getPodcastRootPath("podcast-order.txt");
+
+        if (files == null)
 			return;
 
 		// Load files in proper order
@@ -59,7 +60,7 @@ public class MetaHolder {
 				DataInputStream dis = new DataInputStream(new FileInputStream(order));
 				String line = null;
 				while ((line = dis.readLine()) != null) {
-					File file = new File(Config.PodcastsRoot, line);
+					File file = config.getPodcastRootPath(line);
 					if (file.exists()) {
 						metas.add(new MetaFile(file));
 					}
@@ -182,7 +183,8 @@ public class MetaHolder {
 	}
 
 	public void saveOrder() {
-		StringBuilder sb = new StringBuilder();
+        File order = config.getPodcastRootPath("podcast-order.txt");
+        StringBuilder sb = new StringBuilder();
 		for (MetaFile metaFile : metas) {
 			sb.append(metaFile.getFilename());
 			sb.append('\n');

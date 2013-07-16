@@ -107,7 +107,7 @@ public class Subscriptions extends BaseActivity {
 			intent.putExtra("subscription", sub);
 			startActivityForResult(intent, info.position);
 		} else if (item.getTitle().equals(ERASE_SUBSCRIPTIONS_S_HISTORY)) {
-			int erasedPodcasts = DownloadHistory.getInstance().eraseHistory(sub.name);
+			int erasedPodcasts = new DownloadHistory(getApplicationContext()).eraseHistory(sub.name);
 			Util.toast(this, "Removed " + erasedPodcasts + " podcasts from download history.");
 		}
 		return true;

@@ -147,7 +147,7 @@ public class PodcastList extends BaseActivity {
 		if (item.getItemId() == R.id.deleteListenedTo) {
 			String currTitle = "";
 			currTitle = contentService.currentTitle();
-			MetaHolder metaHolder = new MetaHolder();
+			MetaHolder metaHolder = new MetaHolder(getApplicationContext());
 			for (int i = metaHolder.getSize() - 1; i >= 0; i--) {
 				MetaFile metaFile = metaHolder.get(i);
 				if (currTitle.equals(metaFile.getTitle())) {
@@ -186,7 +186,7 @@ public class PodcastList extends BaseActivity {
 					.setPositiveButton("Erase", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							int historyDeleted = DownloadHistory.getInstance().eraseHistory();
+							int historyDeleted = new DownloadHistory(getApplicationContext()).eraseHistory();
 							Util.toast(PodcastList.this, "Erased " + historyDeleted + " podcast from dowload history.");
 						}
 
@@ -200,7 +200,7 @@ public class PodcastList extends BaseActivity {
 
 		ListView listView = (ListView) findViewById(R.id.list);
 
-		MetaHolder metaHolder = new MetaHolder();
+		MetaHolder metaHolder = new MetaHolder(getApplicationContext());
 		list.clear();
 
 		for (int i = 0; i < metaHolder.getSize(); i++) {
@@ -313,7 +313,7 @@ public class PodcastList extends BaseActivity {
 		public void onClick(View v) {
 			Tag tag = (Tag) v.getTag();
 
-			MetaHolder metaHolder = new MetaHolder();
+			MetaHolder metaHolder = new MetaHolder(getApplicationContext());
 			MetaFile mfile = metaHolder.get(tag.position);
 
 			if (mfile.getTitle().equals(contentService.currentTitle())) {
@@ -332,7 +332,7 @@ public class PodcastList extends BaseActivity {
 		public boolean onLongClick(View v) {
 			final Tag tag = (Tag) v.getTag();
 
-			final MetaHolder metaHolder = new MetaHolder();
+			final MetaHolder metaHolder = new MetaHolder(getApplicationContext());
 			final MetaFile mfile = metaHolder.get(tag.position);
 
 			// Ask the user if they want to really delete all

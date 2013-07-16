@@ -32,7 +32,6 @@ import com.jadn.cc.core.Util;
 public class DownloadHelper implements Sayer {
 	public String currentSubscription = " ";
 	public String currentTitle = " ";
-	DownloadHistory history = DownloadHistory.getInstance();
 	int globalMax;
 	StringBuilder newText = new StringBuilder();
 	int podcastsCurrentBytes;
@@ -62,7 +61,9 @@ public class DownloadHelper implements Sayer {
 	}
 
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
-		// just to be explicit (or if a DownloadHelper ever gets reused):
+        DownloadHistory history = new DownloadHistory(contentService);
+
+        // just to be explicit (or if a DownloadHelper ever gets reused):
 		idle = false;
 		say("Starting find/download new podcasts. CarCast ver " + CarCastApplication.getVersion());
 		say("Problems? please use Menu / Email Download Report - THANKS!");
@@ -153,11 +154,12 @@ public class DownloadHelper implements Sayer {
 			podcastsDownloaded = i + 1;
 
 			try {
-				File castFile = new File(Config.PodcastsRoot, Long.toString(System.currentTimeMillis()) + localFileExt);
+                Config config = new Config(contentService);
+				File castFile = config.getPodcastRootPath(System.currentTimeMillis() + localFileExt);
 
 				currentSubscription = newPodcasts.get(i).getSubscription();
 				currentTitle = newPodcasts.get(i).getTitle();
-				File tempFile = new File(Config.PodcastsRoot, "tempFile");
+				File tempFile = config.getPodcastRootPath( "tempFile");
 				say("Subscription: " + currentSubscription);
 				say("Title: " + currentTitle);
 				say("enclosure url: " + new URL(newPodcasts.get(i).getUrl()));

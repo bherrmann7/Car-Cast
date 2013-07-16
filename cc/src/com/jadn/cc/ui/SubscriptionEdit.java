@@ -138,12 +138,13 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 	}
 	
 	private void testUrl() {
-		DownloadHistory history = DownloadHistory.getInstance();
+		DownloadHistory history = new DownloadHistory(getApplicationContext());
 		encloseureHandler = new EnclosureHandler(history);
 		Spinner spinner = (Spinner) findViewById(R.id.subMax);
 		int max = mValues[spinner.getSelectedItemPosition()];
 		if (max == Subscription.GLOBAL) {
-			max = Config.getMax(SubscriptionEdit.this);
+            Config config = new Config(getApplicationContext());
+			max = config.getMax();
 		}
 		encloseureHandler.setMax(max);
 

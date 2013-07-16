@@ -26,6 +26,7 @@ import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.util.MailRecordings;
 import com.jadn.cc.util.Recording;
+import com.jadn.cc.util.RecordingSet;
 import com.jadn.cc.util.Updater;
 
 public class AudioRecorder extends BaseActivity {
@@ -33,13 +34,14 @@ public class AudioRecorder extends BaseActivity {
 	Updater updater;
 	// Need handler for callbacks to the UI thread
 	final Handler handler = new Handler();
+    RecordingSet recordingSet;
 	
 	final Runnable mUpdateResults = new Runnable() {
 		@Override
 		public void run() {
 			
 			ListView listView = (ListView) findViewById(R.id.audioRecorderListing);
-			if (listView.getCount() != Recording.getRecordings().size())
+			if (listView.getCount() != recordingSet.getRecordings().size())
 				showRecordings();
 		}
 	};
@@ -64,12 +66,12 @@ public class AudioRecorder extends BaseActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		if (item.getTitle().equals("Play")) {
-			Recording recording = Recording.getRecordings().get(info.position);
+			Recording recording = recordingSet.getRecordings().get(info.position);
 			recording.play();
 		}
 		if (item.getTitle().equals("Delete")) {
-			Recording recording = Recording.getRecordings().get(info.position);
-			recording.delete(this);
+			Recording recording = recordingSet.getRecordings().get(info.position);
+            recordingSet.delete(recording);
 			showRecordings();
 		}
 		return true;
@@ -80,14 +82,16 @@ public class AudioRecorder extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.recorder);
 
-		setTitle(CarCastApplication.getAppTitle() + ": Audio Note Recorder");
+        recordingSet = new RecordingSet(this);
+
+        setTitle(CarCastApplication.getAppTitle() + ": Audio Note Recorder");
 
 		setReadyToRecord(true);
 
 		fb(R.id.audioRecorderRecordButton).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Recording.record();
+				recordingSet.record();
 				// transition to record mode
 				setReadyToRecord(false);
 			}
@@ -96,7 +100,7 @@ public class AudioRecorder extends BaseActivity {
 		fb(R.id.audioRecorderCancelButton).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Recording.cancel();
+                recordingSet.cancel();
 				// transition back to ready
 				setReadyToRecord(true);
 			}
@@ -105,7 +109,7 @@ public class AudioRecorder extends BaseActivity {
 		fb(R.id.audioRecorderSaveButton).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Recording.save(AudioRecorder.this);
+                recordingSet.save();
 
 				// transition back to ready
 				setReadyToRecord(true);
@@ -122,7 +126,7 @@ public class AudioRecorder extends BaseActivity {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-				Recording.getRecordings().get(position).play();
+				recordingSet.getRecordings().get(position).play();
 			}
 		});
 
@@ -152,7 +156,7 @@ public class AudioRecorder extends BaseActivity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
 		if (item.getItemId() == R.id.deleteAll) {
-			Recording.deleteAll();
+			recordingSet.deleteAll();
 			showRecordings();
 		}
 		if (item.getItemId() == R.id.sendAudioToEmail) {
@@ -182,7 +186,7 @@ public class AudioRecorder extends BaseActivity {
 	private void showRecordings() {
 		ListView listView = (ListView) findViewById(R.id.audioRecorderListing);
 
-		List<Recording> recordings = Recording.getRecordings();
+		List<Recording> recordings = recordingSet.getRecordings();
 		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 
 		for (Recording recording : recordings) {
