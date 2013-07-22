@@ -14,72 +14,75 @@ import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
 
 public class Settings extends PreferenceActivity {
-		
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 
-		String version="";
-		try {
-			String ourPackage = CarCast.class.getPackage().getName();
-			int lastDot = ourPackage.lastIndexOf('.');
-			ourPackage = ourPackage.substring(0, lastDot);
-			PackageInfo pInfo = getPackageManager().getPackageInfo(ourPackage, PackageManager.GET_META_DATA);
-			version = pInfo.versionName;
-		} catch (NameNotFoundException e) {
-			Log.e("Settings", "looking up own version", e);
-		}
-		addPreferencesFromResource(R.xml.settings);
-		
-		setTitle(CarCastApplication.getAppTitle()+": "+CarCastApplication.getVersion()+" / "+version);
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-		SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		String accounts = app_preferences.getString("accounts", "");
-		if (app_preferences.getBoolean("emailSecret", false)) {
-			if (!accounts.startsWith("anon:")) {
-				SharedPreferences.Editor editor = app_preferences.edit();
-				editor.putString("accounts", "anon:" + System.currentTimeMillis());
-				editor.commit();
-			}
-		} else {
-			if (accounts.startsWith("anon:")) {
-				SharedPreferences.Editor editor = app_preferences.edit();
-				// We use null to mean ask google.
-				editor.putString("accounts", null);
-				editor.commit();
-			}
-		}
+        String version = "";
+        try {
+            String ourPackage = CarCast.class.getPackage().getName();
+            int lastDot = ourPackage.lastIndexOf('.');
+            ourPackage = ourPackage.substring(0, lastDot);
+            PackageInfo pInfo = getPackageManager().getPackageInfo(ourPackage, PackageManager.GET_META_DATA);
+            version = pInfo.versionName;
+        } catch (NameNotFoundException e) {
+            Log.e("Settings", "looking up own version", e);
+        }
+        addPreferencesFromResource(R.xml.settings);
 
-		//Prepare to cycle the alarm host service
-		Intent serviceIntent = new Intent();
-		serviceIntent.setAction("com.jadn.cc.services.AlarmHostService");
+        setTitle(CarCastApplication.getAppTitle() + ": " + CarCastApplication.getVersion() + " / " + version);
+    }
 
-		//We always want to stop
-		try {
-			stopService(serviceIntent);
-		} catch (Throwable e)
-		{
-			Log.w("Settings", "stopping AlarmHostService", e);
-		}
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String accounts = app_preferences.getString("accounts", "");
+        if (app_preferences.getBoolean("emailSecret", false)) {
+            if (!accounts.startsWith("anon:")) {
+                SharedPreferences.Editor editor = app_preferences.edit();
+                editor.putString("accounts", "anon:" + System.currentTimeMillis());
+                editor.commit();
+            }
+        } else {
+            if (accounts.startsWith("anon:")) {
+                SharedPreferences.Editor editor = app_preferences.edit();
+                // We use null to mean ask google.
+                editor.putString("accounts", null);
+                editor.commit();
+            }
+        }
 
-		//We might want to start
-		if(app_preferences.getBoolean("autoDownload", false)) {
-			try {
-				startService(serviceIntent);
-			} catch (Throwable e)
-			{
-				Log.e("Settings", "starting AlarmHostService", e);
-			}
-		}
-		
-		 Intent i = getApplicationContext().getPackageManager()
-		 .getLaunchIntentForPackage(getApplicationContext().getPackageName() );
+        //Prepare to cycle the alarm host service
+        Intent serviceIntent = new Intent();
+        serviceIntent.setAction("com.jadn.cc.services.AlarmHostService");
 
-		 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK );
-		 startActivity(i);
-	}
+        //We always want to stop
+        try {
+            stopService(serviceIntent);
+        } catch (Throwable e) {
+            Log.w("Settings", "stopping AlarmHostService", e);
+        }
+
+        //We might want to start
+        if (app_preferences.getBoolean("autoDownload", false)) {
+            try {
+                startService(serviceIntent);
+            } catch (Throwable e) {
+                Log.e("Settings", "starting AlarmHostService", e);
+            }
+        }
+
+        // Tell Service to rebuild all metadata
+        ((CarCastApplication)getApplication()).directorySettingsChanged();
+
+        // ### BOBH 21July2013 - Not sure what this was buying us.
+        // restart CarCast
+//        Intent i = getApplicationContext().getPackageManager()
+//                .getLaunchIntentForPackage(getApplicationContext().getPackageName());
+//
+//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(i);
+    }
 }

@@ -17,7 +17,13 @@ public class FirstTest extends ActivityInstrumentationTestCase2<CarCast> {
 		solo = new Solo(getInstrumentation(), getActivity());
 	}
 
-	public void testPreferenceIsSaved() throws Exception {
+    @Override
+    public void tearDown() throws Exception {
+        solo.finishOpenedActivities();
+    }
+
+
+    public void testPreferenceIsSaved() throws Exception {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Settings");
 		solo.isCheckBoxChecked(1);// wifi checkbox

@@ -1,5 +1,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <EditTextPreference
+            android:key="CarCastRoot"
+            android:summary="!!BETA!! set location to save all data"
+            android:title="!!BETA!! will loose current subscriptions and podcasts" />
+
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="autoDownload"

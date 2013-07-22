@@ -1,6 +1,7 @@
 package com.jadn.cc.test;
 
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.ListView;
 
 import com.jadn.cc.ui.CarCast;
 import com.jayway.android.robotium.solo.Solo;
@@ -17,9 +18,14 @@ public class WSJListenedToTest extends
 	public void setUp() throws Exception {
 		solo = new Solo(getInstrumentation(), getActivity());
 	}
-	
-		
-	public void testWSJ() throws Exception {
+
+
+    @Override
+    public void tearDown() throws Exception {
+        solo.finishOpenedActivities();
+    }
+
+    public void testWSJ() throws Exception {
 						
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Settings");
@@ -32,7 +38,7 @@ public class WSJListenedToTest extends
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Delete All");
 		solo.clickOnButton("Delete");
-		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter()
+		assertEquals(0, solo.getCurrentViews(ListView.class).get(0).getAdapter()
 				.getCount());
 		// add in fakefeed cast
 		solo.sendKey(Solo.MENU);

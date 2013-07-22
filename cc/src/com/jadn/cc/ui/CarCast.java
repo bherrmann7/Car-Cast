@@ -41,6 +41,8 @@ public class CarCast extends MediaControlActivity {
 	private SharedPreferences app_preferences;
 	int bgcolor;
 	ImageButton pausePlay = null;
+    private Config config;
+    private File podroot;
 
 	// Need handler for callbacks to the UI thread
 	final Handler handler = new Handler();
@@ -95,7 +97,7 @@ public class CarCast extends MediaControlActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// google handles surprise exceptions
-		//ExceptionHandler.register(this);
+	    //ExceptionHandler.register(this);
 
 		super.onCreate(savedInstanceState);
 
@@ -347,8 +349,6 @@ public class CarCast extends MediaControlActivity {
 		editor.commit();
 	}
 
-    private Config config;
-    private File podroot;
 
 	public void updateUI() {
 		if (contentService == null)

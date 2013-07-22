@@ -50,6 +50,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 	private HeadsetReceiver headsetReceiver;
 	private RemoteControlReceiver remoteControlReceiver;
     private Context context;
+    private Config config;
+    FileSubscriptionHelper subHelper;
+
 
     public void setApplicationContext(Context context) {
         this.context = context;
@@ -496,18 +499,19 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 		}
 	}
 
-    private Config config;
-    FileSubscriptionHelper subHelper;
+    private
+    void initDirs(){
+        File legacyFile = config.getCarCastPath("podcasts.txt");
+        File siteListFile = config.getCarCastPath("podcasts.properties");
+        subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
+    }
 
     @Override
 	public void onCreate() {
 		super.onCreate();
         config = new Config(getApplicationContext());
 
-        File legacyFile = config.getCarCastPath("podcasts.txt");
-        File siteListFile = config.getCarCastPath("podcasts.properties");
-        subHelper = new FileSubscriptionHelper(siteListFile, legacyFile);
-        config.getPodcastsRoot().mkdirs();
+        initDirs();
 
         // Google handles surprise exceptions now, so we dont have to.
 		//ExceptionHandler.register(this);
@@ -905,6 +909,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 	public void newContentAdded() {
 		metaHolder = new MetaHolder(getApplicationContext());
 	}
+
+    public void directorySettingsChanged() {
+        initDirs();
+        metaHolder = new MetaHolder(getApplicationContext());
+    }
 
 	// This section cribbed from
 	// http://developer.android.com/reference/android/app/Service.html#startForeground%28int,%20android.app.Notification%29

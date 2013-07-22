@@ -1,6 +1,7 @@
 package com.jadn.cc.test;
 
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.ListView;
 
 import com.jadn.cc.ui.CarCast;
 import com.jayway.android.robotium.solo.Solo;
@@ -18,8 +19,13 @@ public class DeleteListenedToTest extends
 		solo = new Solo(getInstrumentation(), getActivity());
 	}
 
-	public void testDeleteListenedTo() throws Exception {
-						
+    @Override
+    public void tearDown() throws Exception {
+        solo.finishOpenedActivities();
+    }
+
+
+    public void testDeleteListenedTo() throws Exception {
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Settings");
 		solo.clickOnText("Max downloads");
@@ -31,8 +37,10 @@ public class DeleteListenedToTest extends
 		solo.clickOnText("Subscriptions");
 		solo.sendKey(Solo.MENU);
 		solo.clickOnText("Delete All");
+        solo.waitForDialogToOpen(3000);
 		solo.clickOnButton("Delete");
-		assertEquals(0, solo.getCurrentListViews().get(0).getAdapter()
+        solo.waitForDialogToClose(3000);
+		assertEquals(0, solo.getCurrentViews(ListView.class).get(0).getAdapter()
 				.getCount());
 		// add in fakefeed cast
 		solo.sendKey(Solo.MENU);
@@ -73,4 +81,6 @@ public class DeleteListenedToTest extends
 		assertTrue(solo.searchText("1/1"));
 
 	}
+
+
 }

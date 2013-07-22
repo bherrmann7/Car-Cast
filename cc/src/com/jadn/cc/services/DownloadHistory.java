@@ -23,7 +23,6 @@ import com.jadn.cc.core.Sayer;
 public class DownloadHistory implements Sayer {
     private static final String UNKNOWN_SUBSCRIPTION = "unknown";
     private final static String HISTORY_TWO_HEADER = "history version 2";
-    private static DownloadHistory instance = null;
     private List<HistoryEntry> historyEntries = new ArrayList<HistoryEntry>();
     StringBuilder sb = new StringBuilder();
 
@@ -95,8 +94,8 @@ public class DownloadHistory implements Sayer {
      * @return number of history items deleted
      */
     public int eraseHistory() {
-        int size = instance.historyEntries.size();
-        instance.historyEntries = new ArrayList<HistoryEntry>();
+        int size = historyEntries.size();
+        historyEntries = new ArrayList<HistoryEntry>();
         save();
         return size;
     }
@@ -107,13 +106,13 @@ public class DownloadHistory implements Sayer {
      * @return number of history items deleted
      */
     public int eraseHistory(String subscription) {
-        int size = instance.historyEntries.size();
+        int size = historyEntries.size();
         List<HistoryEntry> nh = new ArrayList<HistoryEntry>();
-        for (HistoryEntry he : instance.historyEntries) {
+        for (HistoryEntry he : historyEntries) {
             if (!he.subscription.equals(subscription))
                 nh.add(he);
         }
-        instance.historyEntries = nh;
+        historyEntries = nh;
         return size - nh.size();
     }
 
