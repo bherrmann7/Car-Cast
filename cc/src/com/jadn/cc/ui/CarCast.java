@@ -1,6 +1,7 @@
 package com.jadn.cc.ui;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -100,6 +101,8 @@ public class CarCast extends MediaControlActivity {
 	    //ExceptionHandler.register(this);
 
 		super.onCreate(savedInstanceState);
+
+        ExceptionHandler.setTraceData(getApplicationContext());
 
 		setTitle(CarCastApplication.getAppTitle());
 

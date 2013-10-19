@@ -1,10 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <EditTextPreference
-            android:key="CarCastRoot"
-            android:summary="!!BETA!! set location to save all data"
-            android:title="!!BETA!! will loose current subscriptions and podcasts" />
-
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="autoDownload"
@@ -87,10 +82,15 @@
         android:summary="Specify player orienation"
         android:title="Orientation Preference" />
 
+    <EditTextPreference
+        android:key="CarCastRoot"
+        android:title="Set data location (looses current subscriptions/podcasts)"
+        android:summary="Changing looses subscriptions and podcasts" />
+
     <PreferenceScreen
         android:key="audionoteforwarding"
         android:summary="Allows notes to be forwared to email"
-        android:title="BETA Audio Note Email Forwarding BETA" >
+        android:title="Audio Notes to Email forwarding" >
         
         <EditTextPreference
             android:key="audioEmail"

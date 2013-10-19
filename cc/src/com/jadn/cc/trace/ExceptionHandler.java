@@ -33,24 +33,28 @@ public class ExceptionHandler {
 		stackTraceFileList = null;
 	}
 
+    public static void setTraceData(Context context){
+        PackageManager pm = context.getPackageManager();
+        try {
+            PackageInfo pi;
+            // Version
+            pi = pm.getPackageInfo(context.getPackageName(), 0);
+            TraceData.APP_VERSION = pi.versionName;
+            // Package name
+            TraceData.APP_PACKAGE = pi.packageName;
+            // Files dir for storing the stack traces
+            TraceData.FILES_PATH = context.getFilesDir().getAbsolutePath();
+            // Device model
+            TraceData.PHONE_MODEL = android.os.Build.MODEL;
+            // Android version
+            TraceData.ANDROID_VERSION = android.os.Build.VERSION.RELEASE;
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
 	public static boolean register(Context context) {
-		PackageManager pm = context.getPackageManager();
-		try {
-			PackageInfo pi;
-			// Version
-			pi = pm.getPackageInfo(context.getPackageName(), 0);
-			TraceData.APP_VERSION = pi.versionName;
-			// Package name
-			TraceData.APP_PACKAGE = pi.packageName;
-			// Files dir for storing the stack traces
-			TraceData.FILES_PATH = context.getFilesDir().getAbsolutePath();
-			// Device model
-			TraceData.PHONE_MODEL = android.os.Build.MODEL;
-			// Android version
-			TraceData.ANDROID_VERSION = android.os.Build.VERSION.RELEASE;
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
+        setTraceData(context);
 		boolean stackTracesFound = false;
 		// We'll return true if any stack traces were found
 		if (searchForStackTraces().length > 0) {
