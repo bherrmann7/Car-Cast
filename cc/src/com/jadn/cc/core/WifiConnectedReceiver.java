@@ -47,7 +47,7 @@ public class WifiConnectedReceiver extends BroadcastReceiver {
 					@Override
 					public void onServiceConnected(ComponentName name, IBinder service) {
 						ContentService contentService = ((ContentService.LocalBinder) service).getService();
-						contentService.publishRecordings();
+						contentService.publishRecordings(null);
 					}
 
 					@Override

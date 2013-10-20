@@ -161,7 +161,7 @@ public class AudioRecorder extends BaseActivity {
 		}
 		if (item.getItemId() == R.id.sendAudioToEmail) {
 			if(MailRecordings.isAudioSendingConfigured(contentService))
-				contentService.publishRecordings();
+				contentService.publishRecordings(this);
 			else
 				Toast.makeText(this, "Audio Note emailing not configured.  See settings.", Toast.LENGTH_LONG).show();
 		}
