@@ -164,6 +164,21 @@
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
+
+        <service android:name=".services.PauseReceiver" >
+            <intent-filter>
+                <action android:name="com.jadn.cc.PAUSE" />
+            </intent-filter>
+        </service>
+
+        <!--
+        <receiver android:name=".services.PauseReceiver" >
+            <intent-filter>
+                <action android:name="com.jadn.cc.PAUSE" />
+            </intent-filter>
+        </receiver>
+        -->
+
         <!--
 			<receiver android:name=".services.UnpluggedListener"> <intent-filter>
 			<action android:name="android.intent.action.ACTION_HEADSET_PLUG" />
