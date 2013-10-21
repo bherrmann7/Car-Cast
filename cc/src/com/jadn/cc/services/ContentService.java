@@ -51,11 +51,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     boolean wasPausedByPhoneCall;
     private PlayStatusListener playStatusListener;
     private HeadsetReceiver headsetReceiver;
+    private ExternalReceiver externalReceiver;
     private RemoteControlReceiver remoteControlReceiver;
     private Context context;
     private Config config;
     FileSubscriptionHelper subHelper;
-
 
     public void setApplicationContext(Context context) {
         this.context = context;
@@ -559,6 +559,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
         registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_MEDIA_BUTTON));
 
+        externalReceiver = new ExternalReceiver(this);
+        registerReceiver(externalReceiver, new IntentFilter(ExternalReceiver.PAUSE));
+        registerReceiver(externalReceiver, new IntentFilter(ExternalReceiver.PLAY));
+        registerReceiver(externalReceiver, new IntentFilter(ExternalReceiver.PAUSEPLAY));
+
         // remoteControlReceiver = new RemoteControlReceiver(this);
         // IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
         // priority cribbed from
@@ -645,7 +650,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         }
     }
 
-    private void play() {
+    public void play() {
         try {
             enableNotification();
 
