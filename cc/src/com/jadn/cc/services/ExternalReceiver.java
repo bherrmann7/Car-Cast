@@ -26,25 +26,25 @@ public class ExternalReceiver extends BroadcastReceiver {
                 if ( action.equals(PAUSE) )
                 {
                          contentService.pauseNow();
-			 abortBroadcast();
-			 return;
+                         abortBroadcast();
+                         return;
                 }
 
                 if ( action.equals(PLAY) )
                 {
                          contentService.play();
-			 abortBroadcast();
-			 return;
+                         abortBroadcast();
+                         return;
                 }
 
                 if ( action.equals(PAUSEPLAY) )
                 {
                          contentService.pauseOrPlay();
-			 abortBroadcast();
-			 return;
+                         abortBroadcast();
+                         return;
                 }
 
-		Log.i("CarCast", "Got external intent, but didnt use it...");
+		Log.i("CarCast", "Got external intent, but didnt use it... " + action);
                 return;
 	}
 
