@@ -165,23 +165,23 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".services.PauseReceiver" >
+        <receiver android:name=".services.PauseReceiver" android:enabled="false" >
             <intent-filter>
                 <action android:name="com.jadn.cc.PAUSE" />
             </intent-filter>
-        </service>
+        </receiver>
 
-        <service android:name=".services.PlayReceiver" >
+        <receiver android:name=".services.PlayReceiver" android:enabled="false" >
             <intent-filter>
                 <action android:name="com.jadn.cc.PLAY" />
             </intent-filter>
-        </service>
+        </receiver>
 
-        <service android:name=".services.PausePlayReceiver" >
+        <receiver android:name=".services.PausePlayReceiver" android:enabled="false" >
             <intent-filter>
                 <action android:name="com.jadn.cc.PAUSEPLAY" />
             </intent-filter>
-        </service>
+        </receiver>
 
         <!--
 			<receiver android:name=".services.UnpluggedListener"> <intent-filter>
