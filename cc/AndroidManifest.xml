@@ -171,13 +171,17 @@
             </intent-filter>
         </service>
 
-        <!--
-        <receiver android:name=".services.PauseReceiver" >
+        <service android:name=".services.PlayReceiver" >
             <intent-filter>
-                <action android:name="com.jadn.cc.PAUSE" />
+                <action android:name="com.jadn.cc.PLAY" />
             </intent-filter>
-        </receiver>
-        -->
+        </service>
+
+        <service android:name=".services.PausePlayReceiver" >
+            <intent-filter>
+                <action android:name="com.jadn.cc.PAUSEPLAY" />
+            </intent-filter>
+        </service>
 
         <!--
 			<receiver android:name=".services.UnpluggedListener"> <intent-filter>
