@@ -87,6 +87,11 @@
         android:title="Set data location (looses current subscriptions/podcasts)"
         android:summary="Changing looses subscriptions and podcasts" />
 
+    <CheckBoxPreference
+        android:key="audioRecorderOff"
+        android:summary="I love it, some hate it."
+        android:title="Audio Recorder Disable" />
+
     <PreferenceScreen
         android:key="audionoteforwarding"
         android:summary="Allows notes to be forwared to email"

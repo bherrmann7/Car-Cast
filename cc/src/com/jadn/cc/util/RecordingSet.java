@@ -96,6 +96,11 @@ public class RecordingSet {
 
     }
 
+    public void clearNotifications(){
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Activity.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(24);
+    }
+
     public void updateNotification() {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Activity.NOTIFICATION_SERVICE);
 

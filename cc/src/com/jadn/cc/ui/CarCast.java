@@ -163,7 +163,7 @@ public class CarCast extends MediaControlActivity {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				if (isKindleAndNoMicrophone())
+				if (isAudioRecorderOff())
 					return true;
 				if (event.getAction() != MotionEvent.ACTION_UP)
 					return true;
@@ -235,9 +235,6 @@ public class CarCast extends MediaControlActivity {
 		}
 		saveLastRun();
 
-        RecordingSet recordingSet = new RecordingSet(this);
-		recordingSet.updateNotification();
-
 		String[] orientations = { "AUTO", "Landscape", "Flipped Landscape", "Portrait", "Flipped Portrait" };
 		int[] orientationValues = { ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
 				ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,
@@ -253,13 +250,20 @@ public class CarCast extends MediaControlActivity {
 			}
 		}
 
-		if (isKindleAndNoMicrophone()) {
-			// Don't show the microphone (which is in the background image.)
-			TextView titleTextView = (TextView) findViewById(R.id.title);
-			titleTextView.setBackgroundDrawable((Drawable) null);
-		}
-
 	}
+
+    public boolean isAudioRecorderOff(){
+        if (isKindleAndNoMicrophone()){
+            return true;
+        }
+        app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!app_preferences.contains("audioRecorderOff")) {
+            SharedPreferences.Editor editor = app_preferences.edit();
+            editor.putBoolean("audioRecorderOff", false);
+            editor.commit();
+        }
+        return app_preferences.getBoolean("audioRecorderOff", false);
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -339,8 +343,18 @@ public class CarCast extends MediaControlActivity {
 		else
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        TextView titleTextView = (TextView) findViewById(R.id.title);
 
-		updater = new Updater(handler, mUpdateResults);
+        RecordingSet recordingSet = new RecordingSet(this);
+        if(isAudioRecorderOff()){
+            recordingSet.clearNotifications();
+            titleTextView.setBackgroundDrawable((Drawable) null);
+        } else {
+            titleTextView.setBackgroundResource(R.drawable.background_319);
+            recordingSet.updateNotification();
+        }
+
+        updater = new Updater(handler, mUpdateResults);
 	}
 
 	private void saveLastRun() {

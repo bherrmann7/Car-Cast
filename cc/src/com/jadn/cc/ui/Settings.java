@@ -74,15 +74,6 @@ public class Settings extends PreferenceActivity {
             }
         }
 
-        // Tell Service to rebuild all metadata
         ((CarCastApplication)getApplication()).directorySettingsChanged();
-
-        // ### BOBH 21July2013 - Not sure what this was buying us.
-        // restart CarCast
-//        Intent i = getApplicationContext().getPackageManager()
-//                .getLaunchIntentForPackage(getApplicationContext().getPackageName());
-//
-//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(i);
     }
 }
