@@ -587,14 +587,14 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-            int retval = Service.START_NOT_STICKY;
+            int not_sticky = Service.START_NOT_STICKY;
             Log.i("CarCast", "ContentService.onStartCommand()");
 
             Bundle extras = intent.getExtras();
             String external = extras.getString("external");
 
             if ( external == null )
-                 return retval;
+                 return not_sticky;
 
             Log.i("CarCast", "ContentService got intent with external extra:" + external);
 
@@ -602,28 +602,15 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                setApplicationContext(getApplicationContext());
 
             if ( external.equals(ExternalReceiver.PAUSE) )
-            {
-                 Log.i("CarCast", "external PAUSE");
                  pauseNow();
-                 return retval;
-            }
 
-            if ( external.equals(ExternalReceiver.PLAY) )
-            {
-                 Log.i("CarCast", "external PLAY");
-                 if ( ! isPlaying() )
-                    play();
-                 return retval;
-            }
+            if ( external.equals(ExternalReceiver.PLAY) && ! isPlaying() )
+                 play();
 
             if ( external.equals(ExternalReceiver.PAUSEPLAY) )
-            {
-                 Log.i("CarCast", "external PAUSEPLAY");
                  pauseOrPlay();
-                 return retval;
-            }
 
-            return retval;
+            return not_sticky;
     }
 
     public void headsetStatusChanged(boolean headsetPresent) {
