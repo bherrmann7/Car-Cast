@@ -165,7 +165,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".services.ExternalReceiver" android:enabled="false" >
+        <receiver android:name=".services.ExternalReceiver" android:enabled="true" >
             <intent-filter>
                 <action android:name="com.jadn.cc.services.external.PAUSE" />
                 <action android:name="com.jadn.cc.services.external.PLAY" />

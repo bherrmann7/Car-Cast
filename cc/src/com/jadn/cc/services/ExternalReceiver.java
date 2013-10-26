@@ -13,39 +13,20 @@ public class ExternalReceiver extends BroadcastReceiver {
 	public static final String PLAY      = "com.jadn.cc.services.external.PLAY";
 	public static final String PAUSEPLAY = "com.jadn.cc.services.external.PAUSEPLAY";
 
-	private final ContentService contentService;
-
-	public ExternalReceiver(ContentService contentService) {
-		this.contentService = contentService;
+	public ExternalReceiver() {
+                Log.i("CarCast", "ExternalReceiver()");
 	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
+                Log.i("CarCast", "ExternalReceiver.onReceive: " + action);
 
-                if ( action.equals(PAUSE) )
-                {
-                         contentService.pauseNow();
-                         abortBroadcast();
-                         return;
-                }
-
-                if ( action.equals(PLAY) )
-                {
-                         contentService.play();
-                         abortBroadcast();
-                         return;
-                }
-
-                if ( action.equals(PAUSEPLAY) )
-                {
-                         contentService.pauseOrPlay();
-                         abortBroadcast();
-                         return;
-                }
-
-		Log.i("CarCast", "Got external intent, but didnt use it... " + action);
+                Intent i = new Intent(context, ContentService.class);
+                i.putExtra("external", action);
+                context.startService(i);
+                abortBroadcast();
                 return;
 	}
-
 }
+

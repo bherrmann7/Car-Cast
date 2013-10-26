@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -51,7 +52,6 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     boolean wasPausedByPhoneCall;
     private PlayStatusListener playStatusListener;
     private HeadsetReceiver headsetReceiver;
-    private ExternalReceiver externalReceiver;
     private RemoteControlReceiver remoteControlReceiver;
     private Context context;
     private Config config;
@@ -60,8 +60,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     public void setApplicationContext(Context context) {
         this.context = context;
         try {
-            mediaPlayer = new MediaPlayer(context, true);
-            fullReset();
+            if ( mediaPlayer == null )
+            {
+                 mediaPlayer = new MediaPlayer(context, true);
+                 fullReset();
+            }
         } catch (Exception e) {
             Log.d("CarCast", "Error doing reset", e);
         }
@@ -559,11 +562,6 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
         registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_MEDIA_BUTTON));
 
-        externalReceiver = new ExternalReceiver(this);
-        registerReceiver(externalReceiver, new IntentFilter(ExternalReceiver.PAUSE));
-        registerReceiver(externalReceiver, new IntentFilter(ExternalReceiver.PLAY));
-        registerReceiver(externalReceiver, new IntentFilter(ExternalReceiver.PAUSEPLAY));
-
         // remoteControlReceiver = new RemoteControlReceiver(this);
         // IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
         // priority cribbed from
@@ -585,6 +583,47 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             }
         }
 
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+            int retval = Service.START_NOT_STICKY;
+            Log.i("CarCast", "ContentService.onStartCommand()");
+
+            Bundle extras = intent.getExtras();
+            String external = extras.getString("external");
+
+            if ( external == null )
+                 return retval;
+
+            Log.i("CarCast", "ContentService got intent with external extra:" + external);
+
+            if ( mediaPlayer == null )
+               setApplicationContext(getApplicationContext());
+
+            if ( external.equals(ExternalReceiver.PAUSE) )
+            {
+                 Log.i("CarCast", "external PAUSE");
+                 pauseNow();
+                 return retval;
+            }
+
+            if ( external.equals(ExternalReceiver.PLAY) )
+            {
+                 Log.i("CarCast", "external PLAY");
+                 if ( ! isPlaying() )
+                    play();
+                 return retval;
+            }
+
+            if ( external.equals(ExternalReceiver.PAUSEPLAY) )
+            {
+                 Log.i("CarCast", "external PAUSEPLAY");
+                 pauseOrPlay();
+                 return retval;
+            }
+
+            return retval;
     }
 
     public void headsetStatusChanged(boolean headsetPresent) {
