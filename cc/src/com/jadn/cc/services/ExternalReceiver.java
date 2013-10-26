@@ -3,9 +3,7 @@ package com.jadn.cc.services;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.util.Log;
-import android.view.KeyEvent;
 
 public class ExternalReceiver extends BroadcastReceiver {
 

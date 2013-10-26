@@ -689,7 +689,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         }
     }
 
-    public void play() {
+    private void play() {
         try {
             enableNotification();
 
