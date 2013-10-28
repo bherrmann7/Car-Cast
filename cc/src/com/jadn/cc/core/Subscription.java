@@ -10,8 +10,9 @@ public class Subscription implements Parcelable, Comparable<Subscription> {
              return new Subscription(in.readString(),   // name
                                      in.readString(),   // URL
                                      in.readInt(),      // max downloads
-                                     OrderingPreference.values()[in.readInt()],// order pref
-                                     Boolean.parseBoolean(in.readString())); //enabled 
+                                     OrderingPreference.values()[in.readInt()], // order pref
+                                     Boolean.parseBoolean(in.readString()),     // enabled 
+                                     Boolean.parseBoolean(in.readString()));    // priority 
          }
 
          public Subscription[] newArray(int size) {
@@ -24,21 +25,23 @@ public class Subscription implements Parcelable, Comparable<Subscription> {
     public OrderingPreference orderingPreference;
 	public String             url;
     public boolean enabled;
+    public boolean priority;
 
     public Subscription(String name, String url) {
-        this(name, url, GLOBAL, OrderingPreference.FIFO, true);
+        this(name, url, GLOBAL, OrderingPreference.FIFO, true, false);
     }
 
     public Subscription(String name, String url, int maxDownloads, OrderingPreference orderingPreference) {
-        this(name, url, maxDownloads, orderingPreference, true);
+        this(name, url, maxDownloads, orderingPreference, true, false);
     }
     
-    public Subscription(String name, String url, int maxDownloads, OrderingPreference orderingPreference, boolean enabled) {
+    public Subscription(String name, String url, int maxDownloads, OrderingPreference orderingPreference, boolean enabled, boolean priority) {
         this.name = name;
         this.url = url;
         this.maxDownloads = maxDownloads;
         this.orderingPreference = orderingPreference;
         this.enabled = enabled;
+        this.priority = priority;
     }
 
     @Override
@@ -53,7 +56,7 @@ public class Subscription implements Parcelable, Comparable<Subscription> {
 
     @Override
     public String toString() {
-        return "Subscription: url=" + url + " ; name="+ name + "; max=" + maxDownloads + " ; ordering=" + orderingPreference + " ; enabled=" + enabled;
+        return "Subscription: url=" + url + " ; name="+ name + "; max=" + maxDownloads + " ; ordering=" + orderingPreference + " ; enabled=" + enabled + " ; priority=" + priority;
     }
 
     @Override
@@ -63,6 +66,7 @@ public class Subscription implements Parcelable, Comparable<Subscription> {
         dest.writeInt(maxDownloads);
         dest.writeInt(orderingPreference.ordinal());
         dest.writeString(Boolean.toString(enabled));
+        dest.writeString(Boolean.toString(priority));
     }
 
 }

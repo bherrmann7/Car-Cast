@@ -94,14 +94,27 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
     private Subscription convertProperty(String url, String nameAndMore) {
         String[] split = nameAndMore.split(REGEX_DIVIDER);
  
-        if (split.length == 4) {
+        if (split.length == 5) {
 	        // best case, we should have all properties:
 	        try {
 	            String name = split[0];
 	            int maxCount = Integer.valueOf(split[1]);
 	            OrderingPreference pref = OrderingPreference.valueOf(split[2]);
 	            boolean enabled = Boolean.valueOf(split[3]);
-	            return new Subscription(name, url, maxCount, pref, enabled);
+	            boolean priority = Boolean.valueOf(split[4]);
+	            return new Subscription(name, url, maxCount, pref, enabled, priority);
+	
+	        } catch (Exception ex) {
+	            Log.w("CarCast", "couldn't read subscription " + url + "=" + nameAndMore);
+	        } // endtry
+        } else if (split.length == 4) {
+	        // best case, we should have everything except priority (default to false)
+	        try {
+	            String name = split[0];
+	            int maxCount = Integer.valueOf(split[1]);
+	            OrderingPreference pref = OrderingPreference.valueOf(split[2]);
+	            boolean enabled = Boolean.valueOf(split[3]);
+	            return new Subscription(name, url, maxCount, pref, enabled, false);
 	
 	        } catch (Exception ex) {
 	            Log.w("CarCast", "couldn't read subscription " + url + "=" + nameAndMore);
@@ -280,7 +293,7 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
             Properties outSubs = new Properties();
             
             for (Subscription sub : subscriptions) {
-                String valueStr = sub.name + CONCAT_DIVIDER + sub.maxDownloads + CONCAT_DIVIDER + sub.orderingPreference.name() + CONCAT_DIVIDER + sub.enabled;
+                String valueStr = sub.name + CONCAT_DIVIDER + sub.maxDownloads + CONCAT_DIVIDER + sub.orderingPreference.name() + CONCAT_DIVIDER + sub.enabled + CONCAT_DIVIDER + sub.priority;
                 outSubs.put(sub.url, valueStr);
             } // endforeach
             

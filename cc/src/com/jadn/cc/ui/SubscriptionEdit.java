@@ -35,6 +35,7 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 			((TextView) findViewById(R.id.editsite_name)).setText(currentSub.name);
 			((TextView) findViewById(R.id.editsite_url)).setText(currentSub.url);
 			((CheckBox) findViewById(R.id.enabled)).setChecked(currentSub.enabled);
+			((CheckBox) findViewById(R.id.priority)).setChecked(currentSub.priority);
 			((CheckBox) findViewById(R.id.fifoLifo)).setChecked(currentSub.orderingPreference == OrderingPreference.FIFO);
 			Spinner spinner = (Spinner) findViewById(R.id.subMax);
 			int max = currentSub.maxDownloads;
@@ -60,6 +61,7 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 				String name = ((TextView) findViewById(R.id.editsite_name)).getText().toString();
 				String url = getURL();
 				Boolean enabled = ((CheckBox) findViewById(R.id.enabled)).isChecked();
+				Boolean priority = ((CheckBox) findViewById(R.id.priority)).isChecked();
 				CheckBox newestFirst = ((CheckBox) findViewById(R.id.fifoLifo));
 				Spinner spinner = (Spinner) findViewById(R.id.subMax);
 				int max = mValues[spinner.getSelectedItemPosition()];
@@ -81,7 +83,7 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 					return;
 				}
 
-				Subscription newSub = new Subscription(name, url, max, orderingPreference, enabled);
+				Subscription newSub = new Subscription(name, url, max, orderingPreference, enabled, priority);
 				if (currentSub != null) {
 					// edit:
 					contentService.editSubscription(currentSub, newSub);
