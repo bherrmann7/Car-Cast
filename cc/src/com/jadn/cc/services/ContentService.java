@@ -941,8 +941,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         this.playStatusListener = playStatusListener;
     }
 
-    public void newContentAdded() {
-        metaHolder = new MetaHolder(getApplicationContext());
+    public void newContentAdded(Boolean priority) {
+        metaHolder = new MetaHolder(getApplicationContext(), priority);
     }
 
     public void directorySettingsChanged() {

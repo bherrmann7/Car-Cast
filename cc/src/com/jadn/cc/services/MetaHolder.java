@@ -23,10 +23,14 @@ public class MetaHolder {
 
 	private List<MetaFile> metas = new ArrayList<MetaFile>();
 
-	public MetaHolder(Context context) {
+	public MetaHolder(Context context, Boolean priority) {
         this.context = context;
         this.config = new Config(context);
-		loadMeta();
+		loadMeta(priority);
+	}
+
+	public MetaHolder(Context context) {
+           this(context,false);
 	}
 
 	public void delete(int i) {
@@ -48,8 +52,15 @@ public class MetaHolder {
 
 	/* Really a part of the constructor -- assumes "metas" is empty */
 	private void loadMeta() {
+           loadMeta(false);
+        }
+
+	private void loadMeta(Boolean priority) {
 		File[] files = config.getPodcastsRoot().listFiles();
         File order = config.getPodcastRootPath("podcast-order.txt");
+
+        // STEVE: 
+        // PROBLEM: No way to know which files are new!
 
         if (files == null)
 			return;
