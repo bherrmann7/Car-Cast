@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -56,12 +57,14 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     private Config config;
     FileSubscriptionHelper subHelper;
 
-
     public void setApplicationContext(Context context) {
         this.context = context;
         try {
-            mediaPlayer = new MediaPlayer(context, true);
-            fullReset();
+            if ( mediaPlayer == null )
+            {
+                 mediaPlayer = new MediaPlayer(context, true);
+                 fullReset();
+            }
         } catch (Exception e) {
             Log.d("CarCast", "Error doing reset", e);
         }
@@ -580,6 +583,34 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             }
         }
 
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+            int not_sticky = Service.START_NOT_STICKY;
+            Log.i("CarCast", "ContentService.onStartCommand()");
+
+            Bundle extras = intent.getExtras();
+            String external = extras.getString("external");
+
+            if ( external == null )
+                 return not_sticky;
+
+            Log.i("CarCast", "ContentService got intent with external extra:" + external);
+
+            if ( mediaPlayer == null )
+               setApplicationContext(getApplicationContext());
+
+            if ( external.equals(ExternalReceiver.PAUSE) )
+                 pauseNow();
+
+            if ( external.equals(ExternalReceiver.PLAY) && ! isPlaying() )
+                 play();
+
+            if ( external.equals(ExternalReceiver.PAUSEPLAY) )
+                 pauseOrPlay();
+
+            return not_sticky;
     }
 
     public void headsetStatusChanged(boolean headsetPresent) {

@@ -52,11 +52,15 @@ public class HeadsetReceiver extends BroadcastReceiver {
 			return;
 		}
 
-		final int state = intent.getIntExtra("state", 0);
-		Log.i("CarCast", "HeadsetReceiver got state of " + state);
+                if ( Intent.ACTION_HEADSET_PLUG.equals(intent.getAction()) && ! isInitialStickyBroadcast() )
+                {
+		        final int state = intent.getIntExtra("state", 0);
+		        Log.i("CarCast", "HeadsetReceiver got state of " + state);
 
-		boolean headsetPresent = state != 0;
-		contentService.headsetStatusChanged(headsetPresent);
+		        boolean headsetPresent = state != 0;
+		        contentService.headsetStatusChanged(headsetPresent);
+                        return;
+                }
 	}
 
 }

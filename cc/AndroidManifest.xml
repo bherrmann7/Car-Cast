@@ -164,6 +164,15 @@
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".services.ExternalReceiver" android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.jadn.cc.services.external.PAUSE" />
+                <action android:name="com.jadn.cc.services.external.PLAY" />
+                <action android:name="com.jadn.cc.services.external.PAUSEPLAY" />
+            </intent-filter>
+        </receiver>
+
         <!--
 			<receiver android:name=".services.UnpluggedListener"> <intent-filter>
 			<action android:name="android.intent.action.ACTION_HEADSET_PLUG" />
