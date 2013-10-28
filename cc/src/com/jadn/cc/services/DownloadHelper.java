@@ -85,7 +85,7 @@ public class DownloadHelper implements Sayer {
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 
 		for (Subscription sub : sites) {
-			EnclosureHandler encloseureHandler = new EnclosureHandler(history);
+			EnclosureHandler encloseureHandler = new EnclosureHandler(history,sub.priority);
 
 			if (sub.enabled) {
 				try {

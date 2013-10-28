@@ -8,11 +8,12 @@ public class MetaNet {
 
 	 Properties properties = new Properties();
 
-	public MetaNet(String feedName, URL url, int size, String mimetype) {	
+	public MetaNet(String feedName, URL url, int size, String mimetype, Boolean priority) {	
 		properties.setProperty("feedName", feedName);
 		properties.setProperty("url", url.toString());
 		properties.setProperty("size", Integer.toString(size));
 		properties.setProperty("mimetype", mimetype);
+		properties.setProperty("priority", priority.toString());
 	}
 
 	public int getSize() {
@@ -33,6 +34,10 @@ public class MetaNet {
 
 	public String getDescription() {
 		return properties.getProperty("description");
+	}
+
+	public Boolean getPriority() {
+		return Boolean.parseBoolean(properties.getProperty("priority"));
 	}
 
 	public String getUrl() {
