@@ -343,7 +343,7 @@ public class CarCast extends MediaControlActivity {
 		else
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        TextView titleTextView = (TextView) findViewById(R.id.title);
+            TextView titleTextView = (TextView) findViewById(R.id.title);
 
         RecordingSet recordingSet = new RecordingSet(this);
         if(isAudioRecorderOff()){

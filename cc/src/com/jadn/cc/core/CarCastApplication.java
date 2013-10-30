@@ -15,6 +15,8 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
     public final static String[] releaseData = new String[]{
+            "29-OCT-2013", "CarCast now has Intents for Play/Pause - for use with things like Tasker.  Thanks to Stephen Blott",
+            "20-OCT-2013", "Add setting to remove Audio Recorder (bottom of settings screen)",
             "23-SEP-2013", "Get rid of Beta status for Data location change and emailing recordings.",
             "21-JUL-2013", "BETA2 - allow change of data directory. (Changing it will drop all subscriptions/podcasts) Please let me know what you think.",
             "20-MAY-2013", "Stop collecting anonymous data... I'm not using it and it slows my server down.",
