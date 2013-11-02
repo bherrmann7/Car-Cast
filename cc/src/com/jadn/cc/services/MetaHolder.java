@@ -24,9 +24,13 @@ public class MetaHolder {
 	private List<MetaFile> metas = new ArrayList<MetaFile>();
 
 	public MetaHolder(Context context) {
-        this.context = context;
-        this.config = new Config(context);
-		loadMeta();
+        	this(context, null);
+	}
+
+	public MetaHolder(Context context, File current) {
+        	this.context = context;
+        	this.config = new Config(context);
+		loadMeta(current);
 	}
 
 	public void delete(int i) {
@@ -47,8 +51,11 @@ public class MetaHolder {
 	}
 
 	/* Really a part of the constructor -- assumes "metas" is empty */
-	private void loadMeta() {
-		File[] files = config.getPodcastsRoot().listFiles();
+	private void loadMeta(File current) {
+	String currentName = current == null ? null : current.getName();
+        int currentIndex = -1;
+        boolean priorityFileAddedToOrder = false;
+	File[] files = config.getPodcastsRoot().listFiles();
         File order = config.getPodcastRootPath("podcast-order.txt");
 
         if (files == null)
@@ -63,6 +70,11 @@ public class MetaHolder {
 					File file = config.getPodcastRootPath(line);
 					if (file.exists()) {
 						metas.add(new MetaFile(file));
+                                                if ( currentName != null && currentName.equals(file.getName()) )
+                                                {
+                                                   currentIndex = metas.size();
+	                                           Log.d("CarCast", "currentIndex: " + currentIndex);
+                                                }
 					}
 				}
 			} catch (IOException e) {
@@ -79,11 +91,22 @@ public class MetaHolder {
 			}
 			if (file.getName().endsWith(".mp3") || file.getName().endsWith(".3gp") || file.getName().endsWith(".ogg")) {
 				if (!alreadyHas(file)) {
-					foundFiles.add(file);
+                                        if ( 0 <= currentIndex && isPriority(file) )
+                                        {
+                                           // The currently-playing podcast is in "podcast-order.txt", so insert the new file
+                                           // immediately after it.
+	                                   Log.d("CarCast", "adding: " + currentIndex + " " + file.getName());
+                                           metas.add(currentIndex++, new MetaFile(file));
+                                           priorityFileAddedToOrder = true;
+                                        }
+                                        else
+                                           // Just append the new file.  If this is from a priority podcast, it'll sort
+                                           // into the right place anyway.
+                                           foundFiles.add(file);
 				}
 			}
 		}
-		// order the found files by file name
+		// Order the found files by file name.
 		Collections.sort(foundFiles, new Comparator<File>() {
 			@Override
 			public int compare(File object1, File object2) {
@@ -92,9 +115,15 @@ public class MetaHolder {
 		});
 		Log.i("carcast", "loadMeta found:"+foundFiles.size()+" meta:"+metas.size());
 		for (File file : foundFiles) {
-			metas.add(new MetaFile(file));
+                     metas.add(new MetaFile(file));
 		}
 
+                // We need to save the order if any priority files have been inserted into the ordered
+                // part of the playlist.  If we don't, then those priority files may appear to jump around
+                // in the playlist. For example, if we select a new file for playback and then stop and restart
+                // the app, then the priority files will jump to after the newly-playing file.
+                if ( priorityFileAddedToOrder )
+                   saveOrder();
 	}
 
 	boolean alreadyHas(File file) {
@@ -198,5 +227,13 @@ public class MetaHolder {
 		}
 
 	}
+
+        private boolean isPriority(File file)
+        {
+           String pattern = "^\\d+:\\d\\d:\\d+\\..*"; // E.g. "YYYY:00:XXXX.mp3"
+           boolean priority = file.getName().matches(pattern);
+	   Log.d("CarCast", "priority: " + priority + " " + file.getName());
+           return priority;
+        }
 
 }

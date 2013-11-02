@@ -42,7 +42,7 @@ import com.jadn.cc.util.MailRecordings;
 
 public class ContentService extends Service implements MediaPlayer.OnCompletionListener {
     private final IBinder binder = new LocalBinder();
-    int currentPodcastInPlayer;
+    int currentPodcastInPlayer = -1;
     DownloadHelper downloadHelper;
     Location location;
     MediaMode mediaMode = MediaMode.UnInitialized;
@@ -120,9 +120,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     }
 
     public MetaFile currentMeta() {
-        if (metaHolder.getSize() == 0) {
-            return null;
-        }
+        if ( metaHolder.getSize() == 0 ) return null;
+        if ( currentPodcastInPlayer == -1 ) return null;
+        if ( metaHolder.getSize() <= currentPodcastInPlayer ) return null;
         return metaHolder.get(currentPodcastInPlayer);
     }
 
@@ -141,7 +141,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     }
 
     public File currentFile() {
-        return currentMeta().file;
+        MetaFile meta = currentMeta();
+        return meta == null ? null : meta.file;
     }
 
     int currentPostion() {
@@ -198,7 +199,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             pauseNow();
         }
         metaHolder.get(currentPodcastInPlayer).delete();
-        metaHolder = new MetaHolder(getApplicationContext());
+        metaHolder = new MetaHolder(getApplicationContext(), currentFile());
         if (currentPodcastInPlayer >= metaHolder.getSize()) {
             currentPodcastInPlayer = 0;
         }
@@ -245,7 +246,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         for (int i = 0; i < upTo; i++) {
             metaHolder.delete(0);
         }
-        metaHolder = new MetaHolder(getApplicationContext());
+        metaHolder = new MetaHolder(getApplicationContext(), currentFile());
         tryToRestoreLocation();
         if (location == null)
             currentPodcastInPlayer = 0;
@@ -283,7 +284,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         // clear so next user request will start new download
         // downloadHelper = null;
 
-        metaHolder = new MetaHolder(getApplicationContext());
+        metaHolder = new MetaHolder(getApplicationContext(), currentFile());
         if (currentPodcastInPlayer >= metaHolder.getSize()) {
             currentPodcastInPlayer = 0;
         }
@@ -942,12 +943,12 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     }
 
     public void newContentAdded() {
-        metaHolder = new MetaHolder(getApplicationContext());
+        metaHolder = new MetaHolder(getApplicationContext(), currentFile());
     }
 
     public void directorySettingsChanged() {
         initDirs();
-        metaHolder = new MetaHolder(getApplicationContext());
+        metaHolder = new MetaHolder(getApplicationContext(), currentFile());
     }
 
     // This section cribbed from
