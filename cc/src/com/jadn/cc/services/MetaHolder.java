@@ -225,9 +225,11 @@ public class MetaHolder {
 		} catch (Exception e) {
 			Log.e("carcast", "saving order", e);
 		}
-
 	}
 
+        // IMPORTANT:
+        // The regular expression used here *must* match the file naming scheme used in
+        // DownloadHelper.downloadNewPodCasts().
         private boolean isPriority(File file)
         {
            String pattern = "^\\d+:\\d\\d:\\d+\\..*"; // E.g. "YYYY:00:XXXX.mp3"

@@ -41,8 +41,7 @@ public class EnclosureHandler extends DefaultHandler {
 
         private boolean priority = false;
 
-        public void setPriority(Boolean priority)
-        {
+        public void setPriority(Boolean priority) {
            this.priority = priority;
         }
 

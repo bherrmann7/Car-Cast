@@ -108,7 +108,7 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
 	            Log.w("CarCast", "couldn't read subscription " + url + "=" + nameAndMore);
 	        } // endtry
         } else if (split.length == 4) {
-	        // best case, we should have everything except priority (default to false)
+	        // next best case, we should have everything except priority (default to false)
 	        try {
 	            String name = split[0];
 	            int maxCount = Integer.valueOf(split[1]);
@@ -120,7 +120,7 @@ public class FileSubscriptionHelper implements SubscriptionHelper {
 	            Log.w("CarCast", "couldn't read subscription " + url + "=" + nameAndMore);
 	        } // endtry
         } else if (split.length == 3) {
-	        // second best case, we have all properties except enabled:
+	        // third best case, we have all properties except enabled:
 	        try {
 	            String name = split[0];
 	            int maxCount = Integer.valueOf(split[1]);

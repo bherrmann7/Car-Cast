@@ -167,10 +167,14 @@ public class DownloadHelper implements Sayer {
                                  * Notes:
                                  *    ":" is chosen as the separator because it sorts after the "." of the file name suffix.
                                  *    The "00" is incuded to make it possible to have multiple priority levels in the future.
+                                 *
+                                 * IMPORTANT:
+                                 *    The naming scheme used here *must* match MetaHolder.isPriority().
                                  */
 
                                 if ( newPodcasts.get(i).getPriority() )
-                                   prefix = contentService.currentMeta().getBaseFilename() + ":00:";
+                                   if ( contentService.currentMeta() != null )
+                                      prefix = contentService.currentMeta().getBaseFilename() + ":00:";
 
                                 String castFileName = prefix + System.currentTimeMillis() + localFileExt;
 				File castFile = config.getPodcastRootPath(castFileName);
