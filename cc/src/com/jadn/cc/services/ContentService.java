@@ -119,7 +119,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
     }
 
-    private MetaFile currentMeta() {
+    public MetaFile currentMeta() {
         if (metaHolder.getSize() == 0) {
             return null;
         }
@@ -941,8 +941,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         this.playStatusListener = playStatusListener;
     }
 
-    public void newContentAdded(Boolean priority) {
-        metaHolder = new MetaHolder(getApplicationContext(), priority);
+    public void newContentAdded() {
+        metaHolder = new MetaHolder(getApplicationContext());
     }
 
     public void directorySettingsChanged() {
