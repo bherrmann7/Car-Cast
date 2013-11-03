@@ -64,6 +64,16 @@
 		        android:checked="true"
 		        android:text="Newest first (vs oldest first for audiobooks)" />
 
+		    <CheckBox
+		        android:id="@+id/priority"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/fifoLifo"
+		        android:layout_marginTop="20px"
+		        android:layout_marginBottom="10px"
+		        android:checked="false"
+		        android:text="Priority (play next vs add to end)" />
+
 		    <RelativeLayout
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content" >

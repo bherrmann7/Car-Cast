@@ -18,6 +18,7 @@ public class MetaFile {
 
 	File file;
 	Properties properties = new Properties();
+        private static final String defaultBaseFilename = "0";
 	
 	String getFilename(){
 		return file.getName();
@@ -42,6 +43,36 @@ public class MetaFile {
 			save();
 		}
 	}
+
+        // It would be better to just store this in the metadata!
+        //
+        // Take a filename of either the form
+        //    "...../XXXX:00:YYYY.mp3"
+        //    "...../XXXX.mp3"
+        // and return just "XXXX".
+        //
+        public String getBaseFilename()
+        {
+           String name = getFilename();
+           if ( name == null ) return defaultBaseFilename;
+	   Log.d("CarCast", "getBaseFilename " + name);
+
+           // Find start of base file name.
+           int slashIndex = name.lastIndexOf('/');
+           // slashIndex is -1 if no slash is present, which works perfactly below!
+	   Log.d("CarCast", "getBaseFilename " + name.substring(slashIndex + 1));
+
+           // Find end of base file name.
+           int i = slashIndex + 1;
+           while ( i < name.length() && Character.isDigit(name.charAt(i)) )
+              i += 1;
+	   Log.d("CarCast", "getBaseFilename " + i);
+           if ( name.length()  <= i ) return defaultBaseFilename;
+           if ( slashIndex + 1 == i ) return defaultBaseFilename;
+
+	   Log.d("CarCast", "getBaseFilename " + name.substring(slashIndex + 1, i));
+           return name.substring(slashIndex + 1, i);
+        }
 
 	public void computeDuration() {
 		// ask media player

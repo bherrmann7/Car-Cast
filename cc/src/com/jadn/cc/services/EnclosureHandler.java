@@ -39,8 +39,19 @@ public class EnclosureHandler extends DefaultHandler {
 	private boolean startDescription = false;
 	private String lastDescription = "";
 
-	public EnclosureHandler(DownloadHistory history) {
+        private boolean priority = false;
+
+        public void setPriority(Boolean priority) {
+           this.priority = priority;
+        }
+
+	public EnclosureHandler(DownloadHistory history, Boolean priority) {
 		this.history = history;
+                this.priority = priority;
+	}
+
+	public EnclosureHandler(DownloadHistory history) {
+                this(history, false);
 	}
 
 	@Override
@@ -132,7 +143,7 @@ public class EnclosureHandler extends DefaultHandler {
 				return;
 			}
 			
-			// Log.i("content", localName + " " + atts.getValue("url"));
+			Log.i("CarCast", localName + " " + atts.getValue("url") + "; priority=" + priority);
 			try {
 				if (max != STOP && (max == UNLIMITED || max > 0)) {
 					if (max > 0)
@@ -152,7 +163,7 @@ public class EnclosureHandler extends DefaultHandler {
 							// some feeds have bad lengths
 						}
 					}
-				    MetaNet metaNet = new MetaNet(feedName, new URL(atts.getValue("url")), length, getMimetype(atts.getValue("url"), atts.getValue("type")));
+				    MetaNet metaNet = new MetaNet(feedName, new URL(atts.getValue("url")), length, getMimetype(atts.getValue("url"), atts.getValue("type")), priority);
 					metaNet.setTitle(lastTitle);
 					metaNet.setDescription(lastDescription);
 					if (history.contains(metaNet)) {

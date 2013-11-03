@@ -85,7 +85,7 @@ public class DownloadHelper implements Sayer {
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 
 		for (Subscription sub : sites) {
-			EnclosureHandler encloseureHandler = new EnclosureHandler(history);
+			EnclosureHandler encloseureHandler = new EnclosureHandler(history,sub.priority);
 
 			if (sub.enabled) {
 				try {
@@ -155,7 +155,32 @@ public class DownloadHelper implements Sayer {
 
 			try {
                 Config config = new Config(contentService);
-				File castFile = config.getPodcastRootPath(System.currentTimeMillis() + localFileExt);
+				String prefix = "";
+
+                                /*
+                                 * Non-priority podcast files are named XXXX.mp3, where XXXX is the millisecond timestamp at
+                                 * the time the podcast was downloaded.
+                                 *
+                                 * Priority podcast files are named YYYY:00:XXXX.mp3, where XXXX is as above, and YYYY is the timestamp of
+                                 * file currently in the player.
+                                 *
+                                 * Notes:
+                                 *    ":" is chosen as the separator because it sorts after the "." of the file name suffix.
+                                 *    The "00" is incuded to make it possible to have multiple priority levels in the future.
+                                 *
+                                 * IMPORTANT:
+                                 *    The naming scheme used here *must* match MetaHolder.isPriority().
+                                 */
+
+                                if ( newPodcasts.get(i).getPriority() )
+                                   if ( contentService.currentMeta() != null )
+                                      prefix = contentService.currentMeta().getBaseFilename() + ":00:";
+
+                                String castFileName = prefix + System.currentTimeMillis() + localFileExt;
+				File castFile = config.getPodcastRootPath(castFileName);
+
+
+				Log.d("CarCast", "New podcast file: " + castFileName);
 
 				currentSubscription = newPodcasts.get(i).getSubscription();
 				currentTitle = newPodcasts.get(i).getTitle();
