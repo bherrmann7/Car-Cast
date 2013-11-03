@@ -82,12 +82,12 @@ public class MetaHolder {
 			}
 		}
 
-                if ( 0 <= currentIndex )
+                if ( 0 <= currentIndex && currentIndex < metas.size() )
                 {
                    // We've already encountered the currently-playing file;
                    // currentIndex is its position.
-                   assert 0 <= currentIndex;
-                   assert currentIndex < metas.size();
+                   // assert 0 <= currentIndex;
+                   // assert currentIndex < metas.size();
                    String prev, curr;
                    do
                    {
@@ -98,9 +98,19 @@ public class MetaHolder {
                    // currentIndex is now the index *after* the
                    // currently-playing podcast file and any following priority
                    // podcasts.
-                   assert 1 <= currentIndex;
-                   assert currentIndex <= metas.size();
+                   // assert 1 <= currentIndex;
+                   // assert currentIndex <= metas.size();
                 }
+
+                // Fail safe.
+                // The code above looks good to me.  I've tested it in various ways.
+                // However, if there are any errors, it could result in incorrect indexing
+                // into the `metas` array, which would crash the app.
+                // So, just to be safe for the time being, let's leave some code here that
+                // catches any problems.
+                if ( currentIndex < 1 || metas.size() < currentIndex )
+                   // SHOULD NOT HAPPEN!
+                   currentIndex = -1;
 
 		// Look for "Found Files" -- not in ordered list... but sitting in the directory
 		ArrayList<File> foundFiles = new ArrayList<File>();
