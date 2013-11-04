@@ -121,7 +121,10 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 			}
 		}
 		
-		
+		if (getIntent().hasExtra("focus")) {
+			findViewById(R.id.editsite_url).requestFocus();
+                }
+
 		if (getIntent().hasExtra("subscription")) {
 			currentSub = (Subscription) getIntent().getExtras().get(
 					"subscription");

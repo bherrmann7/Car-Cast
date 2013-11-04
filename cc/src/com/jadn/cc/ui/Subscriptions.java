@@ -142,7 +142,9 @@ public class Subscriptions extends BaseActivity {
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		if (item.getItemId() == R.id.addSubscription) {
-			startActivityForResult(new Intent(this, SubscriptionEdit.class), Integer.MAX_VALUE);
+			Intent addIntent = new Intent(this, SubscriptionEdit.class);
+			addIntent.putExtra("focus", "This value is ignored; only the presence of the key matters.");
+			startActivityForResult(addIntent, Integer.MAX_VALUE);
 			return true;
 		}
 		if (item.getItemId() == R.id.deleteAllSubscriptions) {
