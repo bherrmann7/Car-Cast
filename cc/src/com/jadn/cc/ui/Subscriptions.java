@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -210,12 +211,11 @@ public class Subscriptions extends BaseActivity {
 	public void exportOpml() {
 		File tempFile = null;
 		try {
-			tempFile = File.createTempFile("carcast", ".opml");
-			tempFile = new File(tempFile.getParentFile(), "carcast.opml");
-			tempFile.delete();
-			FileOutputStream fileOutputStream = new FileOutputStream(tempFile);			
-			contentService.exportOPML(fileOutputStream);
-			fileOutputStream.close();
+
+            tempFile = new File(Environment.getExternalStorageDirectory(),"/carcast.opml");
+            FileOutputStream opmlFile = new FileOutputStream(tempFile);
+			contentService.exportOPML(opmlFile);
+            opmlFile.close();
 		} catch (Exception ex) {
 			// Do a toast...
 			Util.toast(this, "Problem creating temporary file\n"+ex.getMessage());

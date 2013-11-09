@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jadn.cc"
-    android:versionCode="157"
-    android:versionName="1.0.157"
+    android:versionCode="160"
+    android:versionName="1.0.160"
     android:installLocation="auto"
      >
 
@@ -140,12 +140,12 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:host="*"
-                    android:pathPattern=".*oiml"
+                    android:pathPattern=".*opml"
                    android:mimeType="text/xml"/>
                 <data
                     android:host="*"
-                    android:pathPattern=".*oiml"
-                   android:mimeType="application/octet-stream"/>                          
+                    android:pathPattern=".*opml"
+                   android:mimeType="application/octet-stream"/>
             </intent-filter>
         </activity>
         
