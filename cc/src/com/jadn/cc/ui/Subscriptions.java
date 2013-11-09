@@ -66,7 +66,7 @@ public class Subscriptions extends BaseActivity {
 			return;
 		}
 
-		listAdapter = new SimpleAdapter(this, subscriptions, R.layout.main_item_two_line_row, new String[] { "name", "enabled" },
+		listAdapter = new SimpleAdapter(this, subscriptions, R.layout.main_item_two_line_row2, new String[] { "name", "enabled" },
 				new int[] { R.id.text1, R.id.text2 });
 		listView.setAdapter(listAdapter);
 	}
