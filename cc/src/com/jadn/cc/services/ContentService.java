@@ -869,7 +869,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             return searchHelper.results;
         }
 
-        searchHelper = new SearchHelper(search);
+        searchHelper = new ItunesSearchHelper(search);
+        //searchHelper = new SearchHelper(search);
         searchHelper.start();
         return "";
     }
