@@ -770,18 +770,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         this.mediaMode = mediaMode;
     }
 
-    private static volatile boolean downloadRunning = false;
-
     public void startDownloadingNewPodCasts(final int max) {
         
-        // Prevent multiple downloads running simultaneously.
-        // This is safe, because the service itself (so, this part of the code)
-        // is single threaded.
-        //
-        if ( downloadRunning )
-            return;
-        downloadRunning = true;
-
         boolean autoDelete = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("autoDelete", false);
         if (autoDelete) {
             for (int i = metaHolder.getSize() - 1; i >= 0; i--) {
@@ -863,7 +853,6 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                     } finally {
                         Log.i("CarCast", "finished download thread.");
                         partialWakeLock.release();
-                        downloadRunning = false;
                     }
                 }
             }.start();
