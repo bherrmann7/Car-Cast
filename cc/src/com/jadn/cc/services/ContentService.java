@@ -863,8 +863,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                     } finally {
                         Log.i("CarCast", "finished download thread.");
                         partialWakeLock.release();
+                        downloadRunning = false;
                     }
-                    downloadRunning = false;
                 }
             }.start();
         }
