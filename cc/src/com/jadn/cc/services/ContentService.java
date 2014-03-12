@@ -770,7 +770,10 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         this.mediaMode = mediaMode;
     }
 
-    public void startDownloadingNewPodCasts(final int max) {
+    // Synchronized: to ensure that maximum one startDownloadingNewPodCasts()
+    // can be active at any time.
+    //
+    public synchronized void startDownloadingNewPodCasts(final int max) {
         
         boolean autoDelete = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("autoDelete", false);
         if (autoDelete) {
@@ -788,15 +791,21 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             }
         }
 
-        if (downloadHelper == null || downloadHelper.idle) {
+        if (downloadHelper == null) {
             // cause display to reflect that we are getting ready to do a
             // download
-            downloadHelper = null;
 
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
             mNotificationManager.cancel(22);
 
             updateNotification("Downloading podcasts started");
+
+            // Creating downloadHelper here, in a synchronized method, prevents
+            // any other thread from spawning concurrent download.
+            //
+            // downloadHelper is reset to null in the finally block, below.
+            //
+            downloadHelper = new DownloadHelper(max);
 
             new Thread() {
                 @Override
@@ -826,7 +835,6 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                                 Log.i("CarCast", "Locked Wifi.");
                             }
 
-                            downloadHelper = new DownloadHelper(max);
                             String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
                                     "none");
                             boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
@@ -853,9 +861,16 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                     } finally {
                         Log.i("CarCast", "finished download thread.");
                         partialWakeLock.release();
+                        // Allow another download to start...
+                        //
+                        downloadHelper = null;
                     }
                 }
             }.start();
+        }
+        else {
+            // downloadHelper != null
+            Log.w("CarCast", "Not downloading podcasts: download already active.");
         }
     }
 
