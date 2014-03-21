@@ -15,12 +15,10 @@ import android.app.Service;
 import android.content.*;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
-import android.os.Handler;
+import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -34,7 +32,6 @@ import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Location;
 import com.jadn.cc.core.MediaMode;
 import com.jadn.cc.core.Subscription;
-import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
 import com.jadn.cc.util.ExportOpml;
@@ -532,7 +529,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                 super.onCallStateChanged(state, incomingNumber);
 
                 if (state == TelephonyManager.CALL_STATE_OFFHOOK || state == TelephonyManager.CALL_STATE_RINGING) {
-                    if (mediaPlayer.isPlaying()) {
+                    // It's possible that this listener is registered before the setApplicationContext
+                    // method is called, which establishes the MediaPlayer instance.
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                         wasPausedByPhoneCall = true;
                         pauseNow();
                     }
@@ -774,7 +773,6 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     // can be active at any time.
     //
     public synchronized void startDownloadingNewPodCasts(final int max) {
-        
         boolean autoDelete = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("autoDelete", false);
         if (autoDelete) {
             for (int i = metaHolder.getSize() - 1; i >= 0; i--) {
