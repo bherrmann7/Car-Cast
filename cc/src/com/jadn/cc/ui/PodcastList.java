@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
@@ -78,7 +80,7 @@ public class PodcastList extends BaseActivity {
 								showPodcasts();
 							}
 						}).setNegativeButton("Cancel", null).show();
-			};
+			}
 		});
 
 		((Button) findViewById(R.id.top)).setOnClickListener(new OnClickListener() {
@@ -89,7 +91,7 @@ public class PodcastList extends BaseActivity {
 				checkedItems = contentService.moveTop(checkedItems);
 				podcastsAdapter.notifyDataSetChanged();
 				showPodcasts();
-			};
+			}
 		});
 
 		((Button) findViewById(R.id.up)).setOnClickListener(new OnClickListener() {
@@ -100,7 +102,7 @@ public class PodcastList extends BaseActivity {
 				checkedItems = contentService.moveUp(checkedItems);
 				podcastsAdapter.notifyDataSetChanged();
 				showPodcasts();
-			};
+			}
 		});
 
 		((Button) findViewById(R.id.down)).setOnClickListener(new OnClickListener() {
@@ -111,7 +113,7 @@ public class PodcastList extends BaseActivity {
 				checkedItems = contentService.moveDown(checkedItems);
 				podcastsAdapter.notifyDataSetChanged();
 				showPodcasts();
-			};
+			}
 		});
 
 		((Button) findViewById(R.id.bottom)).setOnClickListener(new OnClickListener() {
@@ -122,7 +124,7 @@ public class PodcastList extends BaseActivity {
 				checkedItems = contentService.moveBottom(checkedItems);
 				podcastsAdapter.notifyDataSetChanged();
 				showPodcasts();
-			};
+			}
 		});
 	}
 
@@ -231,18 +233,18 @@ public class PodcastList extends BaseActivity {
 
 		}
 
-		// When doing a delete before, we rebuild the list, but the adapter is
-		// ok.
+		// When doing a delete before, we rebuild the list, but the adapter is ok.
 		if (podcastsAdapter == null) {
-			podcastsAdapter = new SimpleAdapter(this, list,
-			// R.layout.main_item_two_line_row, new String[] { "line1",
-			// "line2" }, new int[] { R.id.text1, R.id.text2 });
-					R.layout.podcast_items_checks, new String[] { "line1", "xx:xx-xx:xx", "line2", "description" }, new int[] { R.id.firstLine,
-							R.id.amountHeard, R.id.secondLine, R.id.description }) {
+			// TODO this needs to be a full-fledged custom adapter, for better performance
+			// and simplicity.
+			podcastsAdapter = new SimpleAdapter(this, list, R.layout.podcast_items_checks,
+					new String[] { "line1", "xx:xx-xx:xx", "line2", "description" },
+					new int[] { R.id.firstLine, R.id.amountHeard, R.id.secondLine, R.id.description }) {
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
 					View view = super.getView(position, convertView, parent);
-					Map map = (Map) getItem(position);
+					@SuppressWarnings("unchecked")
+					Map<String, String> map = (Map<String, String>) getItem(position);
 					if (map.get("listened") != null) {
 						view.setBackgroundColor(Color.rgb(0, 70, 70));
 					} else {
@@ -250,8 +252,6 @@ public class PodcastList extends BaseActivity {
 					}
 					final CheckBox checkbox = (CheckBox) view.findViewById(R.id.checkBox1);
 					checkbox.setOnClickListener(checkBoxClicked);
-					// ((TextView)view.findViewById(R.id.firstLine)).setOnClickListener(itemClicked);
-					// ((TextView)view.findViewById(R.id.secondLine)).setOnClickListener(itemClicked);
 					view.setOnClickListener(itemClicked);
 					view.setOnLongClickListener(itemLongClicked);
 
@@ -263,6 +263,14 @@ public class PodcastList extends BaseActivity {
 					tag.item = map;
 
 					checkbox.setChecked(checkedItems.contains(position));
+
+					// See if we should try to strip out HTML from the description.
+					String desc = map.get("description");
+					if (desc != null) {
+						TextView description = (TextView) view.findViewById(R.id.description);
+						// Strip the HTML and then go back to a string to drop formatting.
+						description.setText(Html.fromHtml(desc).toString());
+					}
 					return view;
 				}
 			};
