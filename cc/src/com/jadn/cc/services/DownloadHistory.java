@@ -113,6 +113,7 @@ public class DownloadHistory implements Sayer {
                 nh.add(he);
         }
         historyEntries = nh;
+        save();
         return size - nh.size();
     }
 
