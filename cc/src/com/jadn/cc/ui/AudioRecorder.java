@@ -30,22 +30,22 @@ import com.jadn.cc.util.RecordingSet;
 import com.jadn.cc.util.Updater;
 
 public class AudioRecorder extends BaseActivity {
-	
+
 	Updater updater;
 	// Need handler for callbacks to the UI thread
 	final Handler handler = new Handler();
     RecordingSet recordingSet;
-	
+
 	final Runnable mUpdateResults = new Runnable() {
 		@Override
 		public void run() {
-			
+
 			ListView listView = (ListView) findViewById(R.id.audioRecorderListing);
 			if (listView.getCount() != recordingSet.getRecordings().size())
 				showRecordings();
 		}
 	};
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -133,7 +133,7 @@ public class AudioRecorder extends BaseActivity {
 		registerForContextMenu(listView);
 
 		showRecordings();
-				
+
 
 		updater = new Updater(handler, mUpdateResults);
 	}
@@ -199,9 +199,9 @@ public class AudioRecorder extends BaseActivity {
 		}
 		/*
 		 * ArrayAdapter<HashMap<String, String>> notes = new ArrayAdapter<HashMap<String, String>>(this,
-		 * R.layout.podcast_items, list);
+		 * R.layout.recorded_items, list);
 		 */
-		SimpleAdapter notes = new SimpleAdapter(this, list, R.layout.podcast_items, new String[] { "line1", "line2", "amountHeard" },
+		SimpleAdapter notes = new SimpleAdapter(this, list, R.layout.recorded_items, new String[] { "line1", "line2", "amountHeard" },
 				new int[] { R.id.firstLine, R.id.secondLine, R.id.amountHeard });
 
 		listView.setAdapter(notes);
