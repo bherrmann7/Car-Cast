@@ -1,39 +1,63 @@
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/listitemschecked" android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-	<CheckBox  android:layout_alignParentLeft="true"
-		android:layout_width="wrap_content" android:id="@+id/checkBox1"
-		android:layout_height="wrap_content"
-		></CheckBox>
-	<TextView android:textSize="14dp" android:id="@+id/amountHeard"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:singleLine="true" android:layout_alignParentTop="true"
-		android:layout_alignParentRight="true" android:paddingRight="5dip"
-		android:text="XX:XXX" />
-	<TextView android:textSize="14dp" android:id="@+id/firstLine"
-		android:text="I'm the name of the Subscription" 
-		android:layout_height="wrap_content" android:singleLine="true"
-		android:layout_width="fill_parent"
-		android:ellipsize="marquee" android:layout_alignParentTop="true"
-		android:layout_toRightOf="@id/checkBox1"
-		android:layout_toLeftOf="@id/amountHeard"
-		 />
-	<TextView android:layout_below="@id/firstLine" android:id="@+id/secondLine"
-		android:textSize="18dp" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:layout_toRightOf="@id/checkBox1"
-		android:singleLine="true" android:ellipsize="marquee"
-		android:text="I'm the name of the episode" />
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listitemschecked"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+  <CheckBox
+      android:layout_alignParentLeft="true"
+      android:layout_width="wrap_content"
+      android:id="@+id/checkBox1"
+      android:layout_height="wrap_content"
+      />
 
-	<TextView
-	    android:id="@+id/description"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_below="@+id/secondLine"
-	    android:layout_toRightOf="@+id/checkBox1"
-	    android:ellipsize="marquee"
-	    android:singleLine="true"
-	    android:text="I&apos;m the description I&apos;m the description I&apos;m the description I&apos;m the description I&apos;m the description"
-	    android:textSize="18dp" />
+  <TextView
+      android:textSize="14sp"
+      android:id="@+id/amountHeard"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:singleLine="true"
+      android:layout_alignParentTop="true"
+      android:layout_alignParentRight="true"
+      android:paddingRight="5dip"
+      android:text="XX:XXX"
+      />
 
+  <TextView
+      android:textSize="14sp"
+      android:id="@+id/firstLine"
+      android:text="I'm the name of the Subscription"
+      android:layout_height="wrap_content"
+      android:singleLine="true"
+      android:layout_width="fill_parent"
+      android:ellipsize="end"
+      android:layout_alignParentTop="true"
+      android:layout_toRightOf="@id/checkBox1"
+      android:layout_toLeftOf="@id/amountHeard"
+      />
+
+  <TextView
+      android:layout_below="@id/firstLine"
+      android:id="@+id/secondLine"
+      android:textSize="18sp"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_toRightOf="@id/checkBox1"
+      android:singleLine="true"
+      android:ellipsize="end"
+      android:text="I'm the name of the episode"
+      />
+
+  <TextView
+      android:id="@+id/description"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/secondLine"
+      android:layout_toRightOf="@+id/checkBox1"
+      android:ellipsize="end"
+      android:singleLine="true"
+      android:text="I&apos;m a really long description that's going to get cut off at the end of the screen"
+      android:textSize="18sp"
+      />
 </RelativeLayout>

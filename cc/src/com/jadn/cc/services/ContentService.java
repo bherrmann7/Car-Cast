@@ -15,12 +15,10 @@ import android.app.Service;
 import android.content.*;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
-import android.os.Handler;
+import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -34,7 +32,6 @@ import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Location;
 import com.jadn.cc.core.MediaMode;
 import com.jadn.cc.core.Subscription;
-import com.jadn.cc.trace.ExceptionHandler;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
 import com.jadn.cc.util.ExportOpml;
@@ -532,7 +529,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                 super.onCallStateChanged(state, incomingNumber);
 
                 if (state == TelephonyManager.CALL_STATE_OFFHOOK || state == TelephonyManager.CALL_STATE_RINGING) {
-                    if (mediaPlayer.isPlaying()) {
+                    // It's possible that this listener is registered before the setApplicationContext
+                    // method is called, which establishes the MediaPlayer instance.
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                         wasPausedByPhoneCall = true;
                         pauseNow();
                     }
@@ -770,8 +769,10 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         this.mediaMode = mediaMode;
     }
 
-    public void startDownloadingNewPodCasts(final int max) {
-
+    // Synchronized: to ensure that maximum one startDownloadingNewPodCasts()
+    // can be active at any time.
+    //
+    public synchronized void startDownloadingNewPodCasts(final int max) {
         boolean autoDelete = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("autoDelete", false);
         if (autoDelete) {
             for (int i = metaHolder.getSize() - 1; i >= 0; i--) {
@@ -788,15 +789,21 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             }
         }
 
-        if (downloadHelper == null || downloadHelper.idle) {
+        if (downloadHelper == null) {
             // cause display to reflect that we are getting ready to do a
             // download
-            downloadHelper = null;
 
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
             mNotificationManager.cancel(22);
 
             updateNotification("Downloading podcasts started");
+
+            // Creating downloadHelper here, in a synchronized method, prevents
+            // any other thread from spawning concurrent download.
+            //
+            // downloadHelper is reset to null in the finally block, below.
+            //
+            downloadHelper = new DownloadHelper(max);
 
             new Thread() {
                 @Override
@@ -826,7 +833,6 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                                 Log.i("CarCast", "Locked Wifi.");
                             }
 
-                            downloadHelper = new DownloadHelper(max);
                             String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
                                     "none");
                             boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
@@ -853,9 +859,16 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                     } finally {
                         Log.i("CarCast", "finished download thread.");
                         partialWakeLock.release();
+                        // Allow another download to start...
+                        //
+                        downloadHelper = null;
                     }
                 }
             }.start();
+        }
+        else {
+            // downloadHelper != null
+            Log.w("CarCast", "Not downloading podcasts: download already active.");
         }
     }
 

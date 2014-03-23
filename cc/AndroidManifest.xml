@@ -170,6 +170,7 @@
                 <action android:name="com.jadn.cc.services.external.PAUSE" />
                 <action android:name="com.jadn.cc.services.external.PLAY" />
                 <action android:name="com.jadn.cc.services.external.PAUSEPLAY" />
+                <action android:name="com.jadn.cc.services.external.DOWNLOAD" />
             </intent-filter>
         </receiver>
 
