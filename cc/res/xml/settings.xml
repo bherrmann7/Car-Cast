@@ -79,7 +79,7 @@
         android:entries="@array/orientationChoice_array"
         android:entryValues="@array/orientationChoice_array"
         android:key="orientation"
-        android:summary="Specify player orienation"
+        android:summary="Specify player orientation"
         android:title="Orientation Preference" />
 
     <EditTextPreference
@@ -94,7 +94,7 @@
 
     <PreferenceScreen
         android:key="audionoteforwarding"
-        android:summary="Allows notes to be forwared to email"
+        android:summary="Allows notes to be forwarded to email"
         android:title="Audio Notes to Email forwarding" >
         
         <EditTextPreference

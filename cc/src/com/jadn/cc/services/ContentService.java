@@ -493,6 +493,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        if (currentMeta()==null)
+            return;
         currentMeta().setCurrentPos(0);
         currentMeta().setListenedTo();
         currentMeta().save();
