@@ -34,6 +34,7 @@ import com.jadn.cc.util.RecordingSet;
 import com.jadn.cc.util.Updater;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 public class CarCast extends MediaControlActivity {
 	final static String tag = CarCast.class.getSimpleName();
@@ -214,24 +215,8 @@ public class CarCast extends MediaControlActivity {
 			editor.putBoolean("showSplash", false);
 			editor.commit();
 		} else if (!lastRun.equals(CarCastApplication.releaseData[0])) {
-			if (CarCastApplication.releaseData[1].equals("OnSale")) {
-				new AlertDialog.Builder(CarCast.this).setTitle(CarCastApplication.getAppTitle() + " Pro Sale!")
-						.setMessage("\nJust $0.99 USD gets rid of Ads and You are helping make CarCast better.")
-						.setNeutralButton("No Thanks", null).setPositiveButton("YES! Get Pro", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								// dialog.cancel();
-								// System.out.println("Do something");
-								// market://search?q=pname:com.jadn.cc
-								Intent intent = new Intent(Intent.ACTION_VIEW);
-								intent.setData(Uri.parse("market://details?id=com.jadn.ccpro"));
-								startActivity(intent);
-							}
-						}).show();
-
-			} else {
 				new AlertDialog.Builder(CarCast.this).setTitle(CarCastApplication.getAppTitle() + " updated")
 						.setMessage(CarCastApplication.releaseData[1]).setNeutralButton("Close", null).show();
-			}
 		}
 		saveLastRun();
 
@@ -337,6 +322,7 @@ public class CarCast extends MediaControlActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+        config = null;
 
 		if (app_preferences.getBoolean("keep_display_on", true))
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -375,10 +361,13 @@ public class CarCast extends MediaControlActivity {
             podroot = config.getPodcastsRoot();
         }
 		try {
-			if (!podroot.exists()) {
-				if (!podroot.mkdirs()) {
+			if (!podroot.exists() || !podroot.canWrite()) {
+				if (!podroot.mkdirs() || !podroot.canWrite()) {
 					TextView textView = (TextView) findViewById(R.id.title);
-					textView.setText("ERROR ** " + CarCastApplication.getAppTitle() + " cannot write to storage: "+podroot+" ** ");
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("ERROR ** " + CarCastApplication.getAppTitle() + " cannot write to storage: "+podroot+" ** ");
+                    sb.append(moreSpaceSuggestions());
+					textView.setText(sb.toString());
 					return;
 				}
 			}
@@ -416,4 +405,30 @@ public class CarCast extends MediaControlActivity {
 			Log.e("cc", "", e);
 		}
 	}
+
+
+    String moreSpaceSuggestions(){
+
+        // getExternalFilesDirs
+        try {
+            Method method = getApplicationContext().getClass().getMethod("getExternalFilesDirs", String.class);
+
+            File[] fileBases = (File[])method.invoke(getApplicationContext(), new Object[]{null});
+
+            StringBuilder sb = new StringBuilder("\n\nTry one of:\n ");
+            sb.append(" ");
+            sb.append(android.os.Environment.getExternalStorageDirectory());
+            sb.append("\n");
+            for(File file: fileBases){
+                sb.append("  ");
+                sb.append(file);
+                sb.append("\n");
+            }
+
+            return sb.toString();
+
+        } catch (Throwable e){
+            return "";
+        }
+    }
 }

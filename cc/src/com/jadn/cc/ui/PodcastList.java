@@ -357,6 +357,7 @@ public class PodcastList extends BaseActivity {
 							}
 
 							podcastsAdapter.notifyDataSetChanged();
+                            showPodcasts();
 						}
 
 					}).setNegativeButton("Cancel", null).show();

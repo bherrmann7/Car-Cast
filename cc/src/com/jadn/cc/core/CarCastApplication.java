@@ -15,6 +15,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
     public final static String[] releaseData = new String[]{
+            "23-APR-2014", "If KitKat 4.4, display better data location error message.  Fix podcast deletions again...",
             "30-DEC-2013", "Fix the 'Erase History' function on the Subscription edit popup - it wasn't reliable.",
             "15-NOV-2013", "Use the Apple iTunes database for finding podcasts.  Thanks Apple! They maintain a good public database.",
             "08-NOV-2013", "Fix 'Export OPML' to work on newer phones.   Lets you move/email subscriptions from phone to phone.",
