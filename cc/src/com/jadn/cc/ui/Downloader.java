@@ -36,10 +36,7 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 	};
 
 	TextView tv;
-
 	Updater updater;
-
-	// PowerManager.WakeLock wl;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -48,12 +45,6 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 		setContentView(R.layout.download);
 
 		tv = (TextView) findViewById(R.id.textconsole);
-
-		// If you are running the debug screen, then do not go to sleep
-		// PowerManager pm = (PowerManager)
-		// getSystemService(Context.POWER_SERVICE);
-		// wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-		// wl.acquire();
 	}
 
 	@Override
@@ -108,9 +99,6 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 
 		// stop display thread
 		updater.allDone();
-
-		// *** This was causing a force quit
-		// wl.release();
 	}
 
 	@Override
