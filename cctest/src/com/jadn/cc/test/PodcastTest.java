@@ -8,7 +8,7 @@ import com.jadn.cc.core.Util;
 import com.jadn.cc.services.DownloadHistory;
 import com.jadn.cc.services.EnclosureHandler;
 import com.jadn.cc.ui.CarCast;
-import com.jayway.android.robotium.solo.Solo;
+import com.robotium.solo.Solo;
 
 import java.util.ArrayList;
 import java.util.List;

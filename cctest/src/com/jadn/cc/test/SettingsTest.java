@@ -5,7 +5,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.MenuItem;
 
 import com.jadn.cc.ui.CarCast;
-import com.jayway.android.robotium.solo.Solo;
+import com.robotium.solo.Solo;
 
 public class SettingsTest extends ActivityInstrumentationTestCase2<CarCast> {
     public SettingsTest() {

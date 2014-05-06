@@ -3,7 +3,7 @@ package com.jadn.cc.test;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.jadn.cc.ui.CarCast;
-import com.jayway.android.robotium.solo.Solo;
+import com.robotium.solo.Solo;
 
 public class FirstTest extends ActivityInstrumentationTestCase2<CarCast> {
 

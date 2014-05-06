@@ -4,7 +4,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.widget.ListView;
 
 import com.jadn.cc.ui.CarCast;
-import com.jayway.android.robotium.solo.Solo;
+import com.robotium.solo.Solo;
 
 public class DeleteListenedToTest extends
 		ActivityInstrumentationTestCase2<CarCast> {
