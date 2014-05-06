@@ -1,18 +1,24 @@
 package com.jadn.cc.ui;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.zip.GZIPOutputStream;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jadn.cc.R;
 import com.jadn.cc.core.CarCastApplication;
@@ -56,29 +62,54 @@ public class Downloader extends BaseActivity implements Sayer, Runnable {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        Toast.makeText(getApplicationContext(), "Creating email report...", Toast.LENGTH_LONG).show();
 
-		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-		emailIntent.setType("plain/text");
-		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
-				new String[] { "carcast-devs@googlegroups.com", "bob@jadn.com" });
-		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-				"Issue on download...");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+                emailIntent.setType("plain/text");
+                emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
+                        new String[] { "carcast-devs@googlegroups.com", "bob@jadn.com" });
+                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+                        "Issue on download...");
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("Thanks. Please describe the problem. \n\n=== Basic Info ===\n");
-		nv(sb, "package_name", TraceData.APP_PACKAGE);
-		nv(sb, "package_version", TraceData.APP_VERSION);
-		nv(sb, "phone_model", TraceData.PHONE_MODEL);
-		nv(sb, "android_version", TraceData.ANDROID_VERSION);
-		sb.append("\nCar Cast Download output\n====================\n");
-		sb.append(tv.getText());
-		sb.append("\nLog snapshot\n============\n");
-		fetchLog(sb);
+                // need to clean these up at some point
+                String strFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ccreprt"+System.currentTimeMillis()+".txt.gz";
 
-		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, sb.toString());
+                StringBuilder sb = new StringBuilder();
+                sb.append("Thanks. Please describe the problem. \n\n=== Basic Info ===\n");
+                nv(sb, "package_name", TraceData.APP_PACKAGE);
+                nv(sb, "package_version", TraceData.APP_VERSION);
+                nv(sb, "phone_model", TraceData.PHONE_MODEL);
+                nv(sb, "android_version", TraceData.ANDROID_VERSION);
+                sb.append("\nCar Cast Download output\n====================\n");
+                sb.append(tv.getText());
+                sb.append("\nLog snapshot\n============\n");
+                fetchLog(sb);
 
-		startActivity(Intent.createChooser(emailIntent,
-				"Email about podcast downloading"));
+                try {
+                    GZIPOutputStream gzipOutputStream  = new GZIPOutputStream(new FileOutputStream(strFile));
+                    gzipOutputStream.write(sb.toString().getBytes());
+                    gzipOutputStream.close();
+
+                    emailIntent.putExtra(Intent.EXTRA_STREAM,
+                            Uri.parse("file://" + strFile));
+
+                    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "This email includes an attachment which describes the internals of your phone when CarCast was running.\n\nPlease add to here, (1) what is the problem as you see it?  (2) Does it happen everytime?\n\nThanks\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Bah! couldnt attach report: " + e.getMessage());
+                }
+
+
+                startActivity(Intent.createChooser(emailIntent,
+                        "Email about podcast downloading"));
+
+            }
+        }).start();
+
 
 		return true;
 	}

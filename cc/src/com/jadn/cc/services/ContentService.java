@@ -32,6 +32,7 @@ import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Location;
 import com.jadn.cc.core.MediaMode;
 import com.jadn.cc.core.Subscription;
+import com.jadn.cc.core.WifiConnectedReceiver;
 import com.jadn.cc.trace.TraceUtil;
 import com.jadn.cc.ui.CarCast;
 import com.jadn.cc.util.ExportOpml;
@@ -165,7 +166,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     public CharSequence currentSummary() {
         StringBuilder sb = new StringBuilder();
         if (currentPodcastInPlayer >= metaHolder.getSize()) {
-            if (downloadHelper != null)
+            if (isDownloading())
                 return "Downloading podcasts";
             return "No Podcasts have been downloaded.";
         }
@@ -175,9 +176,15 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         return sb.toString();
     }
 
+    boolean isDownloading(){
+        if(downloadHelper == null)
+                return false;
+        return downloadHelper.isRunning();
+    }
+
     public String currentTitle() {
         if (currentPodcastInPlayer >= metaHolder.getSize()) {
-            if (downloadHelper != null && !downloadHelper.idle) {
+            if (isDownloading()) {
                 return "Downloading podcasts\n" + downloadHelper.getStatus();
             }
             return "No podcasts loaded.\nUse 'Menu' and 'Download Podcasts'";
@@ -278,9 +285,6 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             mNotificationManager.notify(22, notification);
         }
 
-        // clear so next user request will start new download
-        // downloadHelper = null;
-
         metaHolder = new MetaHolder(getApplicationContext(), currentFile());
         if (currentPodcastInPlayer >= metaHolder.getSize()) {
             currentPodcastInPlayer = 0;
@@ -295,10 +299,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         if (downloadHelper == null) {
             return "";
         }
-        String status = (downloadHelper.idle ? "idle" : "busy") + "," + downloadHelper.sitesScanned + "," + downloadHelper.totalSites + ","
-                + downloadHelper.podcastsDownloaded + "," + downloadHelper.totalPodcasts + "," + downloadHelper.podcastsCurrentBytes + ","
-                + downloadHelper.podcastsTotalBytes + "," + downloadHelper.currentSubscription + "," + downloadHelper.currentTitle;
-        return status;
+
+        return downloadHelper.getEncodedStatus();
     }
 
     private boolean fullReset() throws Exception {
@@ -514,6 +516,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     @Override
     public void onCreate() {
         super.onCreate();
+        WifiConnectedReceiver.registerForWifiBroadcasts(getApplicationContext());
+
         config = new Config(getApplicationContext());
 
         initDirs();
@@ -791,21 +795,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             }
         }
 
-        if (downloadHelper == null) {
-            // cause display to reflect that we are getting ready to do a
-            // download
-
+        if (downloadHelper == null || !downloadHelper.isRunning()) {
+            downloadHelper = new DownloadHelper(max);
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
             mNotificationManager.cancel(22);
-
             updateNotification("Downloading podcasts started");
-
-            // Creating downloadHelper here, in a synchronized method, prevents
-            // any other thread from spawning concurrent download.
-            //
-            // downloadHelper is reset to null in the finally block, below.
-            //
-            downloadHelper = new DownloadHelper(max);
 
             new Thread() {
                 @Override
@@ -861,15 +855,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                     } finally {
                         Log.i("CarCast", "finished download thread.");
                         partialWakeLock.release();
-                        // Allow another download to start...
-                        //
-                        downloadHelper = null;
                     }
                 }
             }.start();
         }
         else {
-            // downloadHelper != null
             Log.w("CarCast", "Not downloading podcasts: download already active.");
         }
     }
@@ -937,7 +927,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     }
 
     public boolean isIdle() {
-        return !isPlaying() && (downloadHelper == null || downloadHelper.idle);
+        return !isPlaying() && (downloadHelper == null || !downloadHelper.isRunning());
     }
 
     public void purgeAll() {

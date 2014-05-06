@@ -30,23 +30,26 @@ import com.jadn.cc.core.Subscription;
 import com.jadn.cc.core.Util;
 
 public class DownloadHelper implements Sayer {
-	public String currentSubscription = " ";
-	public String currentTitle = " ";
-	int globalMax;
-	StringBuilder newText = new StringBuilder();
-	int podcastsCurrentBytes;
-	int podcastsDownloaded;
-	int podcastsTotalBytes;
-	int sitesScanned;
-	int totalPodcasts;
-	int totalSites;
-	TextView tv;
-	boolean idle;
-	StringBuilder sb = new StringBuilder();
+    private String currentSubscription = " ";
+    private String currentTitle = " ";
+    private int globalMax;
+    private int podcastsCurrentBytes;
+    private int podcastsDownloaded;
+    private int podcastsTotalBytes;
+    private int sitesScanned;
+    private int totalPodcasts;
+	private int totalSites;
+	private TextView tv;
+	private boolean isRunning = true;
+	StringBuilder sb = new StringBuilder("Getting ready to start downloads\n");
 
 	public DownloadHelper(int globalMax) {
 		this.globalMax = globalMax;
 	}
+
+    public boolean isRunning(){
+        return isRunning;
+    }
 
 	SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd hh:mma");
 
@@ -61,101 +64,100 @@ public class DownloadHelper implements Sayer {
 	}
 
 	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
-        DownloadHistory history = new DownloadHistory(contentService);
+        try {
+            DownloadHistory history = new DownloadHistory(contentService);
 
-        // just to be explicit (or if a DownloadHelper ever gets reused):
-		idle = false;
-		say("Starting find/download new podcasts. CarCast ver " + CarCastApplication.getVersion());
-		say("Problems? please use Menu / Email Download Report - THANKS!");
+            say("Starting find/download new podcasts. CarCast ver " + CarCastApplication.getVersion());
+            say("Problems? please use Menu / Email Download Report - THANKS!");
 
-		List<Subscription> sites = contentService.getSubscriptions();
+            List<Subscription> sites = contentService.getSubscriptions();
 
-		if (canCollectData) {
-			postSitesToJadn(accounts, sites);
-		}
+            if (canCollectData) {
+                postSitesToJadn(accounts, sites);
+            }
 
-		say("\nSearching " + sites.size() + " subscriptions. " + sdf.format(new Date()));
+            say("\nSearching " + sites.size() + " subscriptions. " + sdf.format(new Date()));
 
-		totalSites = sites.size();
+            totalSites = sites.size();
 
-		say("History of downloads contains " + history.size() + " podcasts.");
+            say("History of downloads contains " + history.size() + " podcasts.");
 
-		List<MetaNet> enclosures = new ArrayList<MetaNet>();
+            List<MetaNet> enclosures = new ArrayList<MetaNet>();
 
-		SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParserFactory spf = SAXParserFactory.newInstance();
 
-		for (Subscription sub : sites) {
-			EnclosureHandler encloseureHandler = new EnclosureHandler(history,sub.priority);
+            for (Subscription sub : sites) {
+                EnclosureHandler encloseureHandler = new EnclosureHandler(history, sub.priority);
 
-			if (sub.enabled) {
-				try {
-					say("\nScanning subscription/feed: " + sub.url);
-					URL url = new URL(sub.url);
-					int foundStart = encloseureHandler.metaNets.size();
-					if (sub.maxDownloads == Subscription.GLOBAL)
-						encloseureHandler.setMax(globalMax);
-					else
-						encloseureHandler.setMax(sub.maxDownloads);
+                if (sub.enabled) {
+                    try {
+                        say("\nScanning subscription/feed: " + sub.url);
+                        URL url = new URL(sub.url);
+                        int foundStart = encloseureHandler.metaNets.size();
+                        if (sub.maxDownloads == Subscription.GLOBAL)
+                            encloseureHandler.setMax(globalMax);
+                        else
+                            encloseureHandler.setMax(sub.maxDownloads);
 
-					String name = sub.name;
-					encloseureHandler.setFeedName(name);
+                        String name = sub.name;
+                        encloseureHandler.setFeedName(name);
 
-					Util.findAvailablePodcasts(sub.url, encloseureHandler);
+                        Util.findAvailablePodcasts(sub.url, encloseureHandler);
 
-					String message = sitesScanned + "/" + sites.size() + ": " + name + ", "
-							+ (encloseureHandler.metaNets.size() - foundStart) + " new";
-					say(message);
-					contentService.updateNotification(message);
+                        String message = sitesScanned + "/" + sites.size() + ": " + name + ", "
+                                + (encloseureHandler.metaNets.size() - foundStart) + " new";
+                        say(message);
+                        contentService.updateNotification(message);
 
-				} catch (Throwable e) {
+                    } catch (Throwable e) {
 					/* Display any Error to the GUI. */
-					say("Error ex:" + e.getMessage());
-					Log.e("BAH", "bad", e);
-				}
-			} else {
-				say("\nSkipping subscription/feed: " + sub.url + " because it is not enabled.");
-			}
+                        say("Error ex:" + e.getMessage());
+                        Log.e("BAH", "bad", e);
+                    }
+                } else {
+                    say("\nSkipping subscription/feed: " + sub.url + " because it is not enabled.");
+                }
 
-			sitesScanned++;
+                sitesScanned++;
 
-			if (sub.orderingPreference == OrderingPreference.LIFO)
-				Collections.reverse(encloseureHandler.metaNets);
+                if (sub.orderingPreference == OrderingPreference.LIFO)
+                    Collections.reverse(encloseureHandler.metaNets);
 
-			enclosures.addAll(encloseureHandler.metaNets);
+                enclosures.addAll(encloseureHandler.metaNets);
 
-		} // endforeach
+            } // endforeach
 
-		say("\nTotal enclosures " + enclosures.size());
+            say("\nTotal enclosures " + enclosures.size());
 
-		List<MetaNet> newPodcasts = new ArrayList<MetaNet>();
-		for (MetaNet metaNet : enclosures) {
-			if (history.contains(metaNet))
-				continue;
-			newPodcasts.add(metaNet);
-		}
-		say(newPodcasts.size() + " podcasts will be downloaded.");
-		contentService.updateNotification(newPodcasts.size() + " podcasts will be downloaded.");
+            List<MetaNet> newPodcasts = new ArrayList<MetaNet>();
+            for (MetaNet metaNet : enclosures) {
+                if (history.contains(metaNet))
+                    continue;
+                newPodcasts.add(metaNet);
+            }
+            say(newPodcasts.size() + " podcasts will be downloaded.");
+            contentService.updateNotification(newPodcasts.size() + " podcasts will be downloaded.");
 
-		totalPodcasts = newPodcasts.size();
-		for (MetaNet metaNet : newPodcasts) {
-			podcastsTotalBytes += metaNet.getSize();
-		}
+            totalPodcasts = newPodcasts.size();
+            for (MetaNet metaNet : newPodcasts) {
+                podcastsTotalBytes += metaNet.getSize();
+            }
 
-		System.setProperty("http.maxRedirects", "50");
-		say("\n");
-		byte[] buf = new byte[16383];
+            System.setProperty("http.maxRedirects", "50");
+            say("\n");
+            byte[] buf = new byte[16383];
 
-		int got = 0;
-		for (int i = 0; i < newPodcasts.size(); i++) {
-			String shortName = newPodcasts.get(i).getTitle();
-			String localFileExt = getLocalFileExtFromMimetype(newPodcasts.get(i).getMimetype());
-			say((i + 1) + "/" + newPodcasts.size() + " " + shortName);
-			contentService.updateNotification((i + 1) + "/" + newPodcasts.size() + " " + shortName);
-			podcastsDownloaded = i + 1;
+            int got = 0;
+            for (int i = 0; i < newPodcasts.size(); i++) {
+                String shortName = newPodcasts.get(i).getTitle();
+                String localFileExt = getLocalFileExtFromMimetype(newPodcasts.get(i).getMimetype());
+                say((i + 1) + "/" + newPodcasts.size() + " " + shortName);
+                contentService.updateNotification((i + 1) + "/" + newPodcasts.size() + " " + shortName);
+                podcastsDownloaded = i + 1;
 
-			try {
-                Config config = new Config(contentService);
-				String prefix = "";
+                try {
+                    Config config = new Config(contentService);
+                    String prefix = "";
 
                                 /*
                                  * Non-priority podcast files are named XXXX.mp3, where XXXX is the millisecond timestamp at
@@ -172,68 +174,70 @@ public class DownloadHelper implements Sayer {
                                  *    The naming scheme used here *must* match MetaHolder.isPriority().
                                  */
 
-                                if ( newPodcasts.get(i).getPriority() )
-                                   if ( contentService.currentMeta() != null )
-                                      prefix = contentService.currentMeta().getBaseFilename() + ":00:";
+                    if (newPodcasts.get(i).getPriority())
+                        if (contentService.currentMeta() != null)
+                            prefix = contentService.currentMeta().getBaseFilename() + ":00:";
 
-                                String castFileName = prefix + System.currentTimeMillis() + localFileExt;
-				File castFile = config.getPodcastRootPath(castFileName);
+                    String castFileName = prefix + System.currentTimeMillis() + localFileExt;
+                    File castFile = config.getPodcastRootPath(castFileName);
 
 
-				Log.d("CarCast", "New podcast file: " + castFileName);
+                    Log.d("CarCast", "New podcast file: " + castFileName);
 
-				currentSubscription = newPodcasts.get(i).getSubscription();
-				currentTitle = newPodcasts.get(i).getTitle();
-				File tempFile = config.getPodcastRootPath( "tempFile");
-				say("Subscription: " + currentSubscription);
-				say("Title: " + currentTitle);
-				say("enclosure url: " + new URL(newPodcasts.get(i).getUrl()));
-				InputStream is = getInputStream(new URL(newPodcasts.get(i).getUrl()));
-				FileOutputStream fos = new FileOutputStream(tempFile);
-				int amt = 0;
-				int expectedSizeKilo = newPodcasts.get(i).getSize() / 1024;
-				String preDownload = sb.toString();
-				int totalForThisPodcast = 0;
-				say(String.format("%dk/%dk 0", totalForThisPodcast / 1024, expectedSizeKilo) + "%\n");
-				while ((amt = is.read(buf)) >= 0) {
-					fos.write(buf, 0, amt);
-					podcastsCurrentBytes += amt;
-					totalForThisPodcast += amt;
-					sb = new StringBuilder(preDownload
-							+ String.format("%dk/%dk  %d", totalForThisPodcast / 1024, expectedSizeKilo,
-									(int) ((totalForThisPodcast / 10.24) / expectedSizeKilo)) + "%\n");
-				}
-				say("download finished.");
-				fos.close();
-				is.close();
-				// add before rename, so if rename fails, we remember
-				// that we tried this file and skip it next time.
-				history.add(newPodcasts.get(i));
+                    currentSubscription = newPodcasts.get(i).getSubscription();
+                    currentTitle = newPodcasts.get(i).getTitle();
+                    File tempFile = config.getPodcastRootPath("tempFile");
+                    say("Subscription: " + currentSubscription);
+                    say("Title: " + currentTitle);
+                    say("enclosure url: " + new URL(newPodcasts.get(i).getUrl()));
+                    InputStream is = getInputStream(new URL(newPodcasts.get(i).getUrl()));
+                    FileOutputStream fos = new FileOutputStream(tempFile);
+                    int amt = 0;
+                    int expectedSizeKilo = newPodcasts.get(i).getSize() / 1024;
+                    String preDownload = sb.toString();
+                    int totalForThisPodcast = 0;
+                    say(String.format("%dk/%dk 0", totalForThisPodcast / 1024, expectedSizeKilo) + "%\n");
+                    while ((amt = is.read(buf)) >= 0) {
+                        fos.write(buf, 0, amt);
+                        podcastsCurrentBytes += amt;
+                        totalForThisPodcast += amt;
+                        sb = new StringBuilder(preDownload
+                                + String.format("%dk/%dk  %d", totalForThisPodcast / 1024, expectedSizeKilo,
+                                (int) ((totalForThisPodcast / 10.24) / expectedSizeKilo)) + "%\n");
+                    }
+                    say("download finished.");
+                    fos.close();
+                    is.close();
+                    // add before rename, so if rename fails, we remember
+                    // that we tried this file and skip it next time.
+                    history.add(newPodcasts.get(i));
 
-				tempFile.renameTo(castFile);
-				new MetaFile(newPodcasts.get(i), castFile).save();
+                    tempFile.renameTo(castFile);
+                    new MetaFile(newPodcasts.get(i), castFile).save();
 
-				got++;
-				if (totalForThisPodcast != newPodcasts.get(i).getSize()) {
-					say("Note: reported size (in feed) doesnt match actual size (downloaded file)");
-					// subtract out wrong value
-					podcastsTotalBytes -= newPodcasts.get(i).getSize();
-					// add in correct value
-					podcastsTotalBytes += totalForThisPodcast;
+                    got++;
+                    if (totalForThisPodcast != newPodcasts.get(i).getSize()) {
+                        say("Note: reported size (in feed) doesnt match actual size (downloaded file)");
+                        // subtract out wrong value
+                        podcastsTotalBytes -= newPodcasts.get(i).getSize();
+                        // add in correct value
+                        podcastsTotalBytes += totalForThisPodcast;
 
-				}
-				say("-");
-				// update progress for player
-				contentService.newContentAdded();
+                    }
+                    say("-");
+                    // update progress for player
+                    contentService.newContentAdded();
 
-			} catch (Throwable e) {
-				say("Problem downloading " + newPodcasts.get(i).getUrl() + " e:" + e);
-			}
-		}
-		say("Finished. Downloaded " + got + " new podcasts. " + sdf.format(new Date()));
+                } catch (Throwable e) {
+                    say("Problem downloading " + newPodcasts.get(i).getUrl() + " e:" + e);
+                }
+            }
+            say("Finished. Downloaded " + got + " new podcasts. " + sdf.format(new Date()));
 
-		contentService.doDownloadCompletedNotification(got);
-		idle = true;
+            contentService.doDownloadCompletedNotification(got);
+        } finally {
+            isRunning = false;
+        }
 	}
 
 	// Deal with servers with "location" instead of "Location" in redirect
@@ -262,23 +266,13 @@ public class DownloadHelper implements Sayer {
 			for (int i = 0; i < 50; i++) {
 				if (con.getHeaderFieldKey(i) == null)
 					continue;
-				// println
-				// "key="+con.getHeaderFieldKey(i)+" field="+con.getHeaderField(i)
 				if (con.getHeaderFieldKey(i).toLowerCase().equals("location")) {
 					url = new URL(con.getHeaderField(i));
-					// say("key=" + con.getHeaderFieldKey(i) + " field="
-					// + con.getHeaderField(i));
 				}
 			}
 			if (url == null) {
 				say("Got 302 without Location");
-				// String x = "";
-				// for (int jj = 0; jj < 50; jj++) {
-				// x += ", " + con.getHeaderFieldKey(jj);
-				// }
-				// say("headers " + x);
 			}
-			// println "next: "+url
 		}
 		throw new IOException(CarCastApplication.getAppTitle() + " redirect limit reached");
 	}
@@ -289,6 +283,14 @@ public class DownloadHelper implements Sayer {
 		return "Fetching " + podcastsDownloaded + "/" + totalPodcasts + "\n" + (podcastsCurrentBytes / 1024) + "k/"
 				+ (podcastsTotalBytes / 1024) + "k";
 	}
+
+    public String getEncodedStatus(){
+        String status = (isRunning() ? "running" : "done") + "," + sitesScanned + "," + totalSites + ","
+                + podcastsDownloaded + "," + totalPodcasts + "," + podcastsCurrentBytes + ","
+                + podcastsTotalBytes + "," + currentSubscription + "," + currentTitle;
+        return status;
+
+    }
 
 	/**
 	 * CarCast sends your list of subscriptions to jadn.com so that the list can be used to make the populate search the

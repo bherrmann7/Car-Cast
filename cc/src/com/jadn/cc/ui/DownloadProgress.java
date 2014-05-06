@@ -220,7 +220,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		subscriptionName.setText(status[6]);
 		title.setText(status[7]);
 
-		if (downloadStatus.startsWith("idle,")) {
+		if (downloadStatus.startsWith("done,")) {
 			if (status[3].equals("0")) {
 				progressSimple.setVisibility(TextView.VISIBLE);
 				progressSimple.setText("  No new podcasts found.");

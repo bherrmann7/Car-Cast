@@ -18,7 +18,7 @@ import android.util.Log;
 
 public class WifiConnectedReceiver extends BroadcastReceiver {
 
-	static void registerForWifiBroadcasts(Context context) {
+	public static void registerForWifiBroadcasts(Context context) {
 		context.registerReceiver(new WifiConnectedReceiver(), new IntentFilter(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
 	}
 

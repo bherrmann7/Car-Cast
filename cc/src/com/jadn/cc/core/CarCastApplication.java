@@ -15,6 +15,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
     public final static String[] releaseData = new String[]{
+            "04-MAY-2014", "Keep download results after download is completed... for analysis...",
             "23-APR-2014", "If KitKat 4.4, display better data location error message.  Fix podcast deletions again...",
             "30-DEC-2013", "Fix the 'Erase History' function on the Subscription edit popup - it wasn't reliable.",
             "15-NOV-2013", "Use the Apple iTunes database for finding podcasts.  Thanks Apple! They maintain a good public database.",
@@ -207,7 +208,7 @@ public class CarCastApplication extends Application {
     public void onCreate() {
         super.onCreate();
         serviceIntent = new Intent(this, ContentService.class);
-        WifiConnectedReceiver.registerForWifiBroadcasts(getApplicationContext());
+        //WifiConnectedReceiver.registerForWifiBroadcasts(getApplicationContext());
     }
 
     private ServiceConnection contentServiceConnection = new ServiceConnection() {
