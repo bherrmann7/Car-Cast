@@ -38,7 +38,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 		if (status.equals("")) {
 			idle = true;
 		} else {
-			if (status.split(",")[0].equals("idle")) {
+			if (status.split(",")[0].equals("done")) {
 				idle = true;
 			}
 		}
@@ -163,7 +163,7 @@ public class DownloadProgress extends BaseActivity implements Runnable {
 			if (!downloadStatus.equals("")) {
 				updateFromString(downloadStatus);
 			}
-			if (downloadStatus.equals("") || downloadStatus.startsWith("idle,")) {
+			if (downloadStatus.equals("") || downloadStatus.startsWith("done,")) {
 				findViewById(R.id.startDownloads).setEnabled(true);
 				findViewById(R.id.AbortDownloads).setEnabled(false);
 			} else {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -58,10 +59,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     public void setApplicationContext(Context context) {
         this.context = context;
         try {
-            if ( mediaPlayer == null )
-            {
-                 mediaPlayer = new MediaPlayer(context, true);
-                 fullReset();
+            if (mediaPlayer == null) {
+                mediaPlayer = new MediaPlayer(context, true);
+                fullReset();
             }
         } catch (Exception e) {
             Log.d("CarCast", "Error doing reset", e);
@@ -118,9 +118,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     }
 
     public MetaFile currentMeta() {
-        if ( metaHolder.getSize() == 0 ) return null;
-        if ( currentPodcastInPlayer == -1 ) return null;
-        if ( metaHolder.getSize() <= currentPodcastInPlayer ) return null;
+        if (metaHolder.getSize() == 0) return null;
+        if (currentPodcastInPlayer == -1) return null;
+        if (metaHolder.getSize() <= currentPodcastInPlayer) return null;
         return metaHolder.get(currentPodcastInPlayer);
     }
 
@@ -176,9 +176,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         return sb.toString();
     }
 
-    boolean isDownloading(){
-        if(downloadHelper == null)
-                return false;
+    boolean isDownloading() {
+        if (downloadHelper == null)
+            return false;
         return downloadHelper.isRunning();
     }
 
@@ -495,7 +495,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (currentMeta()==null)
+        if (currentMeta() == null)
             return;
         currentMeta().setCurrentPos(0);
         currentMeta().setListenedTo();
@@ -593,30 +593,30 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-            int not_sticky = Service.START_NOT_STICKY;
-            Log.i("CarCast", "ContentService.onStartCommand()");
+        int not_sticky = Service.START_NOT_STICKY;
+        Log.i("CarCast", "ContentService.onStartCommand()");
 
-            Bundle extras = intent.getExtras();
-            String external = extras.getString("external");
+        Bundle extras = intent.getExtras();
+        String external = extras.getString("external");
 
-            if ( external == null )
-                 return not_sticky;
-
-            Log.i("CarCast", "ContentService got intent with external extra:" + external);
-
-            if ( mediaPlayer == null )
-               setApplicationContext(getApplicationContext());
-
-            if ( external.equals(ExternalReceiver.PAUSE) )
-                 pauseNow();
-
-            if ( external.equals(ExternalReceiver.PLAY) && ! isPlaying() )
-                 play();
-
-            if ( external.equals(ExternalReceiver.PAUSEPLAY) )
-                 pauseOrPlay();
-
+        if (external == null)
             return not_sticky;
+
+        Log.i("CarCast", "ContentService got intent with external extra:" + external);
+
+        if (mediaPlayer == null)
+            setApplicationContext(getApplicationContext());
+
+        if (external.equals(ExternalReceiver.PAUSE))
+            pauseNow();
+
+        if (external.equals(ExternalReceiver.PLAY) && !isPlaying())
+            play();
+
+        if (external.equals(ExternalReceiver.PAUSEPLAY))
+            pauseOrPlay();
+
+        return not_sticky;
     }
 
     public void headsetStatusChanged(boolean headsetPresent) {
@@ -779,6 +779,14 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     // can be active at any time.
     //
     public synchronized void startDownloadingNewPodCasts(final int max) {
+        if (downloadHelper != null && downloadHelper.isRunning()) {
+            Log.w("carcast", "abort start - carcast already running");
+            return;
+        } else {
+            downloadHelper = new DownloadHelper(max);
+        }
+
+        Log.w("carcast", "startDownloadingNewPodCasts");
         boolean autoDelete = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("autoDelete", false);
         if (autoDelete) {
             for (int i = metaHolder.getSize() - 1; i >= 0; i--) {
@@ -795,73 +803,68 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             }
         }
 
-        if (downloadHelper == null || !downloadHelper.isRunning()) {
-            downloadHelper = new DownloadHelper(max);
-            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
-            mNotificationManager.cancel(22);
-            updateNotification("Downloading podcasts started");
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(22);
+        updateNotification("Downloading podcasts started");
 
-            new Thread() {
-                @Override
-                public void run() {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    partialWakeLock.acquire();
+
+                    Log.i("CarCast", "starting download thread.");
+                    // Lets not the phone go to sleep while doing
+                    // downloads....
+                    PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                    PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ContentService download thread");
+
+                    WifiManager.WifiLock wifiLock = null;
+
                     try {
-                        partialWakeLock.acquire();
+                        // The intent here is keep the phone from shutting
+                        // down during a download.
+                        wl.acquire();
 
-                        Log.i("CarCast", "starting download thread.");
-                        // Lets not the phone go to sleep while doing
-                        // downloads....
-                        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-                        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ContentService download thread");
-
-                        WifiManager.WifiLock wifiLock = null;
-
-                        try {
-                            // The intent here is keep the phone from shutting
-                            // down during a download.
-                            wl.acquire();
-
-                            // If we have wifi now, lets hold on to it.
-                            WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-                            if (wifi.isWifiEnabled()) {
-                                wifiLock = wifi.createWifiLock("CarCast");
-                                if (wifiLock != null)
-                                    wifiLock.acquire();
-                                Log.i("CarCast", "Locked Wifi.");
-                            }
-
-                            String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
-                                    "none");
-                            boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
-                                    "canCollectData", true);
-                            // I've not been using this data.   Primarily this was used to seed the podcast database, but I'm thinking
-                            // of using Apple's itunes database going forward.   They do a better job.
-                            canCollectData = false;
-
-                            downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
-                        } finally {
-                            if (wifiLock != null) {
-                                try {
-                                    wifiLock.release();
-                                    Log.i("CarCast", "released Wifi.");
-                                } catch (Throwable t) {
-                                    Log.i("CarCast", "Yikes, issue releasing Wifi.");
-                                }
-                            }
-
-                            wl.release();
+                        // If we have wifi now, lets hold on to it.
+                        WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+                        if (wifi.isWifiEnabled()) {
+                            wifiLock = wifi.createWifiLock("CarCast");
+                            if (wifiLock != null)
+                                wifiLock.acquire();
+                            Log.i("CarCast", "Locked Wifi.");
                         }
-                    } catch (Throwable t) {
-                        Log.i("CarCast", "Unpleasentness during download: " + t.getMessage());
+
+                        String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
+                                "none");
+                        boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
+                                "canCollectData", true);
+                        // I've not been using this data.   Primarily this was used to seed the podcast database, but I'm thinking
+                        // of using Apple's itunes database going forward.   They do a better job.
+                        canCollectData = false;
+
+                        downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
                     } finally {
-                        Log.i("CarCast", "finished download thread.");
-                        partialWakeLock.release();
+                        if (wifiLock != null) {
+                            try {
+                                wifiLock.release();
+                                Log.i("CarCast", "released Wifi.");
+                            } catch (Throwable t) {
+                                Log.i("CarCast", "Yikes, issue releasing Wifi.");
+                            }
+                        }
+
+                        wl.release();
                     }
+                } catch (Throwable t) {
+                    Log.i("CarCast", "Unpleasentness during download: " + t.getMessage());
+                } finally {
+                    Log.i("CarCast", "finished download thread.");
+                    partialWakeLock.release();
                 }
-            }.start();
-        }
-        else {
-            Log.w("CarCast", "Not downloading podcasts: download already active.");
-        }
+            }
+        }.start();
+
     }
 
     public String startSearch(String search) {
