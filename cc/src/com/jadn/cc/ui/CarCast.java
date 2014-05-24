@@ -1,13 +1,10 @@
 package com.jadn.cc.ui;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -29,7 +26,6 @@ import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.MediaMode;
 import com.jadn.cc.trace.ExceptionHandler;
-import com.jadn.cc.util.Recording;
 import com.jadn.cc.util.RecordingSet;
 import com.jadn.cc.util.Updater;
 
@@ -90,9 +86,17 @@ public class CarCast extends MediaControlActivity {
 		}
 	}
 
-	private boolean isKindleAndNoMicrophone() {
-		// Yea, should be something like "Capabilities.has(MICROPHONE)" - but Android doesnt seem to have this
-		return android.os.Build.MODEL.equals("Kindle Fire");
+    // Yea, should be something like "Capabilities.has(MICROPHONE)" - but Android doesnt seem to have this
+	private boolean isDeviceWithoutMicrophone() {
+        // From https://developer.amazon.com/appsandservices/solutions/devices/kindle-fire/specifications/01-device-and-feature-specifications
+        // The Kindle Fire HDX has a microphone
+        if ( android.os.Build.MODEL.equals("KFAPWA (WAN)") ||
+                android.os.Build.MODEL.equals("KFAPWI (Wi-Fi)") ){
+            return false;
+        }
+        // Other kindles do not.
+		return android.os.Build.MODEL.equals("Kindle Fire")
+                || android.os.Build.MODEL.startsWith("KF");
 	}
 
 	/** Called when the activity is first created. */
@@ -238,7 +242,7 @@ public class CarCast extends MediaControlActivity {
 	}
 
     public boolean isAudioRecorderOff(){
-        if (isKindleAndNoMicrophone()){
+        if (isDeviceWithoutMicrophone()){
             return true;
         }
         app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
