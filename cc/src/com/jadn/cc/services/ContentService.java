@@ -28,10 +28,12 @@ import android.widget.Toast;
 
 import com.aocate.media.MediaPlayer;
 import com.jadn.cc.R;
+import com.jadn.cc.core.AudioFocusHelper;
 import com.jadn.cc.core.CarCastApplication;
 import com.jadn.cc.core.Config;
 import com.jadn.cc.core.Location;
 import com.jadn.cc.core.MediaMode;
+import com.jadn.cc.core.MusicFocusable;
 import com.jadn.cc.core.Subscription;
 import com.jadn.cc.core.WifiConnectedReceiver;
 import com.jadn.cc.trace.TraceUtil;
@@ -39,7 +41,7 @@ import com.jadn.cc.ui.CarCast;
 import com.jadn.cc.util.ExportOpml;
 import com.jadn.cc.util.MailRecordings;
 
-public class ContentService extends Service implements MediaPlayer.OnCompletionListener {
+public class ContentService extends Service implements MediaPlayer.OnCompletionListener, MusicFocusable {
     private final IBinder binder = new LocalBinder();
     int currentPodcastInPlayer = -1;
     DownloadHelper downloadHelper;
@@ -55,6 +57,27 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     private Context context;
     private Config config;
     FileSubscriptionHelper subHelper;
+    enum PauseReason {
+        UserRequest,  // paused by user request
+        FocusLoss,    // paused because of audio focus loss
+    };
+
+    // why did we pause?
+    PauseReason mPauseReason = PauseReason.UserRequest;
+
+    // do we have audio focus?
+    enum AudioFocus {
+        NoFocusNoDuck,    // we don't have audio focus, and can't duck
+        NoFocusCanDuck,   // we don't have focus, but can play at a low volume ("ducking")
+        Focused           // we have full audio focus
+    }
+    AudioFocus mAudioFocus = AudioFocus.NoFocusNoDuck;
+
+
+    // Lifted from RandomMusicPlayer google reference application
+    // our AudioFocusHelper object, if it's available (it's available on SDK level >= 8)
+    // If not available, this will be null. Always check for null before using!
+    AudioFocusHelper mAudioFocusHelper = null;
 
     public void setApplicationContext(Context context) {
         this.context = context;
@@ -589,6 +612,12 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             }
         }
 
+        // create the Audio Focus Helper, if the Audio Focus feature is available (SDK 8 or above)
+        if (android.os.Build.VERSION.SDK_INT >= 8)
+            mAudioFocusHelper = new AudioFocusHelper(getApplicationContext(), this);
+        else
+            mAudioFocus = AudioFocus.Focused; // no focus feature, so we always "have" audio focus
+
     }
 
     @Override
@@ -639,7 +668,17 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
         // Make sure our notification is gone.
         disableNotification();
+
+        giveUpAudioFocus();
     }
+
+
+    void giveUpAudioFocus() {
+        if (mAudioFocus == AudioFocus.Focused && mAudioFocusHelper != null
+                && mAudioFocusHelper.abandonFocus())
+            mAudioFocus = AudioFocus.NoFocusNoDuck;
+    }
+
 
     public void pauseNow() {
         if (mediaPlayer.isPlaying()) {
@@ -688,6 +727,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
             if (!fullReset())
                 return;
+
+            tryToGetAudioFocus();
 
             // say(activity, "started " + currentTitle());
             mediaPlayer.start();
@@ -837,11 +878,6 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
                         String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
                                 "none");
-                        boolean canCollectData = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(
-                                "canCollectData", true);
-                        // I've not been using this data.   Primarily this was used to seed the podcast database, but I'm thinking
-                        // of using Apple's itunes database going forward.   They do a better job.
-                        canCollectData = false;
 
                         downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
                     } finally {
@@ -1148,6 +1184,34 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         };
         publishRecordingsThread.start();
 
+    }
+
+    /** Signals that audio focus was gained. */
+    public void onGainedAudioFocus(){
+        Toast.makeText(getApplicationContext(), "CarCast: gained audio focus.", Toast.LENGTH_SHORT).show();
+        mAudioFocus = AudioFocus.Focused;
+
+        play();
+    }
+
+    /**
+     * Signals that audio focus was lost.
+     *
+     * @param canDuck If true, audio can continue in "ducked" mode (low volume). Otherwise, all
+     * audio must stop.
+     */
+    public void onLostAudioFocus(boolean canDuck){
+        Toast.makeText(getApplicationContext(), "lost audio focus." + (canDuck ? "can duck" :
+                "no duck"), Toast.LENGTH_SHORT).show();
+        mAudioFocus = canDuck ? AudioFocus.NoFocusCanDuck : AudioFocus.NoFocusNoDuck;
+
+        pauseNow();
+    }
+
+    void tryToGetAudioFocus() {
+        if (mAudioFocus != AudioFocus.Focused && mAudioFocusHelper != null
+                && mAudioFocusHelper.requestFocus())
+            mAudioFocus = AudioFocus.Focused;
     }
 
 
