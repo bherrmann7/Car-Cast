@@ -58,16 +58,7 @@
         android:key="autoPlayNext"
         android:summary="When the current podcast finishes, play the next one"
         android:title="Auto play next" />
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="canCollectData"
-        android:summary="Data helps us improve"
-        android:title="Allow data collection" />
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="emailSecret"
-        android:summary="Used for internal tracking only"
-        android:title="Keep email address secret" />
+
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="notifiyOnZeroDownloads"

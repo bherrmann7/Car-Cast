@@ -63,7 +63,7 @@ public class DownloadHelper implements Sayer {
 		return ".bin";
 	}
 
-	protected void downloadNewPodCasts(ContentService contentService, String accounts, boolean canCollectData) {
+	protected void downloadNewPodCasts(ContentService contentService) {
         try {
             DownloadHistory history = new DownloadHistory(contentService);
 
@@ -72,9 +72,6 @@ public class DownloadHelper implements Sayer {
 
             List<Subscription> sites = contentService.getSubscriptions();
 
-            if (canCollectData) {
-                postSitesToJadn(accounts, sites);
-            }
 
             say("\nSearching " + sites.size() + " subscriptions. " + sdf.format(new Date()));
 
@@ -291,64 +288,6 @@ public class DownloadHelper implements Sayer {
         return status;
 
     }
-
-	/**
-	 * CarCast sends your list of subscriptions to jadn.com so that the list can be used to make the populate search the
-	 * search engine. This information is collected only if the checkbox is set in the settings
-	 */
-	private void postSitesToJadn(final String accounts, final List<Subscription> sites) {
-
-		// Do this in the background so user doesn't wait for data collection...
-		// they hate that. :)
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					// Construct data
-					StringBuilder data = new StringBuilder();
-					boolean first = true;
-					for (Subscription sub : sites) {
-						if (first)
-							first = false;
-						else
-							data.append('|');
-						data.append(sub.url);
-					}
-
-					// Send data - we collect sites to build the searchable podcast database
-					URL url = new URL("http://jadn.com/carcast/collectSites");
-					// URL url = new
-					// URL("http://192.168.0.128:9090/carcast/collectSites");
-					URLConnection conn = url.openConnection();
-					conn.setConnectTimeout(20 * 1000);
-					conn.setReadTimeout(20 * 1000);
-					conn.setDoOutput(true);
-					OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-					wr.write("appVersion=" + URLEncoder.encode(CarCastApplication.getVersion(), "UTF-8"));
-					wr.write('&');
-					wr.write("accounts=" + URLEncoder.encode(accounts, "UTF-8"));
-					wr.write('&');
-					wr.write("sites=" + URLEncoder.encode(data.toString(), "UTF-8"));
-					wr.flush();
-
-					// Get the response
-					BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-					// String line = null;
-					while ((rd.readLine()) != null) {
-						// Process line...
-						// Log.d("carcast",line);
-					}
-					wr.close();
-					rd.close();
-				} catch (Exception e) {
-					Log.e("carcast", "updateSite", e);
-				}
-
-			}
-		}).start();
-
-	}
 
 	@Override
 	public void say(String text) {
