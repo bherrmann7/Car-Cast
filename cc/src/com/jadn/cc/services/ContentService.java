@@ -50,7 +50,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     MediaPlayer mediaPlayer = null;
     MetaHolder metaHolder;
     SearchHelper searchHelper;
-    boolean wasPausedByPhoneCall;
+
     private PlayStatusListener playStatusListener;
     private HeadsetReceiver headsetReceiver;
     private RemoteControlReceiver remoteControlReceiver;
@@ -58,6 +58,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     private Config config;
     FileSubscriptionHelper subHelper;
     enum PauseReason {
+        PhoneCall,
         UserRequest,  // paused by user request
         FocusLoss,    // paused because of audio focus loss
     };
@@ -561,13 +562,13 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                     // It's possible that this listener is registered before the setApplicationContext
                     // method is called, which establishes the MediaPlayer instance.
                     if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                        wasPausedByPhoneCall = true;
+                        mPauseReason = PauseReason.PhoneCall;
                         pauseNow();
                     }
                 }
 
-                if (state == TelephonyManager.CALL_STATE_IDLE && wasPausedByPhoneCall) {
-                    wasPausedByPhoneCall = false;
+                if (state == TelephonyManager.CALL_STATE_IDLE && mPauseReason == PauseReason.PhoneCall ) {
+                    mPauseReason = PauseReason.UserRequest;
                     pauseOrPlay();
                 }
             }
@@ -879,7 +880,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                         String accounts = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("accounts",
                                 "none");
 
-                        downloadHelper.downloadNewPodCasts(ContentService.this, accounts, canCollectData);
+                        downloadHelper.downloadNewPodCasts(ContentService.this);
                     } finally {
                         if (wifiLock != null) {
                             try {
@@ -1191,7 +1192,10 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         Toast.makeText(getApplicationContext(), "CarCast: gained audio focus.", Toast.LENGTH_SHORT).show();
         mAudioFocus = AudioFocus.Focused;
 
-        play();
+        if(mPauseReason == PauseReason.FocusLoss) {
+            mPauseReason = PauseReason.UserRequest;
+            play();
+        }
     }
 
     /**
@@ -1205,7 +1209,10 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                 "no duck"), Toast.LENGTH_SHORT).show();
         mAudioFocus = canDuck ? AudioFocus.NoFocusCanDuck : AudioFocus.NoFocusNoDuck;
 
-        pauseNow();
+        if(isPlaying()){
+            mPauseReason = PauseReason.FocusLoss;
+            pauseNow();
+        }
     }
 
     void tryToGetAudioFocus() {
