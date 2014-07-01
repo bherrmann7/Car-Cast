@@ -1,9 +1,25 @@
+---
 
 The PrestoClient subdirectory has it's own Apache style license.
 
-License text from http://www.opensource.org/licenses/mit-license.php
+http://www.apache.org/licenses/LICENSE-2.0
+
+---
+
+Portions of this software were taken from Google's example "RandomMusicPlayer" which is under
+
+       https://android.googlesource.com/platform/development/+/master/samples/RandomMusicPlayer
+
+       Which uses,
+        http://www.apache.org/licenses/LICENSE-2.0
+
+---
 
 Copyright (c) 2010,2014 Bob Herrmann, 4 Amandas Way, Groton, MA 01876
+
+CarCast is licensed under  http://www.opensource.org/licenses/mit-license.php (which is copied below)
+
+
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
