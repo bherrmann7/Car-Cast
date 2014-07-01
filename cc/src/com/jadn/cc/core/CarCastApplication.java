@@ -15,7 +15,7 @@ import com.jadn.cc.trace.TraceUtil;
 
 public class CarCastApplication extends Application {
     public final static String[] releaseData = new String[]{
-            "30-JUN-2014", "Pause when the GPS (or another app) starts speaking.\n\nBluetooth play/pause next/prev working.",
+            "01-JUL-2014", "Pause when the GPS (or another app) starts speaking.\n\nBluetooth play/pause next/prev working.",
             "18-MAY-2014", "(Another crack at) Fix enabling of Start Download button, try to prevent 2 carcast downloads at once",
             "04-MAY-2014", "Keep download results after download is completed... for analysis...",
             "23-APR-2014", "If KitKat 4.4, display better data location error message.  Fix podcast deletions again...",

@@ -6,13 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.KeyEvent;
 
+// Handles,
+//   <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+//   <action android:name="android.intent.action.MEDIA_BUTTON" />
+//
 public class MusicIntentReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
-            if(isInitialStickyBroadcast())
-                return;
-        } else if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+        // Otherwise, it seems to replay the last Intent after connecting via Bluetooth,
+        if (isInitialStickyBroadcast())
+            return;
+        if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
             KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
             if (keyEvent.getAction() != KeyEvent.ACTION_DOWN)
                 return;
