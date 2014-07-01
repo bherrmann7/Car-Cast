@@ -32,7 +32,7 @@ import com.jadn.cc.util.Updater;
 import java.io.File;
 import java.lang.reflect.Method;
 
-public class CarCast extends MediaControlActivity {
+public class CarCast extends BaseActivity {
 	final static String tag = CarCast.class.getSimpleName();
 	boolean toggleOnPause;
 	Updater updater;

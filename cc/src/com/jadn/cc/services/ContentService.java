@@ -14,6 +14,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.*;
+import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.aocate.media.MediaPlayer;
@@ -52,16 +54,18 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     SearchHelper searchHelper;
 
     private PlayStatusListener playStatusListener;
-    private HeadsetReceiver headsetReceiver;
     private RemoteControlReceiver remoteControlReceiver;
     private Context context;
     private Config config;
     FileSubscriptionHelper subHelper;
+
     enum PauseReason {
         PhoneCall,
         UserRequest,  // paused by user request
         FocusLoss,    // paused because of audio focus loss
-    };
+    }
+
+    ;
 
     // why did we pause?
     PauseReason mPauseReason = PauseReason.UserRequest;
@@ -72,8 +76,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         NoFocusCanDuck,   // we don't have focus, but can play at a low volume ("ducking")
         Focused           // we have full audio focus
     }
-    AudioFocus mAudioFocus = AudioFocus.NoFocusNoDuck;
 
+    AudioFocus mAudioFocus = AudioFocus.NoFocusNoDuck;
 
     // Lifted from RandomMusicPlayer google reference application
     // our AudioFocusHelper object, if it's available (it's available on SDK level >= 8)
@@ -564,10 +568,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                     if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                         mPauseReason = PauseReason.PhoneCall;
                         pauseNow();
+                        bumpForwardSeconds(-5);
                     }
                 }
 
-                if (state == TelephonyManager.CALL_STATE_IDLE && mPauseReason == PauseReason.PhoneCall ) {
+                if (state == TelephonyManager.CALL_STATE_IDLE && mPauseReason == PauseReason.PhoneCall) {
                     mPauseReason = PauseReason.UserRequest;
                     pauseOrPlay();
                 }
@@ -585,19 +590,16 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
         restoreState();
 
-        // Due to some crazy quirks in Android, this cannot be done in the
-        // manifest and must be done manually like this. See
-        // http://groups.google.com/group/android-developers/browse_thread/thread/6d0dda99b4f42c8f/d7de082acdb0da25
-        headsetReceiver = new HeadsetReceiver(this);
-        registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
-        registerReceiver(headsetReceiver, new IntentFilter(Intent.ACTION_MEDIA_BUTTON));
+//        remoteControlReceiver = new RemoteControlReceiver(this);
+//        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+//        priority cribbed from
+//        http://www.gauntface.co.uk/blog/2010/04/14/using-android-headset-buttons-earphone-buttons/
+//        intentFilter.setPriority(10*IntentFilter.SYSTEM_HIGH_PRIORITY);
+//        registerReceiver(remoteControlReceiver, intentFilter);
 
-        // remoteControlReceiver = new RemoteControlReceiver(this);
-        // IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-        // priority cribbed from
-        // http://www.gauntface.co.uk/blog/2010/04/14/using-android-headset-buttons-earphone-buttons/
-        // intentFilter.setPriority(10*IntentFilter.SYSTEM_HIGH_PRIORITY);
-        // registerReceiver(remoteControlReceiver, intentFilter);
+        AudioManager mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        ComponentName mMediaButtonReceiverComponent = new ComponentName(this, MusicIntentReceiver.class);
+        mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
 
         // foreground stuff
         try {
@@ -626,6 +628,45 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         int not_sticky = Service.START_NOT_STICKY;
         Log.i("CarCast", "ContentService.onStartCommand()");
 
+        if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+            KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
+
+            switch (keyEvent.getKeyCode()) {
+                case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                    pauseOrPlay();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PLAY:
+                    if (!isPlaying()) {
+                        play();
+                    }
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                case KeyEvent.KEYCODE_MEDIA_STOP:
+                    pauseNow();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_NEXT:
+                    bumpForwardSeconds(30);
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                    bumpForwardSeconds(-30);
+                    break;
+            }
+            return not_sticky;
+        }
+
+        if (intent.getAction().equals(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+            // if unplugged
+            if (intent.getIntExtra("state", 0) == 0 && isPlaying()) {
+                pauseNow();
+                bumpForwardSeconds(-2);
+                if (playStatusListener != null) {
+                    playStatusListener.playStateUpdated(false);
+                }
+
+            }
+            return not_sticky;
+        }
+
         Bundle extras = intent.getExtras();
         String external = extras.getString("external");
 
@@ -649,20 +690,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         return not_sticky;
     }
 
-    public void headsetStatusChanged(boolean headsetPresent) {
-        Log.i("CarCast", "ContentService got intent that headset present is " + headsetPresent);
-        if (!headsetPresent && isPlaying()) {
-            pauseNow();
-            bumpForwardSeconds(-2);
-            if (playStatusListener != null) {
-                playStatusListener.playStateUpdated(false);
-            }
-        }
-    }
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(headsetReceiver);
         super.onDestroy();
         Log.i("CarCast", "ContentService destroyed");
         // Toast.makeText(getApplication(), "Service Destroyed", 1000).show();
@@ -671,6 +701,11 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         disableNotification();
 
         giveUpAudioFocus();
+
+        AudioManager mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        ComponentName mMediaButtonReceiverComponent = new ComponentName(this, MusicIntentReceiver.class);
+        mAudioManager.unregisterMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+
     }
 
 
@@ -1187,12 +1222,14 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
 
     }
 
-    /** Signals that audio focus was gained. */
-    public void onGainedAudioFocus(){
-        Toast.makeText(getApplicationContext(), "CarCast: gained audio focus.", Toast.LENGTH_SHORT).show();
+    /**
+     * Signals that audio focus was gained.
+     */
+    public void onGainedAudioFocus() {
+        //Toast.makeText(getApplicationContext(), "CarCast: gained audio focus.", Toast.LENGTH_SHORT).show();
         mAudioFocus = AudioFocus.Focused;
 
-        if(mPauseReason == PauseReason.FocusLoss) {
+        if (mPauseReason == PauseReason.FocusLoss) {
             mPauseReason = PauseReason.UserRequest;
             play();
         }
@@ -1202,16 +1239,17 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
      * Signals that audio focus was lost.
      *
      * @param canDuck If true, audio can continue in "ducked" mode (low volume). Otherwise, all
-     * audio must stop.
+     *                audio must stop.
      */
-    public void onLostAudioFocus(boolean canDuck){
-        Toast.makeText(getApplicationContext(), "lost audio focus." + (canDuck ? "can duck" :
-                "no duck"), Toast.LENGTH_SHORT).show();
+    public void onLostAudioFocus(boolean canDuck) {
+//        Toast.makeText(getApplicationContext(), "lost audio focus." + (canDuck ? "can duck" :
+//                "no duck"), Toast.LENGTH_SHORT).show();
         mAudioFocus = canDuck ? AudioFocus.NoFocusCanDuck : AudioFocus.NoFocusNoDuck;
 
-        if(isPlaying()){
+        if (isPlaying()) {
             mPauseReason = PauseReason.FocusLoss;
             pauseNow();
+            bumpForwardSeconds(-3);
         }
     }
 
