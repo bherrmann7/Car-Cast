@@ -177,6 +177,9 @@ public class Subscriptions extends BaseActivity {
 		if (item.getItemId() == R.id.export) {
 			exportOpml();
 		}
+        if (item.getItemId() == R.id.importx) {
+            startActivityForResult(new Intent(this, OpmlLocator.class), 0);
+        }
 		return super.onMenuItemSelected(featureId, item);
 
 	}

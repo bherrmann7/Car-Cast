@@ -6,7 +6,6 @@ import org.xmlpull.v1.XmlPullParser;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Xml;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,7 +18,7 @@ import com.jadn.cc.core.Subscription;
 public class OpmlImport extends BaseActivity {
 
 	boolean replaceAllonImport = true;
-	Uri feedUrl;
+	Uri feedFile;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +45,7 @@ public class OpmlImport extends BaseActivity {
 			}
 		});
 
-		feedUrl = getIntent().getData();
+		feedFile = getIntent().getData();
 
 	}
 
@@ -56,7 +55,7 @@ public class OpmlImport extends BaseActivity {
 		}
 		InputStream in = null;
 		try {
-			in = getContentResolver().openInputStream(feedUrl);
+			in = getContentResolver().openInputStream(feedFile);
 			XmlPullParser parser = Xml.newPullParser();
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 			parser.setInput(in, null);
@@ -78,7 +77,8 @@ public class OpmlImport extends BaseActivity {
 			Toast.makeText(getApplicationContext(), "Imported "+count+" subscriptions", Toast.LENGTH_LONG).show();
 			finish();
 		} catch (Throwable t) {
-			t.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Yikes "+t.getMessage(), Toast.LENGTH_LONG).show();
+			//t.printStackTrace();
 		} finally {
 			try {
 				in.close();

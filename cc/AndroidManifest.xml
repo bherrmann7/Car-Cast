@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jadn.cc"
-    android:versionCode="172"
-    android:versionName="1.0.172"
+    android:versionCode="173"
+    android:versionName="1.0.173"
     android:installLocation="auto"
      >
 
@@ -32,8 +32,9 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.AudioRecorder" >
-        </activity>
+        <activity android:name=".ui.AudioRecorder" />
+        <activity android:name=".ui.OpmlLocator" />
+
         <activity
             android:name=".ui.Downloader"
             android:screenOrientation="portrait" >

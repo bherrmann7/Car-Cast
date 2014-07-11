@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Enter a path to the opml.xml file\n ie.   /sdcard/mycasts.opml"
+        android:layout_weight="0.19"
+        android:editable="false"
+        android:id="@+id/textblabla" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/path"
+        android:layout_weight="0.06" />
+
+    <Button
+        android:layout_width="198dp"
+        android:layout_height="wrap_content"
+        android:text="Import OPML"
+        android:id="@+id/import_oiml_button"
+        android:layout_weight="0.06"
+        android:singleLine="false" />
+</LinearLayout>

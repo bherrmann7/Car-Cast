@@ -134,7 +134,7 @@ public class SubscriptionEdit extends BaseActivity implements Runnable {
 				Log.d("onCreate", "data: "+getIntent().getDataString());
 				String feedUrl = getIntent().getDataString();
 				((TextView) findViewById(R.id.editsite_url)).setText(feedUrl);
-//				currentSub = new Subscription("", feedUrl);
+//				currentSub = new Subscription("", feedFile);
 				testUrl();
 			}
 		}

@@ -14,7 +14,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
+import android.media.RemoteControlClient;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Bundle;
@@ -52,9 +56,12 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
     MediaPlayer mediaPlayer = null;
     MetaHolder metaHolder;
     SearchHelper searchHelper;
+    // Dummy album art we will pass to the remote control (if the APIs are available).
+    Bitmap mDummyAlbumArt;
+
 
     private PlayStatusListener playStatusListener;
-    private RemoteControlReceiver remoteControlReceiver;
+    RemoteControlClientCompat mRemoteControlClientCompat;
     private Context context;
     private Config config;
     FileSubscriptionHelper subHelper;
@@ -235,6 +242,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         if (currentPodcastInPlayer >= metaHolder.getSize()) {
             currentPodcastInPlayer = 0;
         }
+        updateRemoteDisplay();
     }
 
     public void deletePodcast(int position) {
@@ -250,6 +258,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         // If we are playing something after what's deleted, adjust the current
         if (currentPodcastInPlayer > position)
             currentPodcastInPlayer--;
+
+        updateRemoteDisplay();
 
         try {
             fullReset();
@@ -317,6 +327,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         if (currentPodcastInPlayer >= metaHolder.getSize()) {
             currentPodcastInPlayer = 0;
         }
+        updateRemoteDisplay();
     }
 
     public boolean editSubscription(Subscription original, Subscription modified) {
@@ -503,6 +514,9 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         }
 
         currentPodcastInPlayer++;
+
+        updateRemoteDisplay();
+
         if (inTheActOfPlaying)
             play();
         else
@@ -601,6 +615,31 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         ComponentName mMediaButtonReceiverComponent = new ComponentName(this, MusicIntentReceiver.class);
         mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
 
+        if (mRemoteControlClientCompat == null) {
+            Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+            intent.setComponent(mMediaButtonReceiverComponent);
+            mRemoteControlClientCompat = new RemoteControlClientCompat(
+                    PendingIntent.getBroadcast(this /*context*/,
+                            0 /*requestCode, ignored*/, intent /*intent*/, 0 /*flags*/)
+            );
+            RemoteControlHelper.registerRemoteControlClient(mAudioManager,
+                    mRemoteControlClientCompat);
+        }
+
+        mRemoteControlClientCompat.setPlaybackState(
+                RemoteControlClient.PLAYSTATE_PAUSED);
+
+        mRemoteControlClientCompat.setTransportControlFlags(
+                RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
+                        RemoteControlClient.FLAG_KEY_MEDIA_PAUSE |
+                        RemoteControlClient.FLAG_KEY_MEDIA_NEXT |
+                        RemoteControlClient.FLAG_KEY_MEDIA_STOP
+        );
+
+        mDummyAlbumArt = BitmapFactory.decodeResource(getResources(), R.drawable.ccp_launcher);
+
+        updateRemoteDisplay();
+
         // foreground stuff
         try {
             mStartForeground = getClass().getMethod("startForeground", mStartForegroundSignature);
@@ -622,6 +661,23 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             mAudioFocus = AudioFocus.Focused; // no focus feature, so we always "have" audio focus
 
     }
+
+    public void updateRemoteDisplay() {
+        if (currentMeta() != null) {
+            // Update the remote controls
+            mRemoteControlClientCompat.editMetadata(true)
+                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, currentMeta().getFeedName())
+                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, currentMeta().getTitle())
+                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, currentMeta().getDescription())
+                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION,
+                            currentMeta().getDuration())
+                    .putBitmap(
+                            RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,
+                            mDummyAlbumArt)
+                    .apply();
+        }
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -727,6 +783,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             mediaMode = MediaMode.Paused;
             // say(activity, "paused " + currentTitle());
             saveState();
+
+            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
         }
         disableNotification();
         // activity.disableJumpButtons();
@@ -746,6 +804,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
                     mediaPlayer.start();
                     mediaMode = MediaMode.Playing;
                     // activity.enableJumpButtons();
+                    mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
                 } else {
                     play();
                 }
@@ -770,6 +829,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             mediaPlayer.start();
             mediaMode = MediaMode.Playing;
             saveState();
+
+            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
         } catch (Exception e) {
             TraceUtil.report(e);
         }
@@ -781,6 +842,8 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         }
         currentPodcastInPlayer = position;
         play();
+        updateRemoteDisplay();
+        mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
     }
 
     public void previous() {
@@ -793,6 +856,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
         mediaMode = MediaMode.UnInitialized;
         if (currentPodcastInPlayer > 0) {
             currentPodcastInPlayer--;
+            updateRemoteDisplay();
         }
         if (currentPodcastInPlayer >= metaHolder.getSize())
             return;
@@ -964,6 +1028,7 @@ public class ContentService extends Service implements MediaPlayer.OnCompletionL
             for (int i = 0; i < metaHolder.getSize(); i++) {
                 if (metaHolder.get(i).getTitle().equals(location.title)) {
                     currentPodcastInPlayer = i;
+                    updateRemoteDisplay();
                     found = true;
                     break;
                 }
