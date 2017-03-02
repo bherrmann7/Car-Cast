@@ -1,7 +1,10 @@
 .idea*
 *.iml
+*.class
 cc/out*
 cc/target*
+cc/app/build
+cc/build
 cc/bin/*
 cc/gen/*
 .gradle

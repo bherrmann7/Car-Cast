@@ -1,9 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/menuSiteList" android:title="Subscriptions" android:icon="@drawable/menu_48_subscription" />
-	<item android:id="@+id/listPodcasts" android:title="Podcasts" android:icon="@drawable/menu_48_podcast" />
-	<item android:id="@+id/email" android:title="Email Podcast" android:icon="@drawable/menu_48_email" />	
-	<item android:id="@+id/feedback" android:title="Feedback / Help" android:icon="@drawable/menu_48_help" />
-	<item android:id="@+id/downloadNewPodcasts" android:title="Download Podcasts" android:icon="@drawable/menu_48_download" />
-	<item android:title="Purge All" android:id="@+id/purgeAll" android:visible="false" />
-	<item android:id="@+id/settings" android:title="Settings" android:icon="@drawable/menu_48_settings" />
-</menu>

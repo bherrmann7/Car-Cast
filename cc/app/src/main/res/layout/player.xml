@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:myapp="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#000"
+    android:padding="0dip" >
+
+    <com.google.ads.AdView
+        android:id="@+id/ad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="a14ca09b777254f"
+        ads:loadAdOnCreate="true"
+        ads:testDevices="68145B546719A50E3EDC15D538DDDF67" />
+
+    <ImageButton
+        android:id="@+id/previous"
+        android:layout_width="64dip"
+        android:layout_height="70dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/player_65_previous" />
+
+    <ImageButton
+        android:id="@+id/pausePlay"
+        android:layout_width="102dip"
+        android:layout_height="140dip"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/player_102_play" />
+
+    <ImageButton
+        android:id="@+id/next"
+        android:layout_width="65dip"
+        android:layout_height="70dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/player_65_next" />
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="35dip"
+        android:layout_above="@id/pausePlay"
+        android:layout_alignParentLeft="true"
+        android:text="XX:XX"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/where"
+        android:layout_width="wrap_content"
+        android:layout_height="35dip"
+        android:layout_above="@id/pausePlay"
+        android:layout_centerInParent="true"
+        android:text="XX:XX"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/duration"
+        android:layout_width="wrap_content"
+        android:layout_height="35dip"
+        android:layout_above="@id/pausePlay"
+        android:layout_alignParentRight="true"
+        android:text="XX:XX"
+        android:textSize="20dp" />
+
+    <SeekBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="30dip"
+        android:layout_above="@+id/where"
+        android:clickable="true"
+        android:focusable="false"
+        android:max="100"
+        android:progress="0"
+        android:scrollbarAlwaysDrawHorizontalTrack="true"
+        android:scrollbarStyle="insideOverlay"
+        android:secondaryProgress="0" />
+
+    <ImageButton
+        android:id="@+id/rewind30"
+        android:layout_width="65dip"
+        android:layout_height="85dip"
+        android:layout_above="@id/previous"
+        android:src="@drawable/player_65_bump_left" />
+
+    <ImageButton
+        android:id="@+id/forward30"
+        android:layout_width="65dip"
+        android:layout_height="85dip"
+        android:layout_above="@id/next"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/player_65_bump_right" />
+
+    <TextView
+        android:id="@+id/subscriptionName"
+        android:layout_width="fill_parent"
+        android:layout_height="35dip"
+        android:layout_below="@id/ad"
+        android:layout_x="0dip"
+        android:background="#c7cbd7"
+        android:ellipsize="none"
+        android:singleLine="true"
+        android:text=""
+        android:textColor="#000"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="110dip"
+        android:layout_above="@id/progress"
+        android:layout_below="@id/subscriptionName"
+        android:background="@drawable/background_319"
+        android:text=""
+        android:textColor="#FFF"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
+</RelativeLayout>
