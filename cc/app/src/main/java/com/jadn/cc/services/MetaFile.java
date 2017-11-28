@@ -55,22 +55,18 @@ public class MetaFile {
         {
            String name = getFilename();
            if ( name == null ) return defaultBaseFilename;
-	   Log.d("CarCast", "getBaseFilename " + name);
 
            // Find start of base file name.
            int slashIndex = name.lastIndexOf('/');
            // slashIndex is -1 if no slash is present, which works perfactly below!
-	   Log.d("CarCast", "getBaseFilename " + name.substring(slashIndex + 1));
 
            // Find end of base file name.
            int i = slashIndex + 1;
            while ( i < name.length() && Character.isDigit(name.charAt(i)) )
               i += 1;
-	   Log.d("CarCast", "getBaseFilename " + i);
            if ( name.length()  <= i ) return defaultBaseFilename;
            if ( slashIndex + 1 == i ) return defaultBaseFilename;
 
-	   Log.d("CarCast", "getBaseFilename " + name.substring(slashIndex + 1, i));
            return name.substring(slashIndex + 1, i);
         }
 
