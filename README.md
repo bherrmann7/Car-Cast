@@ -2,6 +2,11 @@
 
 Car Cast is a simple Android podcast downloader and player. Optimized for use in a daily commute.
 
+History
+
+Car Cast was created when Android was first released.   The project was a learning exercise to understand the Android APIs.    Car Cast peaked with around 100k installs, but after about 5 years it has mostly been in maintenance mode.   There are a large variety of other podcast applications to choose from, so Car Cast is no longer actively developed.
+
+
 Features
 
   * large buttons (typical for automotive use)
